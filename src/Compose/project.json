@@ -1,0 +1,11 @@
+﻿{
+	"version": "1.0.0-*",
+	"authors": [ "Tommy Long" ],
+	"dependencies": {
+	},
+
+	"frameworks": {
+		".NETPortable,Version=v4.5,Profile=Profile259": {
+		}
+	}
+}
