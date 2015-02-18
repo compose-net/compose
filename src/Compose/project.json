@@ -1,6 +1,7 @@
 ﻿{
 	"version": "1.0.0-*",
 	"authors": [ "Tommy Long" ],
+	"resources": [ "*.cs.pp" ],
 	"dependencies": {
 		"Microsoft.Framework.DependencyInjection": "1.0.0-beta4-10881"
 	},
