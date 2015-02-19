@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Compose.Tests")]
 [assembly: AssemblyCompany("Devbot.Net")]
@@ -9,4 +8,3 @@ using System.Runtime.InteropServices;
 [assembly: Guid("7138fe9f-e1ec-45ba-ba2a-cf89535e5f23")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: InternalsVisibleTo("Compose.Tests")]

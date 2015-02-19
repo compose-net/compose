@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using FluentAssertions;
+using Xunit;
 
 namespace Compose.Tests
 {
@@ -7,7 +8,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanResolveMicrosoftFrameworkDependencyInjectionServiceProvider()
 		{
-			Assert.NotNull(Constants.GetServiceProvider());
+			Constants.GetServiceProvider().Should().NotBeNull();
 		}
     }
 }
