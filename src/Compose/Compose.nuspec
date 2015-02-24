@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>Compose</id>
-    <version>0.0.1-beta</version>
+    <version>0.0.1-alpha</version>
     <authors>Tommy Long</authors>
     <owners>Tommy Long</owners>
     <licenseUrl>https://raw.githubusercontent.com/Smudge202/Compose/master/LICENSE</licenseUrl>
@@ -10,6 +10,8 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>The easy wasy to compose well formed application components in .Net</description>
     <tags>Compose</tags>
-    <dependencies></dependencies>
+    <dependencies>
+      <dependency id="Microsoft.Framework.DependencyInjection" version="1.0.0-beta4-10884" />
+    </dependencies>
   </metadata>
 </package>

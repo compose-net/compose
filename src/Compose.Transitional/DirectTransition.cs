@@ -1,4 +1,4 @@
-﻿namespace Compose.Transitional
+﻿namespace Compose
 {
 	public abstract class DirectTransition<T> : ITransition<T>
 	{

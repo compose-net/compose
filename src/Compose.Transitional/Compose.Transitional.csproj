@@ -7,10 +7,11 @@
     <ProjectGuid>{85148F69-6500-4FEE-A60A-6F976EE619B5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Compose.Transitional</RootNamespace>
+    <RootNamespace>Compose</RootNamespace>
     <AssemblyName>Compose.Transitional</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,6 +31,21 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Compose">
+      <HintPath>..\..\packages\Compose.0.0.1-beta\lib\net452\Compose.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Framework.ConfigurationModel">
+      <HintPath>..\..\packages\Microsoft.Framework.ConfigurationModel.1.0.0-beta4-10857\lib\net45\Microsoft.Framework.ConfigurationModel.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Framework.ConfigurationModel.Interfaces">
+      <HintPath>..\..\packages\Microsoft.Framework.ConfigurationModel.Interfaces.1.0.0-beta4-10857\lib\net45\Microsoft.Framework.ConfigurationModel.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Framework.DependencyInjection">
+      <HintPath>..\..\packages\Microsoft.Framework.DependencyInjection.1.0.0-beta4-10884\lib\net45\Microsoft.Framework.DependencyInjection.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Framework.DependencyInjection.Interfaces">
+      <HintPath>..\..\packages\Microsoft.Framework.DependencyInjection.Interfaces.1.0.0-beta4-10884\lib\net45\Microsoft.Framework.DependencyInjection.Interfaces.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -39,12 +55,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApplicationExtensions.cs" />
     <Compile Include="DirectTransition.cs" />
     <Compile Include="ITransition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceCollectionExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Compose.Transitional.nuspec" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

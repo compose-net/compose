@@ -10,6 +10,8 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>The easy wasy to compose well formed application components in .Net</description>
     <tags>Compose</tags>
-    <dependencies></dependencies>
+    <dependencies>
+      <dependency id="Compose" version="0.0.1-alpha" />
+    </dependencies>
   </metadata>
 </package>

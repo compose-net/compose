@@ -1,8 +1,8 @@
-﻿namespace Compose.Transitional
+﻿namespace Compose
 {
-	public interface ITransition<T>
+	public interface ITransition<TService>
 	{
-		T Service { get; }
-		bool Change<TService>(TService service) where TService : T;
+		TService Service { get; }
+		bool Change<TImplementation>() where TImplementation : TService;
 	}
 }
