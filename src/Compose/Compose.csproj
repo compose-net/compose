@@ -16,7 +16,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\artifacts\Compose\Debug\</OutputPath>
+    <OutputPath>..\..\artifacts\bin\Compose\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -28,6 +28,9 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Framework.ConfigurationModel">
@@ -58,9 +61,14 @@
     <Compile Include="WrappedReflectionServiceProvider.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Compose.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>IF NOT EXIST "$(SolutionDir)artifacts\packages\$(ProjectName)\lib\" MKDIR "$(SolutionDir)artifacts\packages\$(ProjectName)\lib\"
+COPY "$(TargetPath)" "$(SolutionDir)artifacts\packages\$(ProjectName)\lib\"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
