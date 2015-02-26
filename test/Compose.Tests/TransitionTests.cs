@@ -85,6 +85,20 @@ namespace Compose.Tests
 			app.Execute();
 		}
 
+		[Fact]
+		public void CanTransitionFactoryWithoutTransitioningProducts()
+		{
+			var app = new TestApplication();
+			app.UseServices(services => { services.AddTransitional<IDependency, Dependency>(); });
+			app.OnExecute<IFactory<IDependency>>(factory =>
+			{
+				var before = factory.GetService();
+				app.Transition<IDependency, OtherDependency>();
+				before.Id.Should().Be(Type.Dependency);
+			});
+			app.Execute();
+		}
+
 		private enum Type { Dependency, OtherDependency }
 
 		private interface IDependency { Type Id { get; } }
