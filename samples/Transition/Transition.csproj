@@ -33,7 +33,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Compose, Version=0.0.1.23817, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Compose, Version=0.0.1.25856, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Compose.0.0.1-alpha\lib\net452\Compose.dll</HintPath>
     </Reference>
@@ -63,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DirectTransitionExample.cs" />
+    <Compile Include="FactoryTransitionExample.cs" />
     <Compile Include="IWriter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

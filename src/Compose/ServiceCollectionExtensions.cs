@@ -10,9 +10,15 @@ namespace Compose
 		{
 			if (typeof(DefaultDirectTransition<,>).IsAssignableFromGeneric(typeof(TImplementation)))
 				services.AddDefault<TService, TImplementation>();
+			return services.AddSingleton<TService, TImplementation>();
+		}
+
+		public static IServiceCollection AddTransitionalFactory<TService, TDefault>(this IServiceCollection services)
+			where TDefault : TService
+		{
 			return services
-				.AddSingleton<TService, TImplementation>()
-				.AddTransient<IDirectTransition<TService>, TImplementation>();
+				.AddTransient<TDefault, TDefault>()
+				.AddSingleton<IFactory<TService>, DirectFactoryTransition<TService, TDefault>>();
 		}
 
 		internal static IServiceCollection AddDefault<TService, TImplementation>(this IServiceCollection services)

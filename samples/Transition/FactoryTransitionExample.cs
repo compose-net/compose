@@ -3,22 +3,20 @@ using System;
 
 namespace Transition
 {
-	internal sealed class DirectTransitionExample
+	internal sealed class FactoryTransitionExample
 	{
 		private readonly Application _app;
 
-		public DirectTransitionExample(Application app) { _app = app; }
+		public FactoryTransitionExample(Application app) { _app = app; }
 
 		private Func<bool, ConsoleKeyInfo> _readKey = Console.ReadKey;
 		private IAsyncResult _result = default(IAsyncResult);
 		private ConsoleKeyInfo _keyPress = default(ConsoleKeyInfo);
 
-		private const string UpperMessage = "This is a spam message; press a key to see it in upper case!!";
-		private const string LowerMessage = "This is a spam message; press a key to see it in normal case!!";
+		private static string[] Messages = new[] { "This is the first message", "This is the second message", "This is the third message" };
+		private bool IsUpper = false;
 
-		private string _message = UpperMessage;
-
-		public int Run(IWriter service)
+		public int Run(IFactory<IWriter> factory)
 		{
 			Console.WriteLine("Press escape to exit...");
 			Console.WriteLine("Press any other key to switch between Uppercase/Standard write services...");
@@ -26,32 +24,37 @@ namespace Transition
 			_result = _readKey.BeginInvoke(true, null, null);
 			while (_keyPress.Key != ConsoleKey.Escape)
 			{
-				if (_result.AsyncWaitHandle.WaitOne(2000)) _message = Transition();
-				service.WriteLine(_message);
+				var service = factory.GetService();
+				for (var i = 0; i < Messages.Length; i++)
+					if (_result.AsyncWaitHandle.WaitOne(500)) service.WriteLine(Transition(i));
+					else service.WriteLine(Messages[i]);
 			}
+
 			return 0;
 		}
 
-		private string Transition()
+		private string Transition(int i)
 		{
 			_keyPress = _readKey.EndInvoke(_result);
 			if (_keyPress.Key == ConsoleKey.Escape) return "Exiting...";
 
 			_result = _readKey.BeginInvoke(true, null, null);
-			if (_message == UpperMessage) return TransitionToUppercase();
-			return TransitionToLowercase();
+			if (IsUpper) return TransitionToLowercase(i);
+			return TransitionToUppercase(i);
 		}
 
-		private string TransitionToUppercase()
+		private string TransitionToUppercase(int i)
 		{
 			_app.Transition<IWriter, UppercaseWriter>();
-			return LowerMessage;
+			IsUpper = true;
+			return Messages[i];
 		}
 
-		private string TransitionToLowercase()
+		private string TransitionToLowercase(int i)
 		{
 			_app.Transition<IWriter, StandardWriter>();
-			return UpperMessage;
+			IsUpper = false;
+			return Messages[i];
 		}
 	}
 }
