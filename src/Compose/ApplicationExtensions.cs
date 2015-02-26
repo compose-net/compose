@@ -18,5 +18,12 @@ namespace Compose
 		{
 			app.HostingServices = configureServices(app.services);
 		}
+
+		public static bool Transition<TService, TImplementation>(this Application app) where TImplementation : class, TService
+		{
+			var transitional = app.HostingServices.GetService<TService>() as ITransition<TService>;
+			if (transitional == null) throw new InvalidOperationException($"{typeof(TService).Name} must be registered as a Transitional Service (services.AddTransitional<{typeof(TService).Name}, TImplementation>()");
+			return transitional.Change(app.GetRequiredService<TImplementation>());
+		}
 	}
 }

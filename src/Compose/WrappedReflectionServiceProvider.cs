@@ -10,12 +10,12 @@ namespace Compose
 
 		public WrappedReflectionServiceProvider(IEnumerable<IServiceDescriptor> services)
 		{
-			_underlyingProvider = (IServiceProvider)Activator.CreateInstance(Constants.GetServiceProvider());
+			_underlyingProvider = (IServiceProvider)Activator.CreateInstance(Constants.GetServiceProvider(), services);
         }
 
 		public object GetService(Type serviceType)
 		{
-			throw new NotImplementedException();
+			return _underlyingProvider.GetService(serviceType);
 		}
 	}
 }
