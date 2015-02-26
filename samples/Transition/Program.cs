@@ -28,7 +28,7 @@ namespace Transition
 
 			app.UseServices(services =>
 			{
-				services.AddTransitionalFactory<IWriter, StandardWriter>();
+				services.AddTransitional<IWriter, StandardWriter>();
 			});
 
 			Console.WriteLine("The following is an example of factory transitions...");

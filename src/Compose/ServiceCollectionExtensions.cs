@@ -6,19 +6,15 @@ namespace Compose
 	public static class ServiceCollectionExtensions
 	{
 		public static IServiceCollection AddTransitional<TService, TImplementation>(this IServiceCollection services) 
-			where TImplementation : IDirectTransition<TService>, TService
+			where TImplementation : TService
 		{
 			if (typeof(DefaultDirectTransition<,>).IsAssignableFromGeneric(typeof(TImplementation)))
 				services.AddDefault<TService, TImplementation>();
-			return services.AddSingleton<TService, TImplementation>();
-		}
-
-		public static IServiceCollection AddTransitionalFactory<TService, TDefault>(this IServiceCollection services)
-			where TDefault : TService
-		{
-			return services
-				.AddTransient<TDefault, TDefault>()
-				.AddSingleton<IFactory<TService>, DirectFactoryTransition<TService, TDefault>>();
+			else
+				services.AddTransient<TImplementation, TImplementation>();
+            return services
+				.AddSingleton<TService, TImplementation>()
+				.AddSingleton<IFactory<TService>, DirectFactoryTransition<TService, TImplementation>>(); ;
 		}
 
 		internal static IServiceCollection AddDefault<TService, TImplementation>(this IServiceCollection services)
