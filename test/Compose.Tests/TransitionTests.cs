@@ -85,7 +85,7 @@ namespace Compose.Tests
 			app.Execute();
 		}
 
-		private enum Type { Dependency, OtherDependency, DirectDependency }
+		private enum Type { Dependency, OtherDependency }
 
 		private interface IDependency { Type Id { get; } }
 
