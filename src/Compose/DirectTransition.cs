@@ -1,6 +1,7 @@
 ﻿namespace Compose
 {
-	public abstract class DirectTransition<TService, TDefault> : DefaultTransition<TService, TDefault>, ITransition<TService> where TDefault : TService
+	public abstract class DirectTransition<TService, TDefault> 
+		: DefaultDirectTransition<TService, TDefault> where TDefault : TService
 	{
 		public DirectTransition(TService service) : base(service) { }
 

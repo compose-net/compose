@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace Compose
+﻿namespace Compose
 {
-	public interface ITransition<TService>
+	public interface IDirectTransition<TService>
 	{
 		TService Service { get; }
 		bool Change<TImplementation>(TImplementation implementation) where TImplementation : TService;

@@ -5,13 +5,15 @@ namespace Compose
 {
     public class Application
     {
-		internal readonly ServiceCollection services = new ServiceCollection();
-
-		internal readonly Func<IServiceCollection, IServiceProvider> createProvider = services => new WrappedReflectionServiceProvider(services);
-		protected virtual Func<IServiceCollection, IServiceProvider> CreateProvider { get { return createProvider; } }
-
 		public string Name { get; set; }
-		public IServiceProvider HostingServices { get; internal set; }
+
+		internal ServiceCollection Services { get; } = new ServiceCollection();
+
+		internal Func<WrappedReflectionServiceProvider, IServiceCollection, WrappedReflectionServiceProvider> CreateProvider =
+			(provider, services) => new WrappedReflectionServiceProvider(provider, services);
+        internal WrappedReflectionServiceProvider Provider { get; set; }
+
+		public IServiceProvider HostingServices { get { return Provider; } }
 
 		internal T GetRequiredService<T>() where T : class
 		{
@@ -20,14 +22,14 @@ namespace Compose
 
 		protected T ResolveRequired<T>() where T : class
 		{
-			return HostingServices.GetService<T>() ?? ResolveSelfBound<T>();
+			return Provider.GetService<T>() ?? ResolveSelfBound<T>();
 		}
 
 		private T ResolveSelfBound<T>() where T : class
 		{
-			services.AddTransient<T, T>();
-			HostingServices = CreateProvider(services);
-			return HostingServices.GetRequiredService<T>();
+			Services.AddTransient<T, T>();
+			Provider = CreateProvider(Provider, Services);
+			return Provider.GetRequiredService<T>();
 		}
 	}
 }
