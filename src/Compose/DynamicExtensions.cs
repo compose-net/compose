@@ -77,7 +77,8 @@ namespace Compose
 
         internal static GenericTypeParameterBuilder DefineGeneric(this GenericTypeParameterBuilder genericBuilder, Type genericType)
         {
-
+            var constraints = genericType.GetGenericParameterConstraints();
+            genericBuilder.SetInterfaceConstraints(constraints.Where(x => x.IsInterface).ToArray());
             return genericBuilder;
         }
 

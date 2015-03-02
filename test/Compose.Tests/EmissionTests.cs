@@ -112,6 +112,15 @@ namespace Compose.Tests
             service.Method(true).Should().BeTrue();
             service.Method(1).Should().Be(1);
         }
+
+        [Fact]
+        public void CanInvokeVoidWithInterfaceConstrainedGenericArgumentsOnDynamicProxy()
+        {
+            var app = new Fake.Application();
+            app.UseServices(services => { services.AddTransient<IInvokeWithInterfaceConstrainedGenericArguments, InvokeWithInterfaceConstrainedGenericArguments>(); });
+            var service = app.CreateProxy<IInvokeWithInterfaceConstrainedGenericArguments>();
+            service.Method(new Dependency1());
+        }
         
 		public interface IBlank { }
 
@@ -190,6 +199,13 @@ namespace Compose.Tests
         private class ReturnGenericFromInvoke : IReturnGenericFromInvoke
         {
             public T Method<T>(T arg) { return arg; }
+        }
+
+        public interface IInvokeWithInterfaceConstrainedGenericArguments { void Method<T>(T arg) where T : IDependency; }
+
+        private class InvokeWithInterfaceConstrainedGenericArguments : IInvokeWithInterfaceConstrainedGenericArguments
+        {
+            public void Method<T>(T arg) where T : IDependency { }
         }
     }
 }
