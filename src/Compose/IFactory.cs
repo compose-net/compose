@@ -1,6 +1,6 @@
 ﻿namespace Compose
 {
-	public interface IFactory<out TService>
+	public interface IFactory<TService> : ITransition<TService>
 	{
 		TService GetService();
 	}

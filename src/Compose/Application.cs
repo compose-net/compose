@@ -9,9 +9,7 @@ namespace Compose
 
 		internal ServiceCollection Services { get; } = new ServiceCollection();
 
-		internal Func<WrappedReflectionServiceProvider, IServiceCollection, WrappedReflectionServiceProvider> CreateProvider =
-			(provider, services) => new WrappedReflectionServiceProvider(provider, services);
-        internal WrappedReflectionServiceProvider Provider { get; set; }
+        internal RootServiceProvider Provider { get; set; }
 
 		public IServiceProvider HostingServices { get { return Provider; } }
 
@@ -28,7 +26,7 @@ namespace Compose
 		private T ResolveSelfBound<T>() where T : class
 		{
 			Services.AddTransient<T, T>();
-			Provider = CreateProvider(Provider, Services);
+			Provider = Provider.Extend(Services);
 			return Provider.GetRequiredService<T>();
 		}
 	}

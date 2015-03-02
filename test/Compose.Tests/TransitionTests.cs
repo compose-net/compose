@@ -1,4 +1,6 @@
-﻿using FluentAssertions;
+﻿using System;
+using FluentAssertions;
+using Microsoft.Framework.DependencyInjection;
 using Xunit;
 
 namespace Compose.Tests
@@ -22,11 +24,11 @@ namespace Compose.Tests
 		public void CanResolveDirectServiceAddedAsTransitional()
 		{
 			var app = new TestApplication();
-			app.UseServices(services => { services.AddTransitional<IDependency, DirectDependency>(); });
+			app.UseServices(services => { services.AddTransitional<IDependency, DefaultDependency>(); });
 			app.OnExecute<IDependency>(dependency =>
 			{
 				dependency.Should().NotBeNull();
-				dependency.Should().BeOfType<DirectDependency>();
+				dependency.Should().BeOfType<DefaultDependency>();
 			});
 			app.Execute();
 		}
@@ -55,20 +57,22 @@ namespace Compose.Tests
 				app.Transition<IDependency, OtherDependency>();
 				dependency.Should().BeOfType<Dependency>();
 			});
+			app.Execute();
 		}
 
 		[Fact]
 		public void CanTransitionDirectService()
 		{
 			var app = new TestApplication();
-			app.UseServices(services => { services.AddTransitional<IDependency, DirectDependency>(); });
+			app.UseServices(services => { services.AddTransitional<IDependency, DefaultDependency>(); });
 			app.OnExecute<IDependency>(dependency =>
 			{
-				dependency.Should().BeOfType<DirectDependency>();
+				dependency.Should().BeOfType<DefaultDependency>();
 				dependency.Id.Should().Be(Type.Dependency);
 				app.Transition<IDependency, OtherDependency>();
 				dependency.Id.Should().Be(Type.OtherDependency);
 			});
+			app.Execute();
 		}
 
 		[Fact]
@@ -99,6 +103,24 @@ namespace Compose.Tests
 			app.Execute();
 		}
 
+		[Fact]
+		public void CanTransitionExternallyBoundDirectService()
+		{
+			var app = new TestApplication();
+			app.UseServices(services =>
+			{
+				services.AddTransient<IDependency, Dependency>()
+					.WithTransitional<IDependency, DirectDependency>();
+			});
+
+			app.OnExecute<IDependency>(dependency =>
+			{
+				dependency.Id.Should().Be(Type.Dependency);
+				app.Transition<IDependency, OtherDependency>();
+				dependency.Id.Should().Be(Type.OtherDependency);
+			});
+		}
+
 		private enum Type { Dependency, OtherDependency }
 
 		private interface IDependency { Type Id { get; } }
@@ -107,7 +129,13 @@ namespace Compose.Tests
 
 		private class OtherDependency : IDependency { public Type Id { get; private set; } = Type.OtherDependency; }
 
-		private class DirectDependency : DirectTransition<IDependency, Dependency>, IDependency
+		private class DefaultDependency : DirectDefaultTransition<IDependency, Dependency>, IDependency
+		{
+			public Type Id { get { return Service.Id; } }
+			public DefaultDependency(Dependency dependency) : base(dependency) { }
+		}
+
+		private class DirectDependency : DirectTransition<IDependency>, IDependency
 		{
 			public Type Id { get { return Service.Id; } }
 			public DirectDependency(Dependency dependency) : base(dependency) { }

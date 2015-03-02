@@ -1,6 +1,6 @@
 ﻿namespace Transition
 {
-	internal class TransitionalStandardWriter : Compose.DirectTransition<IWriter, StandardWriter>, IWriter
+	internal class TransitionalStandardWriter : Compose.DirectDefaultTransition<IWriter, StandardWriter>, IWriter
 	{
 		public TransitionalStandardWriter(StandardWriter service) : base(service) { }
 

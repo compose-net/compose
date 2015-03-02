@@ -1,13 +1,16 @@
-﻿namespace Compose
-{
-	public abstract class DirectTransition<TService, TDefault> 
-		: DefaultDirectTransition<TService, TDefault> where TDefault : TService
-	{
-		public DirectTransition(TService service) : base(service) { }
+﻿using System;
 
-		public override bool Change<TImplementation>(TImplementation service)
+namespace Compose
+{
+	public class DirectTransition<TService> : ITransition<TService>
+	{
+		protected TService Service { get; private set; }
+
+		public DirectTransition(TService service) { Service = service; }
+
+		public bool Change<TImplementation>(TImplementation implementation) where TImplementation : TService
 		{
-			Service = service;
+			Service = implementation;
 			return true;
 		}
 	}

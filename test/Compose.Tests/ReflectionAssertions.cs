@@ -24,7 +24,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanActivateServiceProviderThroughWrappingFacade()
 		{
-			Action act = () => new WrappedReflectionServiceProvider(null, Enumerable.Empty<IServiceDescriptor>());
+			Action act = () => new WrappedServiceProvider(Enumerable.Empty<IServiceDescriptor>());
 			act.ShouldNotThrow<Exception>();
 		}
     }

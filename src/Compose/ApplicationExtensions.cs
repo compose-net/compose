@@ -10,11 +10,13 @@ namespace Compose
 			app.UseServices(services =>
 			{
 				configureServices(services);
-				return app.CreateProvider(app.Provider, services);
+				if (services.ContainsTransitions())
+					return new TransitionalServiceProvider(services);
+				return new WrappedServiceProvider(services);
 			});
 		}
 
-		internal static void UseServices(this Application app, Func<IServiceCollection, WrappedReflectionServiceProvider> configureServices)
+		internal static void UseServices(this Application app, Func<IServiceCollection, RootServiceProvider> configureServices)
 		{
 			app.Provider = configureServices(app.Services);
 		}
