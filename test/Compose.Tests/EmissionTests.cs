@@ -60,7 +60,7 @@ namespace Compose.Tests
 		}
 
 		[Fact]
-		public void CanReturnInvokcationResultOnDynamicProxy()
+		public void CanReturnInvocationResultOnDynamicProxy()
 		{
 			var app = new Fake.Application();
 			app.UseServices(services => { services.AddTransient<IReturnFromInvoke, ReturnFromInvoke>(); });
@@ -103,6 +103,16 @@ namespace Compose.Tests
             service.Method(1, 2, 3);
         }
 
+        [Fact]
+        public void CanReturnGenericInvocationResultOnDynamicProxy()
+        {
+            var app = new Fake.Application();
+            app.UseServices(services => { services.AddTransient<IReturnGenericFromInvoke, ReturnGenericFromInvoke>(); });
+            var service = app.CreateProxy<IReturnGenericFromInvoke>();
+            service.Method(true).Should().BeTrue();
+            service.Method(1).Should().Be(1);
+        }
+        
 		public interface IBlank { }
 
 		private class Dependency : IBlank { }
@@ -173,6 +183,13 @@ namespace Compose.Tests
         private class InvokeWithGenericArguments : IInvokeWithGenericArguments
         {
             public void Method<T1, T2, T3>(T1 a, T2 b, T3 c) { }
+        }
+
+        public interface IReturnGenericFromInvoke { T Method<T>(T arg); }
+
+        private class ReturnGenericFromInvoke : IReturnGenericFromInvoke
+        {
+            public T Method<T>(T arg) { return arg; }
         }
     }
 }
