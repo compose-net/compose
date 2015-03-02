@@ -94,6 +94,15 @@ namespace Compose.Tests
 			service.GetId().Should().Be(Dependency2.Id);
 		}
 
+        [Fact]
+        public void CanInvokeVoidWithGenericArgumentsOnDynamicProxy()
+        {
+            var app = new Fake.Application();
+            app.UseServices(services => { services.AddTransient<IInvokeWithGenericArguments, InvokeWithGenericArguments>(); });
+            var service = app.CreateProxy<IInvokeWithGenericArguments>();
+            service.Method(1, 2, 3);
+        }
+
 		public interface IBlank { }
 
 		private class Dependency : IBlank { }
@@ -157,5 +166,13 @@ namespace Compose.Tests
 			internal static string Id { get; set; }
 			public string GetId() { return Id; }
 		}
-	}
+
+        public interface IInvokeWithGenericArguments
+        { void Method<T1, T2, T3>(T1 a, T2 b, T3 c); }
+
+        private class InvokeWithGenericArguments : IInvokeWithGenericArguments
+        {
+            public void Method<T1, T2, T3>(T1 a, T2 b, T3 c) { }
+        }
+    }
 }

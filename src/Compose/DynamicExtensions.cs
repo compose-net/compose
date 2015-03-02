@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -51,8 +52,11 @@ namespace Compose
 
 		internal static void AddMethodImplementation(this TypeBuilder typeBuilder, MethodInfo methodInfo, FieldBuilder serviceField)
 		{
-			var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual, methodInfo.ReturnType, methodInfo.GetParameters().Select(x => x.ParameterType).ToArray());
-			var methodEmitter = methodBuilder.GetILGenerator();
+            var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual);
+            methodBuilder.SetReturnType(methodInfo.ReturnType);
+            methodBuilder.SetParameters(methodInfo.GetParameters().Select(x => x.ParameterType).ToArray());
+            if (methodInfo.IsGenericMethod) methodBuilder.AddGenericParameters(methodInfo);
+            var methodEmitter = methodBuilder.GetILGenerator();
 			methodEmitter.Emit(OpCodes.Ldarg_0);
 			methodEmitter.Emit(OpCodes.Ldfld, serviceField);
 			for (var argIndex = 1; argIndex <= methodInfo.GetParameters().Length; argIndex++)
@@ -61,6 +65,21 @@ namespace Compose
 			methodEmitter.Emit(OpCodes.Ret);
 			typeBuilder.DefineMethodOverride(methodBuilder, methodInfo);
 		}
+
+        internal static void AddGenericParameters(this MethodBuilder methodBuilder, MethodInfo methodInfo)
+        {
+            List<GenericTypeParameterBuilder> parameters = new List<GenericTypeParameterBuilder>();
+            var genericInfos = methodInfo.GetGenericArguments().ToArray();
+            var genericBuilders = methodBuilder.DefineGenericParameters(genericInfos.Select(x => x.Name).ToArray());
+            for (var i = 0; i < genericBuilders.Length; i++)
+                parameters.Add(genericBuilders[i].DefineGeneric(genericInfos[i]));
+        }
+
+        internal static GenericTypeParameterBuilder DefineGeneric(this GenericTypeParameterBuilder genericBuilder, Type genericType)
+        {
+
+            return genericBuilder;
+        }
 
 		internal static void AddPropertyImplementations<TService>(this TypeBuilder typeBuilder, FieldBuilder serviceField)
 		{
