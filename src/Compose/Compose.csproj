@@ -58,6 +58,9 @@
     <Compile Include="DefaultTransition.cs" />
     <Compile Include="DirectDefaultTransition.cs" />
     <Compile Include="DirectTransition.cs" />
+    <Compile Include="DyanmicHelper.cs" />
+    <Compile Include="DynamicEmitter.cs" />
+    <Compile Include="DynamicExtensions.cs" />
     <Compile Include="Executable.cs" />
     <Compile Include="ApplicationExtensions.cs" />
     <Compile Include="CommandLineApplication.cs" />

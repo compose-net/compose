@@ -1,5 +1,4 @@
-﻿using System;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.Framework.DependencyInjection;
 using Xunit;
 
@@ -10,7 +9,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanResolveServiceAddedAsTransitional()
 		{
-			var app = new TestApplication();
+			var app = new Fake.Application();
 			app.UseServices(services => { services.AddTransitional<IDependency, Dependency>(); });
 			app.OnExecute<IDependency>(dependency =>
 			{
@@ -23,7 +22,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanResolveDirectServiceAddedAsTransitional()
 		{
-			var app = new TestApplication();
+			var app = new Fake.Application();
 			app.UseServices(services => { services.AddTransitional<IDependency, DefaultDependency>(); });
 			app.OnExecute<IDependency>(dependency =>
 			{
@@ -36,7 +35,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanResolveFactoryForServiceAddedAsTransitional()
 		{
-			var app = new TestApplication();
+			var app = new Fake.Application();
 			app.UseServices(services => { services.AddTransitional<IDependency, Dependency>(); });
 			app.OnExecute<IFactory<IDependency>>(factory =>
 			{
@@ -50,7 +49,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanTransitionUndirectService()
 		{
-			var app = new TestApplication();
+			var app = new Fake.Application();
 			app.UseServices(services => { services.AddTransitional<IDependency, Dependency>(); });
 			app.OnExecute<IDependency>(dependency =>
 			{
@@ -63,7 +62,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanTransitionDirectService()
 		{
-			var app = new TestApplication();
+			var app = new Fake.Application();
 			app.UseServices(services => { services.AddTransitional<IDependency, DefaultDependency>(); });
 			app.OnExecute<IDependency>(dependency =>
 			{
@@ -78,7 +77,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanTransitionFactoryService()
 		{
-			var app = new TestApplication();
+			var app = new Fake.Application();
 			app.UseServices(services => { services.AddTransitional<IDependency, Dependency>(); });
 			app.OnExecute<IFactory<IDependency>>(factory =>
 			{
@@ -92,7 +91,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanTransitionFactoryWithoutTransitioningProducts()
 		{
-			var app = new TestApplication();
+			var app = new Fake.Application();
 			app.UseServices(services => { services.AddTransitional<IDependency, Dependency>(); });
 			app.OnExecute<IFactory<IDependency>>(factory =>
 			{
@@ -106,7 +105,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanTransitionExternallyBoundDirectService()
 		{
-			var app = new TestApplication();
+			var app = new Fake.Application();
 			app.UseServices(services =>
 			{
 				services.AddTransient<IDependency, Dependency>()
@@ -140,7 +139,5 @@ namespace Compose.Tests
 			public Type Id { get { return Service.Id; } }
 			public DirectDependency(Dependency dependency) : base(dependency) { }
 		}
-
-		private class TestApplication : Executable { internal void Execute() { Execution(); } }
 	}
 }
