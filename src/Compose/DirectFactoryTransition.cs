@@ -1,6 +1,6 @@
 ﻿namespace Compose
 {
-	public class DirectFactoryTransition<TService, TDefault> : IFactory<TService>, ITransition<TService> where TDefault : TService
+	public class DirectFactoryTransition<TService, TDefault> : IFactoryTransition<TService>, ITransition<TService> where TDefault : TService
 	{
 		internal TService Service { get; set; }
 

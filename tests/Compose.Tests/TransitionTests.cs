@@ -37,7 +37,7 @@ namespace Compose.Tests
 		{
 			var app = new Fake.Application();
 			app.UseServices(services => { services.AddTransitional<IDependency, Dependency>(); });
-			app.OnExecute<IFactory<IDependency>>(factory =>
+			app.OnExecute<IFactoryTransition<IDependency>>(factory =>
 			{
 				factory.Should().NotBeNull();
 				factory.GetService().Should().NotBeNull();
@@ -79,7 +79,7 @@ namespace Compose.Tests
 		{
 			var app = new Fake.Application();
 			app.UseServices(services => { services.AddTransitional<IDependency, Dependency>(); });
-			app.OnExecute<IFactory<IDependency>>(factory =>
+			app.OnExecute<IFactoryTransition<IDependency>>(factory =>
 			{
 				factory.GetService().Id.Should().Be(Type.Dependency);
 				app.Transition<IDependency, OtherDependency>();
@@ -93,7 +93,7 @@ namespace Compose.Tests
 		{
 			var app = new Fake.Application();
 			app.UseServices(services => { services.AddTransitional<IDependency, Dependency>(); });
-			app.OnExecute<IFactory<IDependency>>(factory =>
+			app.OnExecute<IFactoryTransition<IDependency>>(factory =>
 			{
 				var before = factory.GetService();
 				app.Transition<IDependency, OtherDependency>();
