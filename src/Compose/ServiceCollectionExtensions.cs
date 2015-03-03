@@ -14,7 +14,7 @@ namespace Compose
 				services.AddTransient<TImplementation, TImplementation>();
             return services
 				.AddSingleton<TService, TImplementation>()
-				.AddSingleton<IFactory<TService>, DirectFactoryTransition<TService, TImplementation>>(); ;
+				.AddSingleton<IFactoryTransition<TService>, DirectFactoryTransition<TService, TImplementation>>(); ;
 		}
 
 		public static IServiceCollection WithTransitional<TService, TImplementation>(this IServiceCollection services)
