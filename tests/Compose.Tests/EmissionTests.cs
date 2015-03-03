@@ -186,7 +186,16 @@ namespace Compose.Tests
 			app.UseServices(services => { services.AddTransient<IInvokeWithClassDefinedGenericArgument<int>, InvokeWithClassDefinedGenericArgument<int>>(); });
 			var service = app.CreateProxy<IInvokeWithClassDefinedGenericArgument<int>>();
 			service.Method(1);
-        }
+		}
+
+		[Fact]
+		public void CanInvokeWithGenericConstrainedGenericArguments()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => { services.AddTransient<IInvokeWithGenericConstrainedGenericArguments<Base>, InvokeWithGenericConstrainedGenericArguments<Base>>(); });
+			var service = app.CreateProxy<IInvokeWithGenericConstrainedGenericArguments<Base>>();
+			service.Method(new Derivative());
+		}
 
 		public interface IBlank { }
 
@@ -331,5 +340,12 @@ namespace Compose.Tests
 		{
 			public void Method(T arg) { }
 		}
+
+		public interface IInvokeWithGenericConstrainedGenericArguments<TBase> { void Method<TDerivative>(TDerivative derivative) where TDerivative : TBase; }
+
+		private class InvokeWithGenericConstrainedGenericArguments<TBase> : IInvokeWithGenericConstrainedGenericArguments<TBase>
+		{
+			public void Method<TDerivative>(TDerivative derivative) where TDerivative : TBase { }
 		}
+	}
 }
