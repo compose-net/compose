@@ -15,6 +15,11 @@ namespace Compose
 		{
 			OnExecute(() => invoke(GetRequiredService<TService>()));
 		}
+
+		public virtual void Execute()
+		{
+			Execution();
+		}
 	}
 
 	public abstract class Executable<TResult> : Application
@@ -30,6 +35,11 @@ namespace Compose
 		{
 			OnExecute(() => invoke(GetRequiredService<TService>()));
 		}
+
+		public virtual TResult Execute()
+		{
+			return Execution();
+		}
 	}
 
 	public abstract class Executable<TContext, TResult> : Application
@@ -44,6 +54,11 @@ namespace Compose
 		public void OnExecute<TService>(Func<TService, TContext, TResult> invoke) where TService : class
 		{
 			OnExecute(context => invoke(GetRequiredService<TService>(), context));
+		}
+
+		public virtual TResult Execute(TContext context)
+		{
+			return Execution(context);
 		}
 	}
 }

@@ -62,18 +62,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DirectTransitionExample.cs" />
-    <Compile Include="FactoryTransitionExample.cs" />
-    <Compile Include="IWriter.cs" />
+    <Compile Include="Demos\CodedOverride.cs" />
+    <Compile Include="Demos\ProxyTransition.cs" />
+    <Compile Include="Demos\StandardBuildup.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StandardWriter.cs" />
-    <Compile Include="TransitionalStandardWriter.cs" />
-    <Compile Include="UppercaseWriter.cs" />
+    <Compile Include="UppercaseHost.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Transition.Service\Transition.Service.csproj">
+      <Project>{cdf6f417-cdf5-4f78-9f43-af013c69c2c7}</Project>
+      <Name>Transition.Service</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

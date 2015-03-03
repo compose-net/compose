@@ -5,37 +5,21 @@ namespace Compose
 {
 	public static class ServiceCollectionExtensions
 	{
-		public static IServiceCollection AddTransitional<TService, TImplementation>(this IServiceCollection services) 
-			where TImplementation : TService
-		{
-			if (typeof(DefaultDirectTransition<,>).IsAssignableFromGeneric(typeof(TImplementation)))
-				services.AddDefault<TService, TImplementation>();
-			else
-				services.AddTransient<TImplementation, TImplementation>();
-            return services
-				.AddSingleton<TService, TImplementation>()
-				.AddSingleton<IFactory<TService>, DirectFactoryTransition<TService, TImplementation>>(); ;
-		}
-
-		public static IServiceCollection WithTransitional<TService, TImplementation>(this IServiceCollection services)
-			where TImplementation : TService, ITransition<TService>
+		public static IServiceCollection AddTransitional<TService, TImplementation>(this IServiceCollection services) where TImplementation : TService
 		{
 			return services
-				.AddTransient<ITransition<TService>, TImplementation>()
-				.AddTransient<TransitionalMarker, TransitionalMarker>();
+				.AddTransient<TService, TImplementation>()
+				.WithTransitional<TService>();
 		}
 
-		internal static IServiceCollection AddDefault<TService, TImplementation>(this IServiceCollection services)
+		public static IServiceCollection AsTransitional(this IServiceCollection services)
 		{
-			var defaultService = typeof(TImplementation).GetDefaultType();
-			return services.AddTransient(defaultService, defaultService);
+			return services.AddTransient<TransitionMarker>();
 		}
 
-		internal static Type GetDefaultType(this Type givenType)
+		public static IServiceCollection WithTransitional<TService>(this IServiceCollection services)
 		{
-			if (givenType.IsGenericType && givenType.GetGenericTypeDefinition() == typeof(DefaultDirectTransition<,>))
-				return givenType.GetGenericArguments()[1];
-			return givenType.BaseType.GetDefaultType();
+			return services.AddTransient<TransitionMarker<TService>>();
 		}
 	}
 }

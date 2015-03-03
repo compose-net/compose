@@ -10,7 +10,7 @@ namespace Compose
 			app.UseServices(services =>
 			{
 				configureServices(services);
-				if (services.ContainsTransitions())
+				if (services.ContainsTransitionMarkers())
 					return new TransitionalServiceProvider(services);
 				return new WrappedServiceProvider(services);
 			});

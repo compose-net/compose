@@ -109,7 +109,7 @@ namespace Compose.Tests
 			app.UseServices(services =>
 			{
 				services.AddTransient<IDependency, Dependency>()
-					.WithTransitional<IDependency, DirectDependency>();
+					.WithTransitional<IDependency>();
 			});
 
 			app.OnExecute<IDependency>(dependency =>

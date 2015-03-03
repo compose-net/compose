@@ -6,6 +6,16 @@ namespace Compose
 {
 	internal static class TransitionalExtensions
 	{
+		internal static bool ContainsTransitionMarkers(this IServiceCollection services)
+		{
+			return services.Any(x => x.IsTransitionMarker());
+		}
+
+		internal static bool IsTransitionMarker(this IServiceDescriptor descriptor)
+		{
+			return typeof(TransitionMarker).IsAssignableFrom(descriptor.ImplementationType);
+		}
+
 		internal static bool ContainsTransitions(this IServiceCollection services)
 		{
 			return services.Any(x => x.IsTransition());
