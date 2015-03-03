@@ -80,11 +80,10 @@ namespace Compose
 
         internal static void AddGenericParameters(this MethodBuilder methodBuilder, MethodInfo methodInfo)
         {
-            List<GenericTypeParameterBuilder> parameters = new List<GenericTypeParameterBuilder>();
             var genericInfos = methodInfo.GetGenericArguments().ToArray();
             var genericBuilders = methodBuilder.DefineGenericParameters(genericInfos.Select(x => x.Name).ToArray());
             for (var i = 0; i < genericBuilders.Length; i++)
-                parameters.Add(genericBuilders[i].DefineGeneric(genericInfos[i]));
+                genericBuilders[i].DefineGeneric(genericInfos[i]);
         }
 
         internal static GenericTypeParameterBuilder DefineGeneric(this GenericTypeParameterBuilder genericBuilder, Type genericType)
