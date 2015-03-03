@@ -8,7 +8,7 @@
 
 		public TService GetService() { return Service; }
 
-		public virtual bool Change<TImplementation>(TImplementation service) where TImplementation : TService
+		public virtual bool Change(TService service)
 		{
 			Service = service;
 			return true;

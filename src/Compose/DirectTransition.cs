@@ -6,7 +6,7 @@
 
 		public DirectTransition(TService service) { Service = service; }
 
-		public bool Change<TImplementation>(TImplementation implementation) where TImplementation : TService
+		public bool Change(TService implementation)
 		{
 			Service = implementation;
 			return true;

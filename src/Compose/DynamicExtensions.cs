@@ -28,22 +28,17 @@ namespace Compose
 		internal static void AddDirectChangeImplementation<TService>(this TypeBuilder typeBuilder, FieldBuilder serviceField)
 		{
 			/* C#: 
-			public virtual bool Change<TImplementation>(TImplementation arg1) where TImplementation : TService
+			public virtual bool Change(TService arg1)
 			{
-				this._TServiceField = (TService)arg1;
+				this._TServiceField = arg1;
 				return true;
 			}
 			*/
 			var methodInfo = typeof(ITransition<TService>).GetMethod("Change");
-			var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual);
-			var implementationBuilder = methodBuilder.DefineGenericParameters("TImplementation")[0];
-			implementationBuilder.SetInterfaceConstraints(typeof(TService));
-			methodBuilder.SetParameters(new[] { implementationBuilder });
-			methodBuilder.SetReturnType(methodInfo.ReturnType);
+			var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual, methodInfo.ReturnType, new[] { typeof(TService) });
             var methodEmitter = methodBuilder.GetILGenerator();
 			methodEmitter.Emit(OpCodes.Ldarg_0);
 			methodEmitter.Emit(OpCodes.Ldarg_1);
-			methodEmitter.Emit(OpCodes.Box, typeof(TService));
 			methodEmitter.Emit(OpCodes.Stfld, serviceField);
 			methodEmitter.Emit(OpCodes.Ldc_I4_1);
 			methodEmitter.Emit(OpCodes.Ret);

@@ -5,7 +5,7 @@
 	{
 		public DirectDefaultTransition(TService service) : base(service) { }
 
-		public override bool Change<TImplementation>(TImplementation service)
+		public override bool Change(TService service)
 		{
 			Service = service;
 			return true;

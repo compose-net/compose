@@ -7,6 +7,6 @@
 
 		public DefaultDirectTransition(TService service) { Service = service; }
 
-		public abstract bool Change<TImplementation>(TImplementation service) where TImplementation : TService;
+		public abstract bool Change(TService service);
 	}
 }
