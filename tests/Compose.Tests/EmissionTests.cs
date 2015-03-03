@@ -179,6 +179,15 @@ namespace Compose.Tests
 			service.Method(new List<List<int>>());
 		}
 
+		[Fact]
+		public void CanInvokeWithClassDefinedGenericArgument()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => { services.AddTransient<IInvokeWithClassDefinedGenericArgument<int>, InvokeWithClassDefinedGenericArgument<int>>(); });
+			var service = app.CreateProxy<IInvokeWithClassDefinedGenericArgument<int>>();
+			service.Method(1);
+        }
+
 		public interface IBlank { }
 
 		private class Dependency : IBlank { }
@@ -315,5 +324,12 @@ namespace Compose.Tests
 		{
 			public void Method<T>(List<List<T>> arg) { }
 		}
-    }
+
+		public interface IInvokeWithClassDefinedGenericArgument<T> { void Method(T arg); }
+
+		private class InvokeWithClassDefinedGenericArgument<T> : IInvokeWithClassDefinedGenericArgument<T>
+		{
+			public void Method(T arg) { }
+		}
+		}
 }
