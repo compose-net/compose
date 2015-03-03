@@ -13,12 +13,7 @@ namespace Compose
 
 		public IServiceProvider HostingServices { get { return Provider; } }
 
-		internal T GetRequiredService<T>() where T : class
-		{
-			return ResolveRequired<T>();
-		}
-
-		protected T ResolveRequired<T>() where T : class
+		protected internal T GetRequiredService<T>() where T : class
 		{
 			return Provider.GetService<T>() ?? ResolveSelfBound<T>();
 		}
