@@ -3,13 +3,9 @@ using System;
 
 namespace Compose
 {
-    public class Application
+    public class Application : ApplicationBase
     {
 		public string Name { get; set; }
-
-		internal ServiceCollection Services { get; } = new ServiceCollection();
-
-        internal RootServiceProvider Provider { get; set; }
 
 		public IServiceProvider HostingServices { get { return Provider; } }
 

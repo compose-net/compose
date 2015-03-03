@@ -55,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Application.cs" />
+    <Compile Include="ApplicationBase.cs" />
     <Compile Include="DefaultTransition.cs" />
     <Compile Include="DirectDefaultTransition.cs" />
     <Compile Include="DirectTransition.cs" />
