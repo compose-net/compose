@@ -17,7 +17,7 @@ namespace Compose.Tests
 		}
 
 		[Fact]
-		public void CanGetPropertyOnDynamicProxy()
+		public void CanGetProperty()
 		{
 			var app = new Fake.Application();
 			app.UseServices(services => { services.AddTransient<IGetProperty, GetProperty>(); });
@@ -27,7 +27,7 @@ namespace Compose.Tests
 		}
 
 		[Fact]
-		public void CanSetPropertyOnDynamicProxy()
+		public void CanSetProperty()
 		{
 			var app = new Fake.Application();
 			app.UseServices(services => { services.AddTransient<ISetProperty, SetProperty>(); });
@@ -38,7 +38,7 @@ namespace Compose.Tests
 		}
 
 		[Fact]
-		public void CanInvokeVoidWithoutArgumentsOnDynamicProxy()
+		public void CanInvokeVoidWithoutArguments()
 		{
 			var app = new Fake.Application();
 			app.UseServices(services => { services.AddTransient<IInvokeWithoutArguments, InvokeWithoutArguments>(); });
@@ -49,7 +49,7 @@ namespace Compose.Tests
 		}
 
 		[Fact]
-		public void CanInvokeVoidWithArgumentsOnDynamicProxy()
+		public void CanInvokeVoidWithArguments()
 		{
 			var app = new Fake.Application();
 			app.UseServices(services => { services.AddTransient<IInvokeWithArguments, InvokeWithArguments>(); });
@@ -60,7 +60,7 @@ namespace Compose.Tests
 		}
 
 		[Fact]
-		public void CanReturnInvocationResultOnDynamicProxy()
+		public void CanReturnInvocationResult()
 		{
 			var app = new Fake.Application();
 			app.UseServices(services => { services.AddTransient<IReturnFromInvoke, ReturnFromInvoke>(); });
@@ -70,7 +70,7 @@ namespace Compose.Tests
 		}
 
 		[Fact]
-		public void CanPassThroughExceptionsOnDynamicProxy()
+		public void CanPassThroughExceptions()
 		{
 			var app = new Fake.Application();
 			app.UseServices(services => { services.AddTransient<IThrowException, ThrowException>(); });
@@ -80,7 +80,7 @@ namespace Compose.Tests
 		}
 
 		[Fact]
-		public void CanChangeImplementationOnDynamicProxy()
+		public void CanChangeImplementation()
 		{
 			var app = new Fake.Application();
 			app.UseServices(services => { services.AddTransient<IDependency, Dependency1>(); });
@@ -95,7 +95,7 @@ namespace Compose.Tests
 		}
 
         [Fact]
-        public void CanInvokeVoidWithGenericArgumentsOnDynamicProxy()
+        public void CanInvokeVoidWithGenericArguments()
         {
             var app = new Fake.Application();
             app.UseServices(services => { services.AddTransient<IInvokeWithGenericArguments, InvokeWithGenericArguments>(); });
@@ -104,7 +104,7 @@ namespace Compose.Tests
         }
 
         [Fact]
-        public void CanReturnGenericInvocationResultOnDynamicProxy()
+        public void CanReturnGenericInvocationResult()
         {
             var app = new Fake.Application();
             app.UseServices(services => { services.AddTransient<IReturnGenericFromInvoke, ReturnGenericFromInvoke>(); });
@@ -114,12 +114,21 @@ namespace Compose.Tests
         }
 
         [Fact]
-        public void CanInvokeVoidWithInterfaceConstrainedGenericArgumentsOnDynamicProxy()
+        public void CanInvokeVoidWithInterfaceConstrainedGenericArguments()
         {
             var app = new Fake.Application();
             app.UseServices(services => { services.AddTransient<IInvokeWithInterfaceConstrainedGenericArguments, InvokeWithInterfaceConstrainedGenericArguments>(); });
             var service = app.CreateProxy<IInvokeWithInterfaceConstrainedGenericArguments>();
             service.Method(new Dependency1());
+        }
+
+		[Fact]
+		public void CanInvokeVoidWithBaseClassConstrainedGenericArguments()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => { services.AddTransient<IInvokeWithBaseClassConstrainedGenericArguments, InvokeWithBaseClassConstrainedGenericArguments>(); });
+			var service = app.CreateProxy<IInvokeWithBaseClassConstrainedGenericArguments>();
+			service.Method(new Derivative());
         }
         
 		public interface IBlank { }
@@ -207,5 +216,16 @@ namespace Compose.Tests
         {
             public void Method<T>(T arg) where T : IDependency { }
         }
+
+		public abstract class Base { }
+
+		private class Derivative : Base { }
+
+		public interface IInvokeWithBaseClassConstrainedGenericArguments { void Method<T>(T arg) where T : Base; }
+
+		private class InvokeWithBaseClassConstrainedGenericArguments : IInvokeWithBaseClassConstrainedGenericArguments
+		{
+			public void Method<T>(T arg) where T : Base { }
+		}
     }
 }
