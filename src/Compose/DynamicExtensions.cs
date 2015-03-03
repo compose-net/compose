@@ -80,6 +80,7 @@ namespace Compose
             var constraints = genericType.GetGenericParameterConstraints();
             genericBuilder.SetInterfaceConstraints(constraints.Where(x => x.IsInterface).ToArray());
 			genericBuilder.SetBaseTypeConstraint(genericType.BaseType);
+			genericBuilder.SetGenericParameterAttributes(genericType.GenericParameterAttributes);
             return genericBuilder;
         }
 

@@ -130,6 +130,33 @@ namespace Compose.Tests
 			var service = app.CreateProxy<IInvokeWithBaseClassConstrainedGenericArguments>();
 			service.Method(new Derivative());
         }
+
+		[Fact]
+		public void CanInvokeWithDefaultConstructorConstrainedGenericArgument()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => { services.AddTransient<IInvokeWithDefaultConstructorConstrainedGenericArguments, InvokeWithDefaultConstructorConstrainedGenericArguments>(); });
+			var service = app.CreateProxy<IInvokeWithDefaultConstructorConstrainedGenericArguments>();
+			service.Method(new object());
+        }
+
+		[Fact]
+		public void CanInvokeWithClassConstrainedGenericArgument()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => { services.AddTransient<IInvokeWithClassConstrainedGenericArguments, InvokeWithClassConstrainedGenericArguments>(); });
+			var service = app.CreateProxy<IInvokeWithClassConstrainedGenericArguments>();
+			service.Method(new object());
+        }
+
+		[Fact]
+		public void CanInvokeWithStructConstrainedGenericArgument()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => { services.AddTransient<IInvokeWithStructConstrainedGenericArguments, InvokeWithStructConstrainedGenericArguments>(); });
+			var service = app.CreateProxy<IInvokeWithStructConstrainedGenericArguments>();
+			service.Method(1);
+        }
         
 		public interface IBlank { }
 
@@ -226,6 +253,27 @@ namespace Compose.Tests
 		private class InvokeWithBaseClassConstrainedGenericArguments : IInvokeWithBaseClassConstrainedGenericArguments
 		{
 			public void Method<T>(T arg) where T : Base { }
+		}
+
+		public interface IInvokeWithDefaultConstructorConstrainedGenericArguments { void Method<T>(T arg) where T : new(); }
+
+		private class InvokeWithDefaultConstructorConstrainedGenericArguments : IInvokeWithDefaultConstructorConstrainedGenericArguments
+		{
+			public void Method<T>(T arg) where T : new() { }
+		}
+
+		public interface IInvokeWithClassConstrainedGenericArguments { void Method<T>(T arg) where T : class; }
+
+		private class InvokeWithClassConstrainedGenericArguments : IInvokeWithClassConstrainedGenericArguments
+		{
+			public void Method<T>(T arg) where T : class { }
+		}
+
+		public interface IInvokeWithStructConstrainedGenericArguments { void Method<T>(T arg) where T : struct; }
+
+		private class InvokeWithStructConstrainedGenericArguments : IInvokeWithStructConstrainedGenericArguments
+		{
+			public void Method<T>(T arg) where T : struct { }
 		}
     }
 }
