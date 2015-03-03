@@ -19,6 +19,12 @@ namespace Compose
 
 		internal TService GetDirectTransitionImplementation<TService>(TService service)
 		{
+			/* C#: 
+			public sealed class WrapperName : TService, ITransition<TService>
+			{
+				// AddDirectImplementation...
+			}
+			*/
 			var interfaceType = typeof(TService);
 			var typeBuilder = _moduleBuilder.DefineType($"{_assemblyName.Name}+{interfaceType.FullName}", TypeAttributes.Public | TypeAttributes.Sealed);
 			typeBuilder.AddInterfaceImplementation(interfaceType);
