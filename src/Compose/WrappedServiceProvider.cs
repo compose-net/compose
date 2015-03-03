@@ -1,12 +1,28 @@
 ﻿using Microsoft.Framework.DependencyInjection;
 using System;
-using System.Collections.Generic;
 
 namespace Compose
 {
-	internal class WrappedServiceProvider
+	internal sealed class WrappedServiceProvider : BaseServiceProvider
 	{
-		public WrappedServiceProvider(IEnumerable<IServiceDescriptor> services) 
-			: base((IServiceProvider)Activator.CreateInstance(Constants.GetServiceProvider(), services)) { }
+		private readonly IServiceCollection _services;
+		private IServiceProvider _fallback;
+
+		public WrappedServiceProvider(IServiceCollection services)
+		{
+			_fallback = (IServiceProvider)Activator.CreateInstance(Constants.GetServiceProvider(), services);
+			_services = services;
+        }
+
+		public override object GetService(Type serviceType)
+		{
+			return _fallback.GetService(serviceType);
+		}
+
+		public override IExtendableServiceProvider Extend(ServiceDescriptor service)
+		{
+			_services.Add(service);
+			return new WrappedServiceProvider(_services);
+		}
 	}
 }

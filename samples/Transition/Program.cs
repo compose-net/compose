@@ -13,7 +13,7 @@ namespace Transition
 
 			new Demos.StandardBuildup().Execute();
 			new Demos.CodedOverride().Execute();
-			new Demos.StandardBuildup().Execute();
+			new Demos.ProxyTransition().Execute();
 		}
 	}
 }

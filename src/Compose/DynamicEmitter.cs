@@ -17,7 +17,7 @@ namespace Compose
 			_moduleBuilder = CreateModuleBuilder();
 		}
 
-		internal TService GetDirectTransitionImplementation<TService>(TService service)
+		internal Type GetDirectTransitionImplementation(Type serviceType)
 		{
 			/* C#: 
 			public sealed class WrapperName : TService, ITransition<TService>
@@ -25,16 +25,17 @@ namespace Compose
 				// AddDirectImplementation...
 			}
 			*/
-			var interfaceType = typeof(TService);
-			var typeBuilder = _moduleBuilder.DefineType($"{_assemblyName.Name}+{interfaceType.FullName}", TypeAttributes.Public | TypeAttributes.Sealed);
-			typeBuilder.AddInterfaceImplementation(interfaceType);
-			typeBuilder.AddInterfaceImplementation(typeof(ITransition<TService>));
-			typeBuilder.AddDirectImplementation<TService>();
-			var proxy = typeBuilder.CreateType();
+			var typeBuilder = _moduleBuilder.DefineType($"{_assemblyName.Name}+{serviceType.FullName}", TypeAttributes.Public | TypeAttributes.Sealed);
+			typeBuilder.AddInterfaceImplementation(serviceType);
+			typeBuilder.AddInterfaceImplementation(typeof(ITransition<>).MakeGenericType(serviceType));
+			typeBuilder.AddDirectImplementation(serviceType);
 #if DEBUG
+			var type = typeBuilder.CreateType();
 			_assemblyBuilder.Save($"{_assemblyName.Name}.dll");
+			return type;
+#else
+			return typeBuilder.CreateType();
 #endif
-			return (TService)Activator.CreateInstance(proxy, service);
 		}
 
 		private AssemblyName CreateAssemblyName()

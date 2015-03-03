@@ -13,12 +13,5 @@ namespace Compose
 		{
 			return Provider.GetService<T>() ?? ResolveSelfBound<T>();
 		}
-
-		private T ResolveSelfBound<T>() where T : class
-		{
-			Services.AddTransient<T, T>();
-			Provider = Provider.Extend(Services);
-			return Provider.GetRequiredService<T>();
-		}
 	}
 }

@@ -57,7 +57,7 @@ namespace Transition.Demos
 
 		private string TransitionToLowercase()
 		{
-			this.Transition<IHost, Service.StandardHost>();
+			this.Transition<IHost, StandardHost>();
 			return UpperMessage;
 		}
 	}

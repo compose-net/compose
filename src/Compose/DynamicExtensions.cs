@@ -9,14 +9,14 @@ namespace Compose
 	{
 		private static Random random = new Random();
 
-		internal static void AddDirectImplementation<TService>(this TypeBuilder typeBuilder)
+		internal static void AddDirectImplementation(this TypeBuilder typeBuilder, Type serviceType)
 		{
 			var serviceName = GetRandomString();
-			var serviceField = typeBuilder.AddServiceField<TService>(serviceName);
-			typeBuilder.AddServiceConstructor<TService>(serviceField);
-			typeBuilder.AddPropertyImplementations<TService>(serviceField);
-			typeBuilder.AddMethodImplementations<TService>(serviceField);
-			typeBuilder.AddDirectChangeImplementation<TService>(serviceField);
+			var serviceField = typeBuilder.AddServiceField(serviceName, serviceType);
+			typeBuilder.AddServiceConstructor(serviceField, serviceType);
+			typeBuilder.AddPropertyImplementations(serviceField, serviceType);
+			typeBuilder.AddMethodImplementations(serviceField, serviceType);
+			typeBuilder.AddDirectChangeImplementation(serviceField, serviceType);
 		}
 
 		internal static string GetRandomString()
@@ -25,7 +25,7 @@ namespace Compose
 			return new string(Enumerable.Repeat(Characters, 16).Select(x => x[random.Next(x.Length)]).ToArray());
 		}
 
-		internal static void AddDirectChangeImplementation<TService>(this TypeBuilder typeBuilder, FieldBuilder serviceField)
+		internal static void AddDirectChangeImplementation(this TypeBuilder typeBuilder, FieldBuilder serviceField, Type serviceType)
 		{
 			/* C#: 
 			public virtual bool Change(TService arg1)
@@ -34,8 +34,8 @@ namespace Compose
 				return true;
 			}
 			*/
-			var methodInfo = typeof(ITransition<TService>).GetMethod("Change");
-			var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual, methodInfo.ReturnType, new[] { typeof(TService) });
+			var methodInfo = typeof(ITransition<>).MakeGenericType(serviceType).GetMethod("Change");
+			var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual, methodInfo.ReturnType, new[] { serviceType });
             var methodEmitter = methodBuilder.GetILGenerator();
 			methodEmitter.Emit(OpCodes.Ldarg_0);
 			methodEmitter.Emit(OpCodes.Ldarg_1);
@@ -45,9 +45,9 @@ namespace Compose
 			typeBuilder.DefineMethodOverride(methodBuilder, methodInfo);
 		}
 
-		internal static void AddMethodImplementations<TService>(this TypeBuilder typeBuilder, FieldBuilder serviceField)
+		internal static void AddMethodImplementations(this TypeBuilder typeBuilder, FieldBuilder serviceField, Type serviceType)
 		{
-			foreach (var methodInfo in typeof(TService).GetMethods(BindingFlags.Instance | BindingFlags.Public).Where(x => !x.IsSpecialName))
+			foreach (var methodInfo in serviceType.GetMethods(BindingFlags.Instance | BindingFlags.Public).Where(x => !x.IsSpecialName))
 				typeBuilder.AddMethodImplementation(methodInfo, serviceField);
 		}
 
@@ -90,9 +90,9 @@ namespace Compose
             return genericBuilder;
         }
 
-		internal static void AddPropertyImplementations<TService>(this TypeBuilder typeBuilder, FieldBuilder serviceField)
+		internal static void AddPropertyImplementations(this TypeBuilder typeBuilder, FieldBuilder serviceField, Type serviceType)
 		{
-			foreach (var propertyInfo in typeof(TService).GetProperties(BindingFlags.Instance | BindingFlags.Public))
+			foreach (var propertyInfo in serviceType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
 				typeBuilder.AddPropertyImplementation(propertyInfo, serviceField);
 		}
 
@@ -137,12 +137,12 @@ namespace Compose
 			typeBuilder.DefineMethodOverride(propertySetMethod, propertyInfoSetMethod);
 		}
 
-		internal static FieldBuilder AddServiceField<TService>(this TypeBuilder typeBuilder, string serviceName)
+		internal static FieldBuilder AddServiceField(this TypeBuilder typeBuilder, string serviceName, Type serviceType)
 		{
-			return typeBuilder.DefineField($"_{serviceName}", typeof(TService), FieldAttributes.Private);
+			return typeBuilder.DefineField($"_{serviceName}", serviceType, FieldAttributes.Private);
 		}
 
-		internal static ConstructorBuilder AddServiceConstructor<TService>(this TypeBuilder typeBuilder, FieldBuilder fieldBuilder)
+		internal static ConstructorBuilder AddServiceConstructor(this TypeBuilder typeBuilder, FieldBuilder fieldBuilder, Type serviceType)
 		{
 			/* C#: 
 			public Constructor(TService arg1)
@@ -150,7 +150,7 @@ namespace Compose
 				this._TServiceField = arg1;
 			}
 			*/
-			var ctorBuilder = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new[] { typeof(TService) });
+			var ctorBuilder = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new[] { serviceType });
 			var ctorEmitter = ctorBuilder.GetILGenerator();
 			ctorEmitter.Emit(OpCodes.Ldarg_0);
 			ctorEmitter.Emit(OpCodes.Ldarg_1);

@@ -30,7 +30,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Compose">
+    <Reference Include="Compose, Version=0.0.1.27107, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Compose.0.0.2-alpha\lib\net452\Compose.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Framework.ConfigurationModel">
