@@ -157,6 +157,16 @@ namespace Compose.Tests
 			var service = app.CreateProxy<IInvokeWithStructConstrainedGenericArguments>();
 			service.Method(1);
         }
+
+		[Fact]
+		public void CanInvokeOverloadedMethods()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => { services.AddTransient<IInvokeOverloadedMethods, InvokeOverloadedMethods>(); });
+			var service = app.CreateProxy<IInvokeOverloadedMethods>();
+			service.Method(1);
+			service.Method("a");
+        }
         
 		public interface IBlank { }
 
@@ -274,6 +284,18 @@ namespace Compose.Tests
 		private class InvokeWithStructConstrainedGenericArguments : IInvokeWithStructConstrainedGenericArguments
 		{
 			public void Method<T>(T arg) where T : struct { }
+		}
+
+		public interface IInvokeOverloadedMethods
+		{
+			void Method(int arg);
+			void Method(string arg);
+		}
+
+		private class InvokeOverloadedMethods : IInvokeOverloadedMethods
+		{
+			public void Method(int arg) { }
+			public void Method(string arg) { }
 		}
     }
 }
