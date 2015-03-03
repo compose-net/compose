@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Microsoft.Framework.DependencyInjection;
 using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace Compose.Tests
@@ -175,7 +176,7 @@ namespace Compose.Tests
 			var app = new Fake.Application();
 			app.UseServices(services => { services.AddTransient<IInvokeWithNestedGenericArgument, InvokeWithNestedGenericArgument>(); });
 			var service = app.CreateProxy<IInvokeWithNestedGenericArgument>();
-			service.Method(new System.Collections.Generic.List<int>());
+			service.Method(new List<List<int>>());
 		}
 
 		public interface IBlank { }
@@ -308,11 +309,11 @@ namespace Compose.Tests
 			public void Method(string arg) { }
 		}
 
-		public interface IInvokeWithNestedGenericArgument { void Method<T>(System.Collections.Generic.List<T> arg); }
+		public interface IInvokeWithNestedGenericArgument { void Method<T>(List<List<T>> arg); }
 
 		private class InvokeWithNestedGenericArgument : IInvokeWithNestedGenericArgument
 		{
-			public void Method<T>(System.Collections.Generic.List<T> arg) { }
+			public void Method<T>(List<List<T>> arg) { }
 		}
     }
 }
