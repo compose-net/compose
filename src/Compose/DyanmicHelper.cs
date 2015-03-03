@@ -1,5 +1,4 @@
 ﻿using Microsoft.Framework.DependencyInjection;
-using System;
 
 namespace Compose
 {

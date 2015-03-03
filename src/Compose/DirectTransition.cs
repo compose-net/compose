@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Compose
+﻿namespace Compose
 {
 	public class DirectTransition<TService> : ITransition<TService>
 	{
