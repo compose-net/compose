@@ -7,6 +7,8 @@ namespace Compose
 {
 	internal static class DynamicExtensions
 	{
+		private static Random random = new Random();
+
 		internal static void AddDirectImplementation<TService>(this TypeBuilder typeBuilder)
 		{
 			var serviceName = GetRandomString();
@@ -20,7 +22,6 @@ namespace Compose
 		internal static string GetRandomString()
 		{
 			const string Characters = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm";
-			var random = new Random();
 			return new string(Enumerable.Repeat(Characters, 16).Select(x => x[random.Next(x.Length)]).ToArray());
 		}
 
