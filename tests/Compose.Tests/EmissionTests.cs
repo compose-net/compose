@@ -206,6 +206,37 @@ namespace Compose.Tests
 			service.Method((Base)null, new Derivative());
 		}
 
+		[Fact]
+		public void CanInvokeWithByRefArguments()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => { services.AddTransient<IInvokeWithByRefArgument, InvokeWithByRefArgument>(); });
+			var service = app.CreateProxy<IInvokeWithByRefArgument>();
+			var arg = 0;
+			service.Method(ref arg);
+        }
+
+		[Fact]
+		public void CanInvokeWithOutArguments()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => { services.AddTransient<IInvokeWithOutArguments, InvokeWithOutArguments>(); });
+			var service = app.CreateProxy<IInvokeWithOutArguments>();
+			var arg = 0;
+			service.Method(out arg);
+        }
+
+		[Fact]
+		public void CanInvokeWithMethodAndClassGenericAndInterfaceConstrainedGenericArguments()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => { services.AddTransient<IInvokeWithAllGenericConstraints<Base>, InvokeWithAllGenericConstraints<Base>>(); });
+			var service = app.CreateProxy<IInvokeWithAllGenericConstraints<Base>>();
+			var arg1 = new Derivative();
+			var arg2 = new LowerDerivative();
+			service.Method(ref arg1, out arg2);
+        }
+
 		public interface IBlank { }
 
 		private class Dependency : IBlank { }
@@ -296,6 +327,8 @@ namespace Compose.Tests
 
 		private class Derivative : Base { }
 
+		private class LowerDerivative : Derivative, IDisposable { public void Dispose() { } }
+
 		public interface IInvokeWithBaseClassConstrainedGenericArguments { void Method<T>(T arg) where T : Base; }
 
 		private class InvokeWithBaseClassConstrainedGenericArguments : IInvokeWithBaseClassConstrainedGenericArguments
@@ -363,5 +396,32 @@ namespace Compose.Tests
 		{
 			public void Method<TBase, TDerivative>(TBase arg1, TDerivative arg2) where TDerivative : TBase { }
         }
-    }
+
+		public interface IInvokeWithAllGenericConstraints<TClass>
+		{
+			void Method<TMethodBase, TMethodDerivative>(ref TMethodBase arg1, out TMethodDerivative arg2) 
+				where TMethodBase : TClass where TMethodDerivative : class, TMethodBase, IDisposable, new();
+		}
+
+		private class InvokeWithAllGenericConstraints<TClass> : IInvokeWithAllGenericConstraints<TClass>
+		{
+			public void Method<TMethodBase, TMethodDerivative>(ref TMethodBase arg1, out TMethodDerivative arg2)
+				where TMethodBase : TClass where TMethodDerivative : class, TMethodBase, IDisposable, new()
+			{ arg2 = new TMethodDerivative(); }
+		}
+
+		public interface IInvokeWithByRefArgument { void Method(ref int arg); }
+
+		private class InvokeWithByRefArgument : IInvokeWithByRefArgument
+		{
+			public void Method(ref int arg) { }
+		}
+
+		public interface IInvokeWithOutArguments { void Method(out int arg); }
+
+		private class InvokeWithOutArguments : IInvokeWithOutArguments
+		{
+			public void Method(out int arg) { arg = 4; }
+		}
+	}
 }
