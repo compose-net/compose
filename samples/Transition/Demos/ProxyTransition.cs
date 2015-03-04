@@ -1,14 +1,11 @@
 ﻿using Compose;
 using System;
+using Transition.Service;
 
-namespace Transition
+namespace Transition.Demos
 {
-	internal sealed class DirectTransitionExample
+	internal sealed class ProxyTransition : Executable
 	{
-		private readonly Application _app;
-
-		public DirectTransitionExample(Application app) { _app = app; }
-
 		private Func<bool, ConsoleKeyInfo> _readKey = Console.ReadKey;
 		private IAsyncResult _result = default(IAsyncResult);
 		private ConsoleKeyInfo _keyPress = default(ConsoleKeyInfo);
@@ -18,18 +15,28 @@ namespace Transition
 
 		private string _message = UpperMessage;
 
-		public int Run(IWriter service)
+		public ProxyTransition()
 		{
-			Console.WriteLine("Press escape to exit...");
-			Console.WriteLine("Press any other key to switch between Uppercase/Standard write services...");
+			Name = "Proxy Transition" ;
+			this.UseServices(services =>
+			{
+				services.AddSampleServices()
+					.AsTransitional();
+			});
+			OnExecute<IHost>(Run);
+		}
+
+		private void Run(IHost console)
+		{
+			console.WriteLine("Press escape to exit...");
+			console.WriteLine("Press any other key to switch between Uppercase/Standard write services...");
 
 			_result = _readKey.BeginInvoke(true, null, null);
 			while (_keyPress.Key != ConsoleKey.Escape)
 			{
 				if (_result.AsyncWaitHandle.WaitOne(2000)) _message = Transition();
-				service.WriteLine(_message);
+				console.WriteLine(_message);
 			}
-			return 0;
 		}
 
 		private string Transition()
@@ -44,13 +51,13 @@ namespace Transition
 
 		private string TransitionToUppercase()
 		{
-			_app.Transition<IWriter, UppercaseWriter>();
+			this.Transition<IHost, UppercaseHost>();
 			return LowerMessage;
 		}
 
 		private string TransitionToLowercase()
 		{
-			_app.Transition<IWriter, StandardWriter>();
+			this.Transition<IHost, StandardHost>();
 			return UpperMessage;
 		}
 	}

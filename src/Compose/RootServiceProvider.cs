@@ -1,40 +1,52 @@
 ﻿using Microsoft.Framework.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Compose
 {
-	internal class RootServiceProvider : IServiceProvider
+	internal class RootServiceProvider : BaseServiceProvider, IObserveServiceCollectionChanges
 	{
-		private readonly IServiceProvider _provider;
-		private Dictionary<Type, object> _singletons;
+		private readonly Dictionary<Type, object> _singletons;
 
-		public RootServiceProvider(IServiceProvider provider)
+		private IExtendableServiceProvider _fallback;
+
+		public RootServiceProvider(IServiceCollection services, IExtendableServiceProvider fallback)
 		{
-			_provider = provider;
+			_fallback = fallback;
+			_fallback.Subscribe(this);
+			_singletons = services.Where(x => x.Lifecycle == LifecycleKind.Singleton)
+				.ToDictionary(x => x.ImplementationType, x => (object)null);
 		}
 
-		public RootServiceProvider(IServiceProvider provider, RootServiceProvider root) : this(provider)
+		public void Next(ServiceDescriptor amendment)
 		{
-			_singletons = root._singletons;
+			if (amendment.Lifecycle == LifecycleKind.Singleton)
+				if (!_singletons.ContainsKey(amendment.ServiceType))
+					_singletons.Add(amendment.ServiceType, null);
 		}
 
-		internal virtual RootServiceProvider Extend(IEnumerable<IServiceDescriptor> services)
+		public override object GetService(Type serviceType)
 		{
-			return new RootServiceProvider(new WrappedServiceProvider(services), this);
+			if (_singletons.ContainsKey(serviceType))
+				return ResolveSingleton(serviceType);
+			return _fallback.GetService(serviceType);
 		}
 
-		public virtual object GetService(Type serviceType)
+		public override IExtendableServiceProvider Extend(ServiceDescriptor service)
 		{
-			return resolveSingleton(serviceType) ?? _provider.GetService(serviceType);
+			if (service.Lifecycle == LifecycleKind.Singleton)
+				if (!_singletons.ContainsKey(service.ImplementationType))
+					_singletons.Add(service.ImplementationType, null);
+			_fallback = _fallback.Extend(service);
+			return this;
 		}
 
-		private object resolveSingleton(Type serviceType)
+		private object ResolveSingleton(Type serviceType)
 		{
-			if (_singletons == null) _singletons = new Dictionary<Type, object>();
-			if (!_singletons.ContainsKey(serviceType)) return null;
-			if (_singletons[serviceType] == null) _singletons[serviceType] = _provider.GetService(serviceType);
+			if (_singletons[serviceType] == null)
+				_singletons[serviceType] = _fallback.GetService(serviceType);
 			return _singletons[serviceType];
-		}
+        }
 	}
 }

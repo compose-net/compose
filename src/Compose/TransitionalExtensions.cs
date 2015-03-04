@@ -7,6 +7,16 @@ namespace Compose
 {
 	internal static class TransitionalExtensions
 	{
+		internal static bool ContainsTransitionMarkers(this IServiceCollection services)
+		{
+			return services.Any(x => x.IsTransitionMarker());
+		}
+
+		internal static bool IsTransitionMarker(this IServiceDescriptor descriptor)
+		{
+			return typeof(TransitionMarker).IsAssignableFrom(descriptor.ImplementationType);
+		}
+
 		internal static bool ContainsTransitions(this IServiceCollection services)
 		{
 			return services.Any(x => x.IsTransition());
@@ -26,6 +36,14 @@ namespace Compose
 		internal static IServiceDescriptor SelfBind(this IServiceDescriptor transitional)
 		{
 			return new ServiceDescriptor(transitional.ImplementationType, transitional.ImplementationType, transitional.Lifecycle);
+		}
+
+		internal static Dictionary<Type, Type> GetTransitionalRedirects(this Application app, IServiceCollection services)
+		{
+			if (services.Any(x => x.ImplementationType == typeof(TransitionMarker)))
+				return services.Where(x => x.ServiceType.IsInterface).ToList().ToDictionary(x => x.ServiceType, x => app.CreateProxy(x.ServiceType));
+			return services.Where(x => typeof(TransitionMarker<>).IsAssignableFromGeneric(x.ServiceType))
+				.Select(x => x.ServiceType.GetGenericArguments().Single()).ToList().ToDictionary(x => x, x => app.CreateProxy(x));
 		}
     }
 }
