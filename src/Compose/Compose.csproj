@@ -63,7 +63,6 @@
     <Compile Include="ApplicationExtensions.cs" />
     <Compile Include="CommandLineApplication.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="IDirectTransition.cs" />
     <Compile Include="IExtendableServiceProvider.cs" />
     <Compile Include="IObserveServiceCollectionChanges.cs" />
     <Compile Include="ITransition.cs" />
