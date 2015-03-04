@@ -78,30 +78,33 @@ namespace Compose
             var genericInfos = methodInfo.GetGenericArguments().ToArray();
             var genericBuilders = methodBuilder.DefineGenericParameters(genericInfos.Select(x => x.Name).ToArray());
             for (var i = 0; i < genericBuilders.Length; i++)
-                genericBuilders[i].DefineGeneric(genericInfos[i], serviceType);
+                genericBuilders[i].DefineGeneric(genericInfos[i], genericInfos, serviceType);
         }
 
-        internal static GenericTypeParameterBuilder DefineGeneric(this GenericTypeParameterBuilder genericBuilder, Type genericType, Type serviceType)
+        internal static GenericTypeParameterBuilder DefineGeneric(this GenericTypeParameterBuilder genericBuilder, Type genericType, Type[] methodGenerics, Type serviceType)
         {
             var constraints = genericType.GetGenericParameterConstraints();
             genericBuilder.SetInterfaceConstraints(
 				constraints.Where(x => x.IsInterface).Union(
-				constraints.Where(x => x.IsGenericParameter).Select(x => x.GetUnderlyingGenericType(serviceType)
+				constraints.Where(x => x.IsGenericParameter).Select(x => x.GetUnderlyingGenericType(methodGenerics, serviceType)
 			)).ToArray());
 			genericBuilder.SetBaseTypeConstraint(genericType.BaseType);
 			genericBuilder.SetGenericParameterAttributes(genericType.GenericParameterAttributes);
             return genericBuilder;
         }
 
-		internal static Type GetUnderlyingGenericType(this Type constraint, Type serviceType)
+		internal static Type GetUnderlyingGenericType(this Type constraint, Type[] methodGenerics, Type serviceType)
 		{
+			if (methodGenerics.Contains(constraint)) return constraint;
+
 			var typedDefintions = serviceType.GetGenericArguments();
-			var genericDefinitions = serviceType.GetGenericTypeDefinition().GetGenericArguments();
+			var genericDefinitions = serviceType.IsGenericType ? serviceType.GetGenericTypeDefinition().GetGenericArguments() : new Type[0];
 
 			for (var i = 0; i < genericDefinitions.Length; i++)
 				if (genericDefinitions[i] == constraint)
 					return typedDefintions[i];
-			throw new NotSupportedException();
+
+			throw new NotSupportedException("Generic constraint is not supported.");
 		}
 
 		internal static void AddPropertyImplementations(this TypeBuilder typeBuilder, FieldBuilder serviceField, Type serviceType)

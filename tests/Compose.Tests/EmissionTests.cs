@@ -189,12 +189,21 @@ namespace Compose.Tests
 		}
 
 		[Fact]
-		public void CanInvokeWithGenericConstrainedGenericArguments()
+		public void CanInvokeWithClassGenericConstrainedGenericArguments()
 		{
 			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransient<IInvokeWithGenericConstrainedGenericArguments<Base>, InvokeWithGenericConstrainedGenericArguments<Base>>(); });
-			var service = app.CreateProxy<IInvokeWithGenericConstrainedGenericArguments<Base>>();
+			app.UseServices(services => { services.AddTransient<IInvokeWithClassGenericConstrainedGenericArguments<Base>, InvokeWithClassGenericConstrainedGenericArguments<Base>>(); });
+			var service = app.CreateProxy<IInvokeWithClassGenericConstrainedGenericArguments<Base>>();
 			service.Method(new Derivative());
+		}
+
+		[Fact]
+		public void CanInvokeWithMethodGenericConstrainedGenericArguments()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => { services.AddTransient<IInvokeWithMethodGenericConstrainedGenericArguments, InvokeWithMethodGenericConstrainedGenericArguments>(); });
+			var service = app.CreateProxy<IInvokeWithMethodGenericConstrainedGenericArguments>();
+			service.Method((Base)null, new Derivative());
 		}
 
 		public interface IBlank { }
@@ -341,11 +350,18 @@ namespace Compose.Tests
 			public void Method(T arg) { }
 		}
 
-		public interface IInvokeWithGenericConstrainedGenericArguments<TBase> { void Method<TDerivative>(TDerivative derivative) where TDerivative : TBase; }
+		public interface IInvokeWithClassGenericConstrainedGenericArguments<TBase> { void Method<TDerivative>(TDerivative derivative) where TDerivative : TBase; }
 
-		private class InvokeWithGenericConstrainedGenericArguments<TBase> : IInvokeWithGenericConstrainedGenericArguments<TBase>
+		private class InvokeWithClassGenericConstrainedGenericArguments<TBase> : IInvokeWithClassGenericConstrainedGenericArguments<TBase>
 		{
 			public void Method<TDerivative>(TDerivative derivative) where TDerivative : TBase { }
 		}
-	}
+
+		public interface IInvokeWithMethodGenericConstrainedGenericArguments { void Method<TBase, TDerivative>(TBase arg1, TDerivative arg2) where TDerivative : TBase; }
+
+		private class InvokeWithMethodGenericConstrainedGenericArguments : IInvokeWithMethodGenericConstrainedGenericArguments
+		{
+			public void Method<TBase, TDerivative>(TBase arg1, TDerivative arg2) where TDerivative : TBase { }
+        }
+    }
 }
