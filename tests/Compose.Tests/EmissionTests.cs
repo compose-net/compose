@@ -227,6 +227,15 @@ namespace Compose.Tests
         }
 
 		[Fact]
+		public void CanInvokeWithParamsArguments()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => { services.AddTransient<IInvokeWithParamsArguments, InvokeWithParamsArguments>(); });
+			var service = app.CreateProxy<IInvokeWithParamsArguments>();
+			service.Method(1, 2, 3);
+        }
+
+		[Fact]
 		public void CanInvokeWithMethodAndClassGenericAndInterfaceConstrainedGenericArguments()
 		{
 			var app = new Fake.Application();
@@ -399,13 +408,13 @@ namespace Compose.Tests
 
 		public interface IInvokeWithAllGenericConstraints<TClass>
 		{
-			void Method<TMethodBase, TMethodDerivative>(ref TMethodBase arg1, out TMethodDerivative arg2) 
+			void Method<TMethodBase, TMethodDerivative>(ref TMethodBase arg1, out TMethodDerivative arg2, params TMethodDerivative[] arg3) 
 				where TMethodBase : TClass where TMethodDerivative : class, TMethodBase, IDisposable, new();
 		}
 
 		private class InvokeWithAllGenericConstraints<TClass> : IInvokeWithAllGenericConstraints<TClass>
 		{
-			public void Method<TMethodBase, TMethodDerivative>(ref TMethodBase arg1, out TMethodDerivative arg2)
+			public void Method<TMethodBase, TMethodDerivative>(ref TMethodBase arg1, out TMethodDerivative arg2, params TMethodDerivative[] arg3)
 				where TMethodBase : TClass where TMethodDerivative : class, TMethodBase, IDisposable, new()
 			{ arg2 = new TMethodDerivative(); }
 		}
@@ -422,6 +431,13 @@ namespace Compose.Tests
 		private class InvokeWithOutArguments : IInvokeWithOutArguments
 		{
 			public void Method(out int arg) { arg = 4; }
+		}
+
+		public interface IInvokeWithParamsArguments { void Method<T>(params T[] arg); }
+
+		private class InvokeWithParamsArguments : IInvokeWithParamsArguments
+		{
+			public void Method<T>(params T[] arg) { }
 		}
 	}
 }
