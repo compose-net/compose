@@ -48,10 +48,10 @@ namespace Compose
 		internal static void AddMethodImplementations(this TypeBuilder typeBuilder, FieldBuilder serviceField, Type serviceType)
 		{
 			foreach (var methodInfo in serviceType.GetMethods(BindingFlags.Instance | BindingFlags.Public).Where(x => !x.IsSpecialName))
-				typeBuilder.AddMethodImplementation(methodInfo, serviceField);
+				typeBuilder.AddMethodImplementation(methodInfo, serviceField, serviceType);
 		}
 
-		internal static void AddMethodImplementation(this TypeBuilder typeBuilder, MethodInfo methodInfo, FieldBuilder serviceField)
+		internal static void AddMethodImplementation(this TypeBuilder typeBuilder, MethodInfo methodInfo, FieldBuilder serviceField, Type serviceType)
 		{
 			/* C#: 
 			public virtual ReturnType MethodName[<Generics>]([Args]) [where Generic : Constraints]
@@ -62,7 +62,7 @@ namespace Compose
 			var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual);
             methodBuilder.SetReturnType(methodInfo.ReturnType);
             methodBuilder.SetParameters(methodInfo.GetParameters().Select(x => x.ParameterType).ToArray());
-            if (methodInfo.IsGenericMethod) methodBuilder.AddGenericParameters(methodInfo);
+            if (methodInfo.IsGenericMethod) methodBuilder.AddGenericParameters(methodInfo, serviceType);
             var methodEmitter = methodBuilder.GetILGenerator();
 			methodEmitter.Emit(OpCodes.Ldarg_0);
 			methodEmitter.Emit(OpCodes.Ldfld, serviceField);
@@ -73,22 +73,36 @@ namespace Compose
 			typeBuilder.DefineMethodOverride(methodBuilder, methodInfo);
 		}
 
-        internal static void AddGenericParameters(this MethodBuilder methodBuilder, MethodInfo methodInfo)
+        internal static void AddGenericParameters(this MethodBuilder methodBuilder, MethodInfo methodInfo, Type serviceType)
         {
             var genericInfos = methodInfo.GetGenericArguments().ToArray();
             var genericBuilders = methodBuilder.DefineGenericParameters(genericInfos.Select(x => x.Name).ToArray());
             for (var i = 0; i < genericBuilders.Length; i++)
-                genericBuilders[i].DefineGeneric(genericInfos[i]);
+                genericBuilders[i].DefineGeneric(genericInfos[i], serviceType);
         }
 
-        internal static GenericTypeParameterBuilder DefineGeneric(this GenericTypeParameterBuilder genericBuilder, Type genericType)
+        internal static GenericTypeParameterBuilder DefineGeneric(this GenericTypeParameterBuilder genericBuilder, Type genericType, Type serviceType)
         {
             var constraints = genericType.GetGenericParameterConstraints();
-            genericBuilder.SetInterfaceConstraints(constraints.Where(x => x.IsInterface).ToArray());
+            genericBuilder.SetInterfaceConstraints(
+				constraints.Where(x => x.IsInterface).Union(
+				constraints.Where(x => x.IsGenericParameter).Select(x => x.GetUnderlyingGenericType(serviceType)
+			)).ToArray());
 			genericBuilder.SetBaseTypeConstraint(genericType.BaseType);
 			genericBuilder.SetGenericParameterAttributes(genericType.GenericParameterAttributes);
             return genericBuilder;
         }
+
+		internal static Type GetUnderlyingGenericType(this Type constraint, Type serviceType)
+		{
+			var typedDefintions = serviceType.GetGenericArguments();
+			var genericDefinitions = serviceType.GetGenericTypeDefinition().GetGenericArguments();
+
+			for (var i = 0; i < genericDefinitions.Length; i++)
+				if (genericDefinitions[i] == constraint)
+					return typedDefintions[i];
+			throw new NotSupportedException();
+		}
 
 		internal static void AddPropertyImplementations(this TypeBuilder typeBuilder, FieldBuilder serviceField, Type serviceType)
 		{
