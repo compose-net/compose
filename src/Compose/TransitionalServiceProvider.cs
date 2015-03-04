@@ -1,41 +1,40 @@
-﻿using Microsoft.Framework.DependencyInjection;
-using System;
+﻿using System;
+using Microsoft.Framework.DependencyInjection;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Compose
 {
-	internal class TransitionalServiceProvider : RootServiceProvider
+	internal class TransitionalServiceProvider : BaseServiceProvider
 	{
-		private readonly Dictionary<Type, object> _transitions;
+		private readonly Dictionary<Type, Type> _redirects;
+		private IExtendableServiceProvider _fallback;
 
-		internal TransitionalServiceProvider(IEnumerable<IServiceDescriptor> services)
-			: base(new WrappedServiceProvider(services.WithSelfBoundTransitionals()))
+		public TransitionalServiceProvider(Dictionary<Type, Type> bindingRedirects, IExtendableServiceProvider fallback)
 		{
-			_transitions = services.Where(x => x.IsTransition()).ToDictionary(x => x.ServiceType, x => base.GetService(x.ImplementationType));
-		}
-
-		internal TransitionalServiceProvider(IServiceProvider provider, TransitionalServiceProvider root) : base(provider)
-		{
-			_transitions = root._transitions;
-		}
-
-		internal TransitionalServiceProvider(IEnumerable<IServiceDescriptor> services, RootServiceProvider provider) 
-			: base(provider, provider)
-		{
-			_transitions = services.Where(x => typeof(ITransition<>).IsAssignableFrom(x.ImplementationType) && x.Lifecycle == LifecycleKind.Singleton)
-				.ToDictionary(x => x.ServiceType, x => provider.GetService(x.ImplementationType));
-		}
-
-		internal override RootServiceProvider Extend(IEnumerable<IServiceDescriptor> services)
-		{
-			return new TransitionalServiceProvider(new WrappedServiceProvider(services), this);
+			_redirects = bindingRedirects;
+			_fallback = fallback;
 		}
 
 		public override object GetService(Type serviceType)
 		{
-			if (_transitions.ContainsKey(serviceType)) return _transitions[serviceType];
-			return base.GetService(serviceType);
+			if (_redirects.ContainsKey(serviceType))
+				return _fallback.GetService(_redirects[serviceType]);
+			return _fallback.GetService(serviceType);
+		}
+
+		public override IExtendableServiceProvider Extend(ServiceDescriptor service)
+		{
+			if (_redirects.ContainsKey(service.ServiceType))
+				_fallback = _fallback.Extend(GetBubbledAmendment(service.ServiceType));
+			else
+				_fallback = _fallback.Extend(service);
+			return this;
+		}
+
+		private ServiceDescriptor GetBubbledAmendment(Type serviceType)
+		{
+            PublishChange(new ServiceDescriptor(serviceType, _redirects[serviceType], LifecycleKind.Singleton));
+			return new ServiceDescriptor(_redirects[serviceType], _redirects[serviceType], LifecycleKind.Singleton);
 		}
 	}
 }
