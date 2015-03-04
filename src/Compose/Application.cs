@@ -7,27 +7,22 @@ namespace Compose
     {
 		public string Name { get; set; }
 
-		internal ServiceCollection Services { get; } = new ServiceCollection();
-
-        internal RootServiceProvider Provider { get; set; }
-
 		public IServiceProvider HostingServices { get { return Provider; } }
 
-		internal T GetRequiredService<T>() where T : class
-		{
-			return ResolveRequired<T>();
-		}
-
-		protected T ResolveRequired<T>() where T : class
+		protected internal T GetRequiredService<T>() where T : class
 		{
 			return Provider.GetService<T>() ?? ResolveSelfBound<T>();
 		}
 
-		private T ResolveSelfBound<T>() where T : class
-		{
-			Services.AddTransient<T, T>();
-			Provider = Provider.Extend(Services);
-			return Provider.GetRequiredService<T>();
-		}
-	}
+        internal ServiceCollection Services { get; } = new ServiceCollection();
+
+        internal IExtendableServiceProvider Provider { get; set; }
+
+        internal T ResolveSelfBound<T>()
+        {
+            var serviceType = typeof(T);
+            Provider = Provider.Extend(new ServiceDescriptor(serviceType, serviceType, LifecycleKind.Transient));
+            return Provider.GetRequiredService<T>();
+        }
+    }
 }

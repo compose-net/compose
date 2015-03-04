@@ -2,6 +2,6 @@
 {
 	public interface ITransition<TService>
 	{
-		bool Change<TImplementation>(TImplementation implementation) where TImplementation : TService;
+		bool Change(TService implementation);
 	}
 }

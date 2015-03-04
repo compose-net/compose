@@ -1,7 +1,4 @@
 ﻿namespace Compose
 {
-	public class CommandLineApplication : Executable<int>
-	{
-		public int Execute() { return Execution(); }
-	}
+	public class CommandLineApplication : Executable<int> { }
 }
