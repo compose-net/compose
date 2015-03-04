@@ -3,7 +3,7 @@ using System;
 
 namespace Compose
 {
-    public class Application : ApplicationBase
+    public class Application
     {
 		public string Name { get; set; }
 
@@ -13,5 +13,16 @@ namespace Compose
 		{
 			return Provider.GetService<T>() ?? ResolveSelfBound<T>();
 		}
-	}
+
+        internal ServiceCollection Services { get; } = new ServiceCollection();
+
+        internal IExtendableServiceProvider Provider { get; set; }
+
+        internal T ResolveSelfBound<T>()
+        {
+            var serviceType = typeof(T);
+            Provider = Provider.Extend(new ServiceDescriptor(serviceType, serviceType, LifecycleKind.Transient));
+            return Provider.GetRequiredService<T>();
+        }
+    }
 }

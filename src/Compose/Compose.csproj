@@ -55,7 +55,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Application.cs" />
-    <Compile Include="ApplicationBase.cs" />
     <Compile Include="BaseServiceProvider.cs" />
     <Compile Include="DyanmicHelper.cs" />
     <Compile Include="DynamicEmitter.cs" />
