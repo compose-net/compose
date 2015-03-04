@@ -60,6 +60,7 @@
     <Compile Include="DyanmicHelper.cs" />
     <Compile Include="DynamicEmitter.cs" />
     <Compile Include="DynamicExtensions.cs" />
+    <Compile Include="ExceptionHelpers.cs" />
     <Compile Include="Executable.cs" />
     <Compile Include="ApplicationExtensions.cs" />
     <Compile Include="CommandLineApplication.cs" />
@@ -75,6 +76,9 @@
     <Compile Include="TransitionalServiceProvider.cs" />
     <Compile Include="TransitionMarker.cs" />
     <Compile Include="TypeExtensions.cs" />
+    <Compile Include="UnsupportedClassDefintionException.cs" />
+    <Compile Include="UnsupportedMethodDefinitionException.cs" />
+    <Compile Include="UnsupportedPropertyDefinitionException.cs" />
     <Compile Include="WrappedServiceProvider.cs" />
   </ItemGroup>
   <ItemGroup>

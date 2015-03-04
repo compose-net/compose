@@ -48,7 +48,7 @@ namespace Compose
 		internal static void AddMethodImplementations(this TypeBuilder typeBuilder, FieldBuilder serviceField, Type serviceType)
 		{
 			foreach (var methodInfo in serviceType.GetMethods(BindingFlags.Instance | BindingFlags.Public).Where(x => !x.IsSpecialName))
-				typeBuilder.AddMethodImplementation(methodInfo, serviceField, serviceType);
+				ExceptionHelpers.ReThrow(typeBuilder.AddMethodImplementation, methodInfo, serviceField, serviceType, inner => new UnsupportedMethodDefinitionException(methodInfo, inner));
 		}
 
 		internal static void AddMethodImplementation(this TypeBuilder typeBuilder, MethodInfo methodInfo, FieldBuilder serviceField, Type serviceType)
@@ -107,7 +107,7 @@ namespace Compose
 		internal static void AddPropertyImplementations(this TypeBuilder typeBuilder, FieldBuilder serviceField, Type serviceType)
 		{
 			foreach (var propertyInfo in serviceType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
-				typeBuilder.AddPropertyImplementation(propertyInfo, serviceField);
+				ExceptionHelpers.ReThrow(typeBuilder.AddPropertyImplementation, propertyInfo, serviceField, inner => new UnsupportedPropertyDefinitionException(propertyInfo, inner));
 		}
 
 		internal static void AddPropertyImplementation(this TypeBuilder typeBuilder, PropertyInfo propertyInfo, FieldBuilder serviceField)

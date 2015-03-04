@@ -29,13 +29,21 @@ namespace Compose
 			typeBuilder.AddInterfaceImplementation(serviceType);
 			typeBuilder.AddInterfaceImplementation(typeof(ITransition<>).MakeGenericType(serviceType));
 			typeBuilder.AddDirectImplementation(serviceType);
+			try
+			{
 #if DEBUG
-			var type = typeBuilder.CreateType();
-			_assemblyBuilder.Save($"{_assemblyName.Name}.dll");
-			return type;
+				var type = typeBuilder.CreateType();
+				_assemblyBuilder.Save($"{_assemblyName.Name}.dll");
+				return type;
+			}
 #else
-			return typeBuilder.CreateType();
+				return typeBuilder.CreateType();
+			}
 #endif
+			catch(Exception ex)
+			{
+				throw new UnsupportedClassDefintionException(serviceType, ex);
+			}
 		}
 
 		private AssemblyName CreateAssemblyName()
