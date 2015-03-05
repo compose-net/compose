@@ -7,6 +7,7 @@ namespace Compose
 	{
 		private readonly IServiceCollection _services;
 		private IServiceProvider _fallback;
+		private IServiceProvider _snapshot;
 
 		public WrappedServiceProvider(IServiceCollection services)
 		{
@@ -23,6 +24,16 @@ namespace Compose
 		{
 			_services.Add(service);
 			return new WrappedServiceProvider(_services);
+		}
+
+		public override void Snapshot()
+		{
+			_snapshot = _fallback;
+		}
+
+		public override void Restore()
+		{
+			_fallback = _snapshot;
 		}
 	}
 }

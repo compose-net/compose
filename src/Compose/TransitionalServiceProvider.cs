@@ -1,12 +1,13 @@
 ﻿using System;
 using Microsoft.Framework.DependencyInjection;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Compose
 {
 	internal class TransitionalServiceProvider : BaseServiceProvider
 	{
-		private readonly Dictionary<Type, Type> _redirects;
+		private Dictionary<Type, Type> _redirects;
 		private IExtendableServiceProvider _fallback;
 
 		public TransitionalServiceProvider(Dictionary<Type, Type> bindingRedirects, IExtendableServiceProvider fallback)
@@ -35,6 +36,20 @@ namespace Compose
 		{
             PublishChange(new ServiceDescriptor(serviceType, _redirects[serviceType], LifecycleKind.Singleton));
 			return new ServiceDescriptor(_redirects[serviceType], _redirects[serviceType], LifecycleKind.Singleton);
+		}
+
+		public override void Snapshot()
+		{
+			foreach (var proxy in _redirects.Select(x => _fallback.GetService(x.Value)).Where(x => x != null).Cast<ITransition>())
+				proxy.Snapshot();
+			_fallback.Snapshot();
+		}
+
+		public override void Restore()
+		{
+			foreach (var proxy in _redirects.Select(x => _fallback.GetService(x.Value)).Where(x => x != null).Cast<ITransition>())
+				proxy.Restore();
+			_fallback.Restore();
 		}
 	}
 }

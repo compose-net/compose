@@ -21,5 +21,8 @@ namespace Compose
 		{
 			_subscribers.Add(subscriber);
 		}
+
+		public abstract void Snapshot();
+		public abstract void Restore();
 	}
 }

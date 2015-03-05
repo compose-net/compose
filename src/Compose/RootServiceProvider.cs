@@ -7,8 +7,8 @@ namespace Compose
 {
 	internal class RootServiceProvider : BaseServiceProvider, IObserveServiceCollectionChanges
 	{
-		private readonly Dictionary<Type, object> _singletons;
-
+		private Dictionary<Type, object> _singletons;
+		private Dictionary<Type, object> _snapshot;
 		private IExtendableServiceProvider _fallback;
 
 		public RootServiceProvider(IServiceCollection services, IExtendableServiceProvider fallback)
@@ -48,5 +48,17 @@ namespace Compose
 				_singletons[serviceType] = _fallback.GetService(serviceType);
 			return _singletons[serviceType];
         }
+
+		public override void Snapshot()
+		{
+			_snapshot = _singletons;
+			_fallback.Snapshot();
+		}
+
+		public override void Restore()
+		{
+			_singletons = _snapshot;
+			_fallback.Restore();
+		}
 	}
 }
