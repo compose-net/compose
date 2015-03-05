@@ -11,7 +11,7 @@
     <description>The easy wasy to compose well formed application components in .Net</description>
     <tags>Compose</tags>
     <dependencies>
-      <dependency id="Microsoft.Framework.DependencyInjection" version="1.0.0-beta4-10884" />
+      <dependency id="Microsoft.Framework.DependencyInjection" version="1.0.0-beta3" />
     </dependencies>
   </metadata>
 </package>

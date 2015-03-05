@@ -30,21 +30,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Compose, Version=0.0.1.27107, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.Framework.ConfigurationModel, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Compose.0.0.2-alpha\lib\net452\Compose.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.Framework.ConfigurationModel.1.0.0-beta3\lib\net45\Microsoft.Framework.ConfigurationModel.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Framework.ConfigurationModel">
-      <HintPath>..\..\packages\Microsoft.Framework.ConfigurationModel.1.0.0-beta4-10857\lib\net45\Microsoft.Framework.ConfigurationModel.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Framework.ConfigurationModel.Interfaces">
-      <HintPath>..\..\packages\Microsoft.Framework.ConfigurationModel.Interfaces.1.0.0-beta4-10857\lib\net45\Microsoft.Framework.ConfigurationModel.Interfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Framework.DependencyInjection">
-      <HintPath>..\..\packages\Microsoft.Framework.DependencyInjection.1.0.0-beta4-10884\lib\net45\Microsoft.Framework.DependencyInjection.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Framework.DependencyInjection.Interfaces">
-      <HintPath>..\..\packages\Microsoft.Framework.DependencyInjection.Interfaces.1.0.0-beta4-10884\lib\net45\Microsoft.Framework.DependencyInjection.Interfaces.dll</HintPath>
+    <Reference Include="Microsoft.Framework.DependencyInjection, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Microsoft.Framework.DependencyInjection.1.0.0-beta3\lib\net45\Microsoft.Framework.DependencyInjection.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
