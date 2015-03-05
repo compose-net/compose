@@ -69,6 +69,7 @@
     <Compile Include="Fake\Application.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReflectionAssertions.cs" />
+    <Compile Include="SnapshotTests.cs" />
     <Compile Include="TransitionTests.cs" />
   </ItemGroup>
   <ItemGroup>
