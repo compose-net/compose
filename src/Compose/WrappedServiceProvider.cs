@@ -16,7 +16,7 @@ namespace Compose
 		{
 			_singletons = services.Where(x => x.Lifecycle == LifecycleKind.Singleton)
 				.ToDictionary(x => x.ImplementationType, x => (object)null);
-			_fallback = (IServiceProvider)Activator.CreateInstance(Constants.GetServiceProvider(), services);
+			_fallback = CreateFallbackProvider(services);
 			_services = services;
         }
 
@@ -30,13 +30,18 @@ namespace Compose
 		public void Extend(ServiceDescriptor service)
 		{
 			_services.Add(service);
-			_fallback = new WrappedServiceProvider(_services);
+			_fallback = CreateFallbackProvider(_services);
 		}
 
 		public void AppendSingleton(Type serviceType)
 		{
 			if (!_singletons.ContainsKey(serviceType))
 				_singletons.Add(serviceType, null);
+		}
+
+		private IServiceProvider CreateFallbackProvider(IServiceCollection services)
+		{
+			return (IServiceProvider)Activator.CreateInstance(Constants.GetServiceProvider(), services);
 		}
 
 		private object ResolveSingleton(Type serviceType)
@@ -48,12 +53,12 @@ namespace Compose
 
 		public void Snapshot()
 		{
-			_snapshot = new WrappedServiceProvider(_services);
+			_snapshot = CreateFallbackProvider(_services);
 		}
 
 		public void Restore()
 		{
-			_fallback = _snapshot;
+			_fallback = _snapshot ?? _fallback;
 		}
 	}
 }

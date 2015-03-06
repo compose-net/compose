@@ -33,7 +33,7 @@ namespace Compose
 
 		private void ExtendTransition(Type serviceType)
 		{
-			_fallback.AppendSingleton(serviceType);
+			_fallback.AppendSingleton(_redirects[serviceType]);
 			_fallback.Extend(new ServiceDescriptor(_redirects[serviceType], _redirects[serviceType], LifecycleKind.Singleton));
 		}
 
@@ -46,9 +46,9 @@ namespace Compose
 
 		public void Restore()
 		{
+			_fallback.Restore();
 			foreach (var proxy in _redirects.Select(x => _fallback.GetService(x.Value)).Cast<ITransition>())
 				proxy?.Restore();
-			_fallback.Restore();
 		}
 	}
 }
