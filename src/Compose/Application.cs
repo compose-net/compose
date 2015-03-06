@@ -21,7 +21,7 @@ namespace Compose
         internal T ResolveSelfBound<T>()
         {
             var serviceType = typeof(T);
-            Provider = Provider.Extend(new ServiceDescriptor(serviceType, serviceType, LifecycleKind.Transient));
+            Provider.Extend(new ServiceDescriptor(serviceType, serviceType, LifecycleKind.Transient));
             return Provider.GetRequiredService<T>();
         }
 

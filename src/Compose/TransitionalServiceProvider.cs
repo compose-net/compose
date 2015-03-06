@@ -5,50 +5,49 @@ using System.Linq;
 
 namespace Compose
 {
-	internal class TransitionalServiceProvider : BaseServiceProvider
+	internal class TransitionalServiceProvider : IExtendableServiceProvider
 	{
+		private readonly ISingletonRepositoryServiceProvider _fallback;
 		private Dictionary<Type, Type> _redirects;
-		private IExtendableServiceProvider _fallback;
 
-		public TransitionalServiceProvider(Dictionary<Type, Type> bindingRedirects, IExtendableServiceProvider fallback)
+		public TransitionalServiceProvider(Dictionary<Type, Type> bindingRedirects, ISingletonRepositoryServiceProvider fallback)
 		{
 			_redirects = bindingRedirects;
 			_fallback = fallback;
 		}
 
-		public override object GetService(Type serviceType)
+		public object GetService(Type serviceType)
 		{
 			if (_redirects.ContainsKey(serviceType))
 				return _fallback.GetService(_redirects[serviceType]);
 			return _fallback.GetService(serviceType);
 		}
 
-		public override IExtendableServiceProvider Extend(ServiceDescriptor service)
+		public void Extend(ServiceDescriptor service)
 		{
 			if (_redirects.ContainsKey(service.ServiceType))
-				_fallback = _fallback.Extend(GetBubbledAmendment(service.ServiceType));
+				ExtendTransition(service.ServiceType);
 			else
-				_fallback = _fallback.Extend(service);
-			return this;
+				_fallback.Extend(service);
 		}
 
-		private ServiceDescriptor GetBubbledAmendment(Type serviceType)
+		private void ExtendTransition(Type serviceType)
 		{
-            PublishChange(new ServiceDescriptor(serviceType, _redirects[serviceType], LifecycleKind.Singleton));
-			return new ServiceDescriptor(_redirects[serviceType], _redirects[serviceType], LifecycleKind.Singleton);
+			_fallback.AppendSingleton(serviceType);
+			_fallback.Extend(new ServiceDescriptor(_redirects[serviceType], _redirects[serviceType], LifecycleKind.Singleton));
 		}
 
-		public override void Snapshot()
+		public void Snapshot()
 		{
-			foreach (var proxy in _redirects.Select(x => _fallback.GetService(x.Value)).Where(x => x != null).Cast<ITransition>())
-				proxy.Snapshot();
+			foreach (var proxy in _redirects.Select(x => _fallback.GetService(x.Value)).Cast<ITransition>())
+				proxy?.Snapshot();
 			_fallback.Snapshot();
 		}
 
-		public override void Restore()
+		public void Restore()
 		{
-			foreach (var proxy in _redirects.Select(x => _fallback.GetService(x.Value)).Where(x => x != null).Cast<ITransition>())
-				proxy.Restore();
+			foreach (var proxy in _redirects.Select(x => _fallback.GetService(x.Value)).Cast<ITransition>())
+				proxy?.Restore();
 			_fallback.Restore();
 		}
 	}
