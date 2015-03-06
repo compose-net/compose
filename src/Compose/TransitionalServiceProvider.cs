@@ -8,6 +8,7 @@ namespace Compose
 	internal class TransitionalServiceProvider : IExtendableServiceProvider
 	{
 		private readonly ISingletonRepositoryServiceProvider _fallback;
+		private readonly Dictionary<Type, object> _transitions = new Dictionary<Type, object>();
 		private Dictionary<Type, Type> _redirects;
 
 		public TransitionalServiceProvider(Dictionary<Type, Type> bindingRedirects, ISingletonRepositoryServiceProvider fallback)
@@ -19,7 +20,7 @@ namespace Compose
 		public object GetService(Type serviceType)
 		{
 			if (_redirects.ContainsKey(serviceType))
-				return _fallback.GetService(_redirects[serviceType]);
+				return ResolveTransition(serviceType);
 			return _fallback.GetService(serviceType);
 		}
 
@@ -30,6 +31,16 @@ namespace Compose
 			else
 				_fallback.Extend(service);
 		}
+
+		private object ResolveTransition(Type serviceType)
+		{
+			if (_transitions.ContainsKey(serviceType))
+				return _transitions[serviceType]; // fallback captures these as singletons anyway
+			var transition = _fallback.GetService(_redirects[serviceType]);
+			if (transition == null) return transition;
+			((ITransition)transition).Snapshot();
+			return transition;
+        }
 
 		private void ExtendTransition(Type serviceType)
 		{
