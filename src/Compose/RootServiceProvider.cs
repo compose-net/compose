@@ -7,7 +7,7 @@ namespace Compose
 {
 	internal class RootServiceProvider : BaseServiceProvider, IObserveServiceCollectionChanges
 	{
-		private Dictionary<Type, object> _singletons;
+		
 		private Dictionary<Type, object> _snapshot;
 		private IExtendableServiceProvider _fallback;
 
@@ -15,8 +15,6 @@ namespace Compose
 		{
 			_fallback = fallback;
 			_fallback.Subscribe(this);
-			_singletons = services.Where(x => x.Lifecycle == LifecycleKind.Singleton)
-				.ToDictionary(x => x.ImplementationType, x => (object)null);
 		}
 
 		public void Next(ServiceDescriptor amendment)
@@ -28,8 +26,7 @@ namespace Compose
 
 		public override object GetService(Type serviceType)
 		{
-			if (_singletons.ContainsKey(serviceType))
-				return ResolveSingleton(serviceType);
+			
 			return _fallback.GetService(serviceType);
 		}
 
@@ -41,13 +38,6 @@ namespace Compose
 			_fallback = _fallback.Extend(service);
 			return this;
 		}
-
-		private object ResolveSingleton(Type serviceType)
-		{
-			if (_singletons[serviceType] == null)
-				_singletons[serviceType] = _fallback.GetService(serviceType);
-			return _singletons[serviceType];
-        }
 
 		public override void Snapshot()
 		{
