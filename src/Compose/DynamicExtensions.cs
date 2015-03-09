@@ -12,11 +12,15 @@ namespace Compose
 		internal static void AddDirectImplementation(this TypeBuilder typeBuilder, Type serviceType)
 		{
 			var serviceName = GetRandomString();
+			var snapshotName = GetRandomString();
 			var serviceField = typeBuilder.AddServiceField(serviceName, serviceType);
+			var snapshotField = typeBuilder.AddSnapshotField(snapshotName, serviceType);
 			typeBuilder.AddServiceConstructor(serviceField, serviceType);
 			typeBuilder.AddPropertyImplementations(serviceField, serviceType);
 			typeBuilder.AddMethodImplementations(serviceField, serviceType);
-			typeBuilder.AddDirectChangeImplementation(serviceField, serviceType);
+			typeBuilder.AddChangeImplementation(serviceField, serviceType);
+			typeBuilder.AddSnapshotImplementation(snapshotField, serviceField);
+			typeBuilder.AddRestoreImplementation(snapshotField, serviceField);
 		}
 
 		internal static string GetRandomString()
@@ -25,7 +29,7 @@ namespace Compose
 			return new string(Enumerable.Repeat(Characters, 16).Select(x => x[random.Next(x.Length)]).ToArray());
 		}
 
-		internal static void AddDirectChangeImplementation(this TypeBuilder typeBuilder, FieldBuilder serviceField, Type serviceType)
+		internal static void AddChangeImplementation(this TypeBuilder typeBuilder, FieldBuilder serviceField, Type serviceType)
 		{
 			/* C#: 
 			public virtual bool Change(TService arg1)
@@ -43,6 +47,36 @@ namespace Compose
 			methodEmitter.Emit(OpCodes.Ldc_I4_1);
 			methodEmitter.Emit(OpCodes.Ret);
 			typeBuilder.DefineMethodOverride(methodBuilder, methodInfo);
+		}
+
+		internal static void AddSnapshotImplementation(this TypeBuilder typeBuilder, FieldBuilder snapshotField, FieldBuilder serviceField)
+		{
+			/* C#:
+			public virtual void Snapshot()
+			{
+				this._TSnapshotField = this._TServiceField;
+			}
+			*/
+			var methodInfo = typeof(ITransition).GetMethod("Snapshot");
+			var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual, methodInfo.ReturnType, Type.EmptyTypes);
+			var methodEmitter = methodBuilder.GetILGenerator();
+			methodEmitter.Emit(OpCodes.Ldarg_0);
+			methodEmitter.Emit(OpCodes.Ldarg_0);
+			methodEmitter.Emit(OpCodes.Ldfld, serviceField);
+			methodEmitter.Emit(OpCodes.Stfld, snapshotField);
+			methodEmitter.Emit(OpCodes.Ret);
+		}
+
+		internal static void AddRestoreImplementation(this TypeBuilder typeBuilder, FieldBuilder snapshotField, FieldBuilder serviceField)
+		{
+			var methodInfo = typeof(ITransition).GetMethod("Restore");
+			var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual, methodInfo.ReturnType, Type.EmptyTypes);
+			var methodEmitter = methodBuilder.GetILGenerator();
+			methodEmitter.Emit(OpCodes.Ldarg_0);
+			methodEmitter.Emit(OpCodes.Ldarg_0);
+			methodEmitter.Emit(OpCodes.Ldfld, snapshotField);
+			methodEmitter.Emit(OpCodes.Stfld, serviceField);
+			methodEmitter.Emit(OpCodes.Ret);
 		}
 
 		internal static void AddMethodImplementations(this TypeBuilder typeBuilder, FieldBuilder serviceField, Type serviceType)
@@ -157,6 +191,11 @@ namespace Compose
 		internal static FieldBuilder AddServiceField(this TypeBuilder typeBuilder, string serviceName, Type serviceType)
 		{
 			return typeBuilder.DefineField($"_{serviceName}", serviceType, FieldAttributes.Private);
+		}
+
+		internal static FieldBuilder AddSnapshotField(this TypeBuilder typeBuilder, string snapshotName, Type serviceType)
+		{
+			return typeBuilder.DefineField($"_{snapshotName}", serviceType, FieldAttributes.Private);
 		}
 
 		internal static ConstructorBuilder AddServiceConstructor(this TypeBuilder typeBuilder, FieldBuilder fieldBuilder, Type serviceType)

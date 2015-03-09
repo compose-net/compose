@@ -5,8 +5,8 @@ namespace Compose
 {
 	internal interface IExtendableServiceProvider : IServiceProvider
 	{
-		void Subscribe(IObserveServiceCollectionChanges subscriber);
-
-		IExtendableServiceProvider Extend(ServiceDescriptor service);
+		void Extend(ServiceDescriptor service);
+		void Snapshot();
+		void Restore();
 	}
 }

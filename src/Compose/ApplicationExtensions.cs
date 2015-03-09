@@ -5,6 +5,8 @@ namespace Compose
 {
     public static class ApplicationExtensions
     {
+		#region Composition
+
 		public static void UseServices(this Application app, Action<IServiceCollection> configureServices)
 		{
 			app.UseServices(services =>
@@ -19,9 +21,12 @@ namespace Compose
 		internal static void UseServices(this Application app, Func<IServiceCollection, IExtendableServiceProvider> configureServices)
 		{
 			app.Provider = new WrappedServiceProvider(app.Services);
-			var fallback = configureServices(app.Services);
-            app.Provider = new RootServiceProvider(app.Services, fallback);
+            app.Provider = configureServices(app.Services);
 		}
+
+		#endregion
+
+		#region Transitions
 
 		public static bool Transition<TService, TImplementation>(this Application app) where TImplementation : class, TService
 		{
@@ -45,8 +50,18 @@ namespace Compose
 
         private static DynamicEmitter GetRegisteredDynamicEmitter(this Application app)
         {
-            app.Provider = app.Provider.Extend(new ServiceDescriptor(typeof(DynamicEmitter), typeof(DynamicEmitter), LifecycleKind.Singleton));
+            app.Provider.Extend(new ServiceDescriptor(typeof(DynamicEmitter), typeof(DynamicEmitter), LifecycleKind.Singleton));
             return app.GetRequiredService<DynamicEmitter>();
         }
-    }
+
+		#endregion
+
+		#region Snapshotting
+
+		public static void Snapshot(this Application app) { app.CreateSnapshot(); }
+
+		public static void Restore(this Application app) { app.RestoreSnapshot(); }
+
+		#endregion
+	}
 }

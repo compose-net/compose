@@ -20,7 +20,7 @@ namespace Transition.Demos
 			Name = "Proxy Transition" ;
 			this.UseServices(services =>
 			{
-				services.AddSampleServices()
+				services.AddSampleService()
 					.AsTransitional();
 			});
 			OnExecute<IHost>(Run);
