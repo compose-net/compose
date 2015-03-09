@@ -78,6 +78,9 @@
     <None Include="Compose.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="README.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>IF NOT EXIST "$(SolutionDir)artifacts\packages\$(ProjectName)\lib\" MKDIR "$(SolutionDir)artifacts\packages\$(ProjectName)\lib\net452\"

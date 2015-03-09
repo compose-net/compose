@@ -14,4 +14,7 @@
       <dependency id="Microsoft.Framework.DependencyInjection" version="1.0.0-beta3" />
     </dependencies>
   </metadata>
+  <files>
+    <file src="README.txt" target="" />
+  </files>
 </package>
