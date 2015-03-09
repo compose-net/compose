@@ -85,6 +85,7 @@
   <PropertyGroup>
     <PostBuildEvent>IF NOT EXIST "$(SolutionDir)artifacts\packages\$(ProjectName)\lib\" MKDIR "$(SolutionDir)artifacts\packages\$(ProjectName)\lib\net452\"
 COPY "$(TargetPath)" "$(SolutionDir)artifacts\packages\$(ProjectName)\lib\net452\"
+COPY "$(ProjectDir)README.txt" "$(SolutionDir)artifacts\packages\$(ProjectName)\"
 COPY "$(ProjectDir)$(ProjectName).nuspec" "$(SolutionDir)artifacts\packages\$(ProjectName)\"
 "$(SolutionDir)packages\NuGet.CommandLine.2.8.3\tools\NUGET" PACK "$(SolutionDir)artifacts\packages\$(ProjectName)\$(ProjectName).nuspec" -OutputDirectory "$(SolutionDir)artifacts\packages"</PostBuildEvent>
   </PropertyGroup>
