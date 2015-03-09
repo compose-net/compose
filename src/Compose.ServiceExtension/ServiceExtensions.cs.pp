@@ -1,8 +1,8 @@
-using Microsoft.Framework.ConfigurationModel;
+﻿using Microsoft.Framework.ConfigurationModel;
 using Microsoft.Framework.DependencyInjection;
 using System.Collections.Generic;
 
-namespace Transition.Service
+namespace $rootnamespace$
 {
 	public static class ServiceExtensions
 	{
@@ -14,7 +14,13 @@ namespace Transition.Service
 
 		private static IEnumerable<IServiceDescriptor> GetDefaultServices(IConfiguration configuration = null)
 		{
-			return TransitionServices.GetDefaultServices(configuration);
+			var describe = new ServiceDescriber(configuration);
+
+			// TODO: yield your service bindings
+
+			yield return describe.Transient<YourService, YourService>();
 		}
+
+		internal class YourService { }
 	}
 }
