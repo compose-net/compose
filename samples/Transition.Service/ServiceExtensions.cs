@@ -6,7 +6,7 @@ namespace Transition.Service
 {
 	public static class ServiceExtensions
 	{
-		public static IServiceCollection AddYourService(this IServiceCollection services, IConfiguration configuration = null)
+		public static IServiceCollection AddSampleService(this IServiceCollection services, IConfiguration configuration = null)
 		{
 			services.TryAdd(GetDefaultServices(configuration));
 			return services;
