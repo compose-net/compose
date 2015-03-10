@@ -27,6 +27,8 @@ namespace Compose
 			*/
 			var typeBuilder = _moduleBuilder.DefineType($"{_assemblyName.Name}+{serviceType.FullName}", TypeAttributes.Public | TypeAttributes.Sealed);
 			typeBuilder.AddInterfaceImplementation(serviceType);
+			foreach (var implementedInterface in serviceType.GetInterfaces())
+				typeBuilder.AddInterfaceImplementation(implementedInterface);
 			typeBuilder.AddInterfaceImplementation(typeof(ITransition<>).MakeGenericType(serviceType));
 			try
 			{
@@ -37,7 +39,7 @@ namespace Compose
 				return type;
 			}
 #else
-				return typeBuilder.CreateType();
+					return typeBuilder.CreateType();
 			}
 #endif
 			catch(Exception ex)

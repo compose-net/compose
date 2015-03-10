@@ -15,9 +15,10 @@ namespace Compose
 			var snapshotName = GetRandomString();
 			var serviceField = typeBuilder.AddServiceField(serviceName, serviceType);
 			var snapshotField = typeBuilder.AddSnapshotField(snapshotName, serviceType);
+			var implementedInterfaces = new[] { serviceType }.Union(serviceType.GetInterfaces()).ToArray();
 			typeBuilder.AddServiceConstructor(serviceField, serviceType);
-			typeBuilder.AddPropertyImplementations(serviceField, serviceType);
-			typeBuilder.AddMethodImplementations(serviceField, serviceType);
+			typeBuilder.AddPropertyImplementations(serviceField, implementedInterfaces);
+			typeBuilder.AddMethodImplementations(serviceField, implementedInterfaces);
 			typeBuilder.AddChangeImplementation(serviceField, serviceType);
 			typeBuilder.AddSnapshotImplementation(snapshotField, serviceField);
 			typeBuilder.AddRestoreImplementation(snapshotField, serviceField);
@@ -79,10 +80,11 @@ namespace Compose
 			methodEmitter.Emit(OpCodes.Ret);
 		}
 
-		internal static void AddMethodImplementations(this TypeBuilder typeBuilder, FieldBuilder serviceField, Type serviceType)
+		internal static void AddMethodImplementations(this TypeBuilder typeBuilder, FieldBuilder serviceField, Type[] implementedInterfaces)
 		{
-			foreach (var methodInfo in serviceType.GetMethods(BindingFlags.Instance | BindingFlags.Public).Where(x => !x.IsSpecialName))
-				ExceptionHelpers.ReThrow(typeBuilder.AddMethodImplementation, methodInfo, serviceField, serviceType, inner => new UnsupportedMethodDefinitionException(methodInfo, inner));
+			foreach (var implementedInterface in implementedInterfaces)
+				foreach (var methodInfo in implementedInterface.GetMethods(BindingFlags.Instance | BindingFlags.Public).Where(x => !x.IsSpecialName))
+					ExceptionHelpers.ReThrow(typeBuilder.AddMethodImplementation, methodInfo, serviceField, implementedInterface, inner => new UnsupportedMethodDefinitionException(methodInfo, inner));
 		}
 
 		internal static void AddMethodImplementation(this TypeBuilder typeBuilder, MethodInfo methodInfo, FieldBuilder serviceField, Type serviceType)
@@ -141,10 +143,11 @@ namespace Compose
 			throw new NotSupportedException("Generic constraint is not supported.");
 		}
 
-		internal static void AddPropertyImplementations(this TypeBuilder typeBuilder, FieldBuilder serviceField, Type serviceType)
+		internal static void AddPropertyImplementations(this TypeBuilder typeBuilder, FieldBuilder serviceField, Type[] implementedInterfaces)
 		{
-			foreach (var propertyInfo in serviceType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
-				ExceptionHelpers.ReThrow(typeBuilder.AddPropertyImplementation, propertyInfo, serviceField, inner => new UnsupportedPropertyDefinitionException(propertyInfo, inner));
+			foreach (var implementedInterface in implementedInterfaces)
+				foreach (var propertyInfo in implementedInterface.GetProperties(BindingFlags.Instance | BindingFlags.Public))
+					ExceptionHelpers.ReThrow(typeBuilder.AddPropertyImplementation, propertyInfo, serviceField, inner => new UnsupportedPropertyDefinitionException(propertyInfo, inner));
 		}
 
 		internal static void AddPropertyImplementation(this TypeBuilder typeBuilder, PropertyInfo propertyInfo, FieldBuilder serviceField)
