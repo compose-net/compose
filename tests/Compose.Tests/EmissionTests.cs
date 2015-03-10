@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.Framework.DependencyInjection;
+using Microsoft.Framework.OptionsModel;
 using System;
 using System.Collections.Generic;
 using Xunit;
@@ -474,6 +475,24 @@ namespace Compose.Tests
 			var service = app.CreateProxy<IInvokeInheritedInterfaceExplcitlyImplementedMethods>();
 			((IExplicitInterface1)service).Method();
 			((IExplicitInterface2)service).Method();
+		}
+		#endregion
+
+		#region CanGenerateProxyForOptions
+		private class Options { }
+		private class OptionsImplementation<T> : IOptions<T> where T : class, new()
+		{
+			public T Options { get; }
+
+			public T GetNamedOptions(string name) { return null; }
+		}
+		[Fact]
+		public void CanGenerateProxyForOptions()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => services.AddSingleton(typeof(IOptions<>), typeof(OptionsImplementation<>)));
+			Action act = () => app.CreateProxy<IOptions<Options>>();
+			act.ShouldNotThrow<UnsupportedClassDefintionException>();
 		}
 		#endregion
 

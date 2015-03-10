@@ -39,7 +39,7 @@ namespace Compose
 				return type;
 			}
 #else
-					return typeBuilder.CreateType();
+				return typeBuilder.CreateType();
 			}
 #endif
 			catch(Exception ex)
