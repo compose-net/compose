@@ -76,6 +76,9 @@ app.Restore();
 
 ##FAQ / Troubleshooting
 
+-Q. How to debug/view the code emitted?
+-A. Add the `ENABLE_SAVE_DYNAMIC_ASSEMBLY` compilation symbol to the _Compose_ build to have the dyanmic assemblies stored in the execution directory.
+
   [OWIN]: http://owin.org/
   [MVC 6 samples]: https://github.com/aspnet/Mvc/blob/dev/samples/MvcSample.Web/Startup.cs
   [Autofac]: http://autofac.org

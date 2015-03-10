@@ -33,7 +33,7 @@ namespace Compose
 			try
 			{
 				typeBuilder.AddDirectImplementation(serviceType);
-#if DEBUG
+#if ENABLE_SAVE_DYNAMIC_ASSEMBLY
 				var type = typeBuilder.CreateType();
 				_assemblyBuilder.Save($"{_assemblyName.Name}.dll");
 				return type;
