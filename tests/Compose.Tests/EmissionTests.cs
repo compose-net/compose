@@ -478,6 +478,22 @@ namespace Compose.Tests
 		}
 		#endregion
 
+		#region CanGenerateCovariantProxies
+		public interface ICovariant<out T> { T Method(); }
+		private class Covariant : ICovariant<string>
+		{
+			public string Method() { return null; }
+		}
+		[Fact]
+		public void CanGenerateCovariantProxies()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => services.AddTransient<ICovariant<string>, Covariant>());
+			Action act = () => app.CreateProxy<ICovariant<string>>();
+			act.ShouldNotThrow<Exception>();
+		}
+		#endregion
+
 		#region CanGenerateProxyForOptions
 		private class Options { }
 		private class OptionsImplementation<T> : IOptions<T> where T : class, new()
