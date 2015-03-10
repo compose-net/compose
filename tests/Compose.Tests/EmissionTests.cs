@@ -437,6 +437,30 @@ namespace Compose.Tests
         }
 		#endregion
 
+		#region CanInvokeInheritedInterfaceMethods
+		public interface IInvokeGenericAsArray<T> : IObservable<T>
+		{
+			void Method(T arg);
+		}
+		private class InvokeGenericAsArray : IInvokeGenericAsArray<byte[]>
+		{
+			public void Method(byte[] arg) { }
+
+			public IDisposable Subscribe(IObserver<byte[]> observer)
+			{
+				throw new NotImplementedException();
+			}
+		}
+        [Fact]
+		public void CanInvokeGenericAsArray()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => services.AddTransient<IInvokeGenericAsArray<byte[]>, InvokeGenericAsArray>());
+			var service = app.CreateProxy<IInvokeGenericAsArray<byte[]>>();
+			service.Method(new byte[0]);
+		}
+		#endregion
+
 		#region Common Classes
 		public abstract class Base { }
 
