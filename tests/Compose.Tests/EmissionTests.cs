@@ -457,6 +457,26 @@ namespace Compose.Tests
 		}
 		#endregion
 
+		#region CanInvokeInheritedInterfaceExplcitlyImplementedMethods
+		public interface IExplicitInterface1 { void Method(); }
+		public interface IExplicitInterface2 { void Method(); }
+		public interface IInvokeInheritedInterfaceExplcitlyImplementedMethods : IExplicitInterface1, IExplicitInterface2 { }
+        private class InvokeInheritedInterfaceExplcitlyImplementedMethods : IInvokeInheritedInterfaceExplcitlyImplementedMethods
+		{
+			void IExplicitInterface1.Method() { }
+			void IExplicitInterface2.Method() { }
+		}
+		[Fact]
+		public void CanInvokeInheritedInterfaceExplcitlyImplementedMethods()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => services.AddTransient<IInvokeInheritedInterfaceExplcitlyImplementedMethods, InvokeInheritedInterfaceExplcitlyImplementedMethods>());
+			var service = app.CreateProxy<IInvokeInheritedInterfaceExplcitlyImplementedMethods>();
+			((IExplicitInterface1)service).Method();
+			((IExplicitInterface2)service).Method();
+		}
+		#endregion
+
 		#region Common Classes
 		public abstract class Base { }
 
