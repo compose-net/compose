@@ -494,6 +494,21 @@ namespace Compose.Tests
 		}
 		#endregion
 
+		#region CanGenerateProxiesForSystemInterfaces
+		private class Disposable : IDisposable
+		{
+			public void Dispose() { }
+		}
+		[Fact]
+		public void CanGenerateProxiesForSystemInterfaces()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => services.AddTransient<IDisposable, Disposable>());
+			Action act = () => app.CreateProxy<IDisposable>();
+			act.ShouldNotThrow<Exception>();
+		}
+		#endregion
+
 		#region CanGenerateProxyForOptions
 		private class Options { }
 		private class OptionsImplementation<T> : IOptions<T> where T : class, new()
