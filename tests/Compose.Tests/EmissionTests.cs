@@ -523,7 +523,23 @@ namespace Compose.Tests
 			app.UseServices(services => services.AddTransient(typeof(IUntypedGeneric<>), typeof(UntypedGeneric<>)));
 			Action act = () => app.CreateProxy<IUntypedGeneric<string>>();
 			act.ShouldNotThrow<Exception>();
+		}
+		#endregion
 
+		#region CanGenerateProxyForConfigureOptions
+		private class ConfigureOptions<T> : IConfigureOptions<T>
+		{
+			public int Order { get; }
+
+			public void Configure(T options, string name = "") { }
+		}
+		[Fact]
+		public void CanGenerateProxyForConfigureOptions()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => services.AddTransient(typeof(IConfigureOptions<>), typeof(ConfigureOptions<>)));
+			Action act = () => app.CreateProxy<IConfigureOptions<IOptions<object>>>();
+			act.ShouldNotThrow<Exception>();
 		}
 		#endregion
 
