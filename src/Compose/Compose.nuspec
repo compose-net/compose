@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>Compose</id>
-    <version>0.0.4-alpha</version>
+    <version>0.0.5-alpha</version>
     <authors>Tommy Long</authors>
     <owners>Tommy Long</owners>
     <licenseUrl>https://raw.githubusercontent.com/Smudge202/Compose/master/LICENSE</licenseUrl>
@@ -16,5 +16,6 @@
   </metadata>
   <files>
     <file src="README.txt" target="" />
+    <file src="lib\net452\Compose.dll" target="lib\net452\Compose.dll" />
   </files>
 </package>

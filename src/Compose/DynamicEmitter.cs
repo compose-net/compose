@@ -27,17 +27,19 @@ namespace Compose
 			*/
 			var typeBuilder = _moduleBuilder.DefineType($"{_assemblyName.Name}+{serviceType.FullName}", TypeAttributes.Public | TypeAttributes.Sealed);
 			typeBuilder.AddInterfaceImplementation(serviceType);
+			foreach (var implementedInterface in serviceType.GetInterfaces())
+				typeBuilder.AddInterfaceImplementation(implementedInterface);
 			typeBuilder.AddInterfaceImplementation(typeof(ITransition<>).MakeGenericType(serviceType));
 			try
 			{
 				typeBuilder.AddDirectImplementation(serviceType);
-#if DEBUG
+#if ENABLE_SAVE_DYNAMIC_ASSEMBLY
 				var type = typeBuilder.CreateType();
 				_assemblyBuilder.Save($"{_assemblyName.Name}.dll");
 				return type;
 			}
 #else
-				return typeBuilder.CreateType();
+					return typeBuilder.CreateType();
 			}
 #endif
 			catch(Exception ex)
