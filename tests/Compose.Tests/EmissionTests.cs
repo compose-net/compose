@@ -494,18 +494,36 @@ namespace Compose.Tests
 		}
 		#endregion
 
-		#region CanGenerateProxiesForSystemInterfaces
+		#region CanGenerateProxyForSystemInterfaces
 		private class Disposable : IDisposable
 		{
 			public void Dispose() { }
 		}
 		[Fact]
-		public void CanGenerateProxiesForSystemInterfaces()
+		public void CanGenerateProxyForSystemInterfaces()
 		{
 			var app = new Fake.Application();
 			app.UseServices(services => services.AddTransient<IDisposable, Disposable>());
 			Action act = () => app.CreateProxy<IDisposable>();
 			act.ShouldNotThrow<Exception>();
+		}
+		#endregion
+
+		#region CanGenerateProxyForUntypedGenerics
+		public interface IUntypedGeneric<T> { void Method(); }
+		private class UntypedGeneric<T> : IUntypedGeneric<T>
+		{
+			public void Method() { }
+		}
+
+		[Fact]
+		public void CanGenerateProxyForUntypedGenerics()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => services.AddTransient(typeof(IUntypedGeneric<>), typeof(UntypedGeneric<>)));
+			Action act = () => app.CreateProxy<IUntypedGeneric<string>>();
+			act.ShouldNotThrow<Exception>();
+
 		}
 		#endregion
 
