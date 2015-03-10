@@ -438,26 +438,22 @@ namespace Compose.Tests
 		#endregion
 
 		#region CanInvokeInheritedInterfaceMethods
-		public interface IInvokeGenericAsArray<T> : IObservable<T>
+		public interface INestedInterface { void NestedMethod(); }
+		public interface IParentInterface : INestedInterface { void ParentMethod(); }
+		private class InvokeInheritedInterfaceMethods : IParentInterface
 		{
-			void Method(T arg);
-		}
-		private class InvokeGenericAsArray : IInvokeGenericAsArray<byte[]>
-		{
-			public void Method(byte[] arg) { }
+			public void NestedMethod() { }
 
-			public IDisposable Subscribe(IObserver<byte[]> observer)
-			{
-				throw new NotImplementedException();
-			}
+			public void ParentMethod() { }
 		}
         [Fact]
-		public void CanInvokeGenericAsArray()
+		public void CanInvokeInheritedInterfaceMethods()
 		{
 			var app = new Fake.Application();
-			app.UseServices(services => services.AddTransient<IInvokeGenericAsArray<byte[]>, InvokeGenericAsArray>());
-			var service = app.CreateProxy<IInvokeGenericAsArray<byte[]>>();
-			service.Method(new byte[0]);
+			app.UseServices(services => services.AddTransient<IParentInterface, InvokeInheritedInterfaceMethods>());
+			var service = app.CreateProxy<IParentInterface>();
+			service.ParentMethod();
+			service.NestedMethod();
 		}
 		#endregion
 
