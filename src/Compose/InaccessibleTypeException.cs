@@ -5,9 +5,9 @@ namespace Compose
 	public class InaccessibleTypeException : Exception
 	{
 		public InaccessibleTypeException(Type serviceType)
-			: base($"") { }
+			: base($"{serviceType.FullName} must be public.") { }
 
 		public InaccessibleTypeException(Type serviceType, Type inaccessibleType)
-			: base($"") { }
+			: base($"The {inaccessibleType.FullName} generic on {serviceType.FullName} must be public.") { }
 	}
 }
