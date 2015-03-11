@@ -31,6 +31,8 @@ namespace Compose
 			typeBuilder.AddInterfaceImplementation(serviceType);
 			foreach (var implementedInterface in serviceType.GetInterfaces())
 				typeBuilder.AddInterfaceImplementation(implementedInterface);
+			if (serviceType.IsGenericType)
+				typeBuilder.AddGenericsFrom(serviceType);
 			typeBuilder.AddInterfaceImplementation(typeof(ITransition<>).MakeGenericType(serviceType));
 			try
 			{

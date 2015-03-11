@@ -489,6 +489,19 @@ namespace Compose.Tests
 		}
 		#endregion
 
+		#region CanGenerateGenericProxy
+		public interface IGeneric<T> { }
+		private class Generic<T> : IGeneric<T> { }
+		[Fact]
+		public void CanGenerateGenericProxy()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => services.AddTransient(typeof(IGeneric<>), typeof(Generic<>)));
+			Action act = () => app.CreateProxy(typeof(IGeneric<>));
+			act.ShouldNotThrow<Exception>();
+		}
+		#endregion
+
 		private static Action InvokeProxy<TInterface, TImplementation>()
 			where TImplementation : TInterface where TInterface : class
 		{
