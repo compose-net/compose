@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -19,6 +20,7 @@ namespace Compose
 
 		internal Type GetDirectTransitionImplementation(Type serviceType)
 		{
+			ValidateProxyIsPossible(serviceType);
 			/* C#: 
 			public sealed class WrapperName : TService, ITransition<TService>
 			{
@@ -44,8 +46,21 @@ namespace Compose
 #endif
 			catch(Exception ex)
 			{
-				throw new UnsupportedClassDefintionException(serviceType, ex);
+				throw new UnsupportedTypeDefintionException(serviceType, ex);
 			}
+		}
+
+		private void ValidateProxyIsPossible(Type serviceType)
+		{
+			if (serviceType.IsGenericType)
+				ValidateGenericTypesAccessible(serviceType);
+		}
+
+		private void ValidateGenericTypesAccessible(Type serviceType)
+		{
+			var inaccessibleGeneric = serviceType.GetGenericArguments().FirstOrDefault(x => x.IsNotPublic);
+			if (inaccessibleGeneric != null)
+				throw new InaccessibleTypeException(serviceType, inaccessibleGeneric);
 		}
 
 		private AssemblyName CreateAssemblyName()

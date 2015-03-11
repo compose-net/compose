@@ -15,10 +15,8 @@ namespace Compose.Tests
 		[Fact]
 		public void CanGenerateDynamicProxy()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransient<IBlank, Dependency>(); });
-			var service = app.CreateProxy<IBlank>();
-			service.Should().NotBeNull();
+			SetupProxy<IBlank, Dependency>()
+				.Should().NotBeNull();
 		}
 		#endregion
 
@@ -32,11 +30,8 @@ namespace Compose.Tests
 		[Fact]
 		public void CanGetProperty()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransient<IGetProperty, GetProperty>(); });
-			GetProperty.Id = Guid.NewGuid().ToString();
-			var service = app.CreateProxy<IGetProperty>();
-			service.Property.Should().Be(GetProperty.Id);
+			SetupProxy<IGetProperty, GetProperty>()()
+				.Property.Should().Be(GetProperty.Id);
 		}
 		#endregion
 
@@ -50,9 +45,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanSetProperty()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransient<ISetProperty, SetProperty>(); });
-			var service = app.CreateProxy<ISetProperty>();
+			var service = SetupProxy<ISetProperty, SetProperty>()();
 			var id = Guid.NewGuid().ToString();
 			service.Property = id;
 			SetProperty.Id.Should().Be(id);
@@ -70,9 +63,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanInvokeVoidWithoutArguments()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransient<IInvokeWithoutArguments, InvokeWithoutArguments>(); });
-			var service = app.CreateProxy<IInvokeWithoutArguments>();
+			var service = SetupProxy<IInvokeWithoutArguments, InvokeWithoutArguments>()();
 			InvokeWithoutArguments.Invoked = false;
 			service.Method();
 			InvokeWithoutArguments.Invoked.Should().BeTrue();
@@ -89,9 +80,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanInvokeVoidWithArguments()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransient<IInvokeWithArguments, InvokeWithArguments>(); });
-			var service = app.CreateProxy<IInvokeWithArguments>();
+			var service = SetupProxy<IInvokeWithArguments, InvokeWithArguments>()();
 			InvokeWithArguments.Invoked = 0;
 			service.Method(1);
 			InvokeWithArguments.Invoked.Should().Be(1);
@@ -108,9 +97,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanReturnInvocationResult()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransient<IReturnFromInvoke, ReturnFromInvoke>(); });
-			var service = app.CreateProxy<IReturnFromInvoke>();
+			var service = SetupProxy<IReturnFromInvoke, ReturnFromInvoke>()();
 			ReturnFromInvoke.Return = 1;
 			service.Method().Should().Be(ReturnFromInvoke.Return);
 		}
@@ -126,10 +113,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanPassThroughExceptions()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransient<IThrowException, ThrowException>(); });
-			var service = app.CreateProxy<IThrowException>();
-			Action act = service.Method;
+			Action act = () => SetupProxy<IThrowException, ThrowException>()().Method();
 			act.ShouldThrow<TestException>();
 		}
 		#endregion
@@ -149,9 +133,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanChangeImplementation()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransient<IDependency, Dependency1>(); });
-			var service = app.CreateProxy<IDependency>();
+			var service = SetupProxy<IDependency, Dependency1>()();
 			Dependency1.Id = Guid.NewGuid().ToString();
 			service.GetId().Should().Be(Dependency1.Id);
 			var transition = service as ITransition<IDependency>;
@@ -171,9 +153,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanInvokeVoidWithGenericArguments()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransient<IInvokeWithGenericArguments, InvokeWithGenericArguments>(); });
-			var service = app.CreateProxy<IInvokeWithGenericArguments>();
+			var service = SetupProxy<IInvokeWithGenericArguments, InvokeWithGenericArguments>()();
 			service.Method(1, 2, 3);
 		}
 		#endregion
@@ -188,9 +168,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanReturnGenericInvocationResult()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransient<IReturnGenericFromInvoke, ReturnGenericFromInvoke>(); });
-			var service = app.CreateProxy<IReturnGenericFromInvoke>();
+			var service = SetupProxy<IReturnGenericFromInvoke, ReturnGenericFromInvoke>()();
 			service.Method(true).Should().BeTrue();
 			service.Method(1).Should().Be(1);
 		}
@@ -206,9 +184,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanInvokeVoidWithInterfaceConstrainedGenericArguments()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransient<IInvokeWithInterfaceConstrainedGenericArguments, InvokeWithInterfaceConstrainedGenericArguments>(); });
-			var service = app.CreateProxy<IInvokeWithInterfaceConstrainedGenericArguments>();
+			var service = SetupProxy<IInvokeWithInterfaceConstrainedGenericArguments, InvokeWithInterfaceConstrainedGenericArguments>()();
 			service.Method(new Dependency1());
 		}
 		#endregion
@@ -222,9 +198,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanInvokeVoidWithBaseClassConstrainedGenericArguments()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransient<IInvokeWithBaseClassConstrainedGenericArguments, InvokeWithBaseClassConstrainedGenericArguments>(); });
-			var service = app.CreateProxy<IInvokeWithBaseClassConstrainedGenericArguments>();
+			var service = SetupProxy<IInvokeWithBaseClassConstrainedGenericArguments, InvokeWithBaseClassConstrainedGenericArguments>()();
 			service.Method(new Derivative());
 		}
 		#endregion
@@ -238,9 +212,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanInvokeWithDefaultConstructorConstrainedGenericArgument()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransient<IInvokeWithDefaultConstructorConstrainedGenericArguments, InvokeWithDefaultConstructorConstrainedGenericArguments>(); });
-			var service = app.CreateProxy<IInvokeWithDefaultConstructorConstrainedGenericArguments>();
+			var service = SetupProxy<IInvokeWithDefaultConstructorConstrainedGenericArguments, InvokeWithDefaultConstructorConstrainedGenericArguments>()();
 			service.Method(new object());
 		}
 		#endregion
@@ -254,9 +226,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanInvokeWithClassConstrainedGenericArgument()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransient<IInvokeWithClassConstrainedGenericArguments, InvokeWithClassConstrainedGenericArguments>(); });
-			var service = app.CreateProxy<IInvokeWithClassConstrainedGenericArguments>();
+			var service = SetupProxy<IInvokeWithClassConstrainedGenericArguments, InvokeWithClassConstrainedGenericArguments>()();
 			service.Method(new object());
 		}
 		#endregion
@@ -270,9 +240,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanInvokeWithStructConstrainedGenericArgument()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransient<IInvokeWithStructConstrainedGenericArguments, InvokeWithStructConstrainedGenericArguments>(); });
-			var service = app.CreateProxy<IInvokeWithStructConstrainedGenericArguments>();
+			var service = SetupProxy<IInvokeWithStructConstrainedGenericArguments, InvokeWithStructConstrainedGenericArguments>()();
 			service.Method(1);
 		}
 		#endregion
@@ -291,9 +259,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanInvokeOverloadedMethods()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransient<IInvokeOverloadedMethods, InvokeOverloadedMethods>(); });
-			var service = app.CreateProxy<IInvokeOverloadedMethods>();
+			var service = SetupProxy<IInvokeOverloadedMethods, InvokeOverloadedMethods>()();
 			service.Method(1);
 			service.Method("a");
 		}
@@ -308,9 +274,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanInvokeWithNestedGenericArgument()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransient<IInvokeWithNestedGenericArgument, InvokeWithNestedGenericArgument>(); });
-			var service = app.CreateProxy<IInvokeWithNestedGenericArgument>();
+			var service = SetupProxy<IInvokeWithNestedGenericArgument, InvokeWithNestedGenericArgument>()();
 			service.Method(new List<List<int>>());
 		}
 		#endregion
@@ -324,9 +288,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanInvokeWithClassDefinedGenericArgument()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransient<IInvokeWithClassDefinedGenericArgument<int>, InvokeWithClassDefinedGenericArgument<int>>(); });
-			var service = app.CreateProxy<IInvokeWithClassDefinedGenericArgument<int>>();
+			var service = SetupProxy<IInvokeWithClassDefinedGenericArgument<int>, InvokeWithClassDefinedGenericArgument<int>>()();
 			service.Method(1);
 		}
 		#endregion
@@ -340,9 +302,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanInvokeWithClassGenericConstrainedGenericArguments()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransient<IInvokeWithClassGenericConstrainedGenericArguments<Base>, InvokeWithClassGenericConstrainedGenericArguments<Base>>(); });
-			var service = app.CreateProxy<IInvokeWithClassGenericConstrainedGenericArguments<Base>>();
+			var service = SetupProxy<IInvokeWithClassGenericConstrainedGenericArguments<Base>, InvokeWithClassGenericConstrainedGenericArguments<Base>>()();
 			service.Method(new Derivative());
 		}
 		#endregion
@@ -356,9 +316,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanInvokeWithMethodGenericConstrainedGenericArguments()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransient<IInvokeWithMethodGenericConstrainedGenericArguments, InvokeWithMethodGenericConstrainedGenericArguments>(); });
-			var service = app.CreateProxy<IInvokeWithMethodGenericConstrainedGenericArguments>();
+			var service = SetupProxy<IInvokeWithMethodGenericConstrainedGenericArguments, InvokeWithMethodGenericConstrainedGenericArguments>()();
 			service.Method((Base)null, new Derivative());
 		}
 		#endregion
@@ -372,12 +330,10 @@ namespace Compose.Tests
 		[Fact]
 		public void CanInvokeWithByRefArguments()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransient<IInvokeWithByRefArgument, InvokeWithByRefArgument>(); });
-			var service = app.CreateProxy<IInvokeWithByRefArgument>();
+			var service = SetupProxy<IInvokeWithByRefArgument, InvokeWithByRefArgument>()();
 			var arg = 0;
 			service.Method(ref arg);
-        }
+		}
 		#endregion
 
 		#region CanInvokeWithOutArguments
@@ -389,12 +345,10 @@ namespace Compose.Tests
 		[Fact]
 		public void CanInvokeWithOutArguments()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransient<IInvokeWithOutArguments, InvokeWithOutArguments>(); });
-			var service = app.CreateProxy<IInvokeWithOutArguments>();
+			var service = SetupProxy<IInvokeWithOutArguments, InvokeWithOutArguments>()();
 			var arg = 0;
 			service.Method(out arg);
-        }
+		}
 		#endregion
 
 		#region CanInvokeWithParamsArguments
@@ -406,11 +360,9 @@ namespace Compose.Tests
 		[Fact]
 		public void CanInvokeWithParamsArguments()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransient<IInvokeWithParamsArguments, InvokeWithParamsArguments>(); });
-			var service = app.CreateProxy<IInvokeWithParamsArguments>();
+			var service = SetupProxy<IInvokeWithParamsArguments, InvokeWithParamsArguments>()();
 			service.Method(1, 2, 3);
-        }
+		}
 		#endregion
 
 		#region CanInvokeWithAllGenericConstraints
@@ -429,13 +381,11 @@ namespace Compose.Tests
 		[Fact]
 		public void CanInvokeWithAllGenericConstraints()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransient<IInvokeWithAllGenericConstraints<Base>, InvokeWithAllGenericConstraints<Base>>(); });
-			var service = app.CreateProxy<IInvokeWithAllGenericConstraints<Base>>();
+			var service = SetupProxy<IInvokeWithAllGenericConstraints<Base>, InvokeWithAllGenericConstraints<Base>>()();
 			var arg1 = new Derivative();
 			var arg2 = new LowerDerivative();
 			service.Method(ref arg1, out arg2);
-        }
+		}
 		#endregion
 
 		#region CanInvokeInheritedInterfaceMethods
@@ -447,12 +397,10 @@ namespace Compose.Tests
 
 			public void ParentMethod() { }
 		}
-        [Fact]
+		[Fact]
 		public void CanInvokeInheritedInterfaceMethods()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => services.AddTransient<IParentInterface, InvokeInheritedInterfaceMethods>());
-			var service = app.CreateProxy<IParentInterface>();
+			var service = SetupProxy<IParentInterface, InvokeInheritedInterfaceMethods>()();
 			service.ParentMethod();
 			service.NestedMethod();
 		}
@@ -462,7 +410,7 @@ namespace Compose.Tests
 		public interface IExplicitInterface1 { void Method(); }
 		public interface IExplicitInterface2 { void Method(); }
 		public interface IInvokeInheritedInterfaceExplcitlyImplementedMethods : IExplicitInterface1, IExplicitInterface2 { }
-        private class InvokeInheritedInterfaceExplcitlyImplementedMethods : IInvokeInheritedInterfaceExplcitlyImplementedMethods
+		private class InvokeInheritedInterfaceExplcitlyImplementedMethods : IInvokeInheritedInterfaceExplcitlyImplementedMethods
 		{
 			void IExplicitInterface1.Method() { }
 			void IExplicitInterface2.Method() { }
@@ -470,9 +418,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanInvokeInheritedInterfaceExplcitlyImplementedMethods()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => services.AddTransient<IInvokeInheritedInterfaceExplcitlyImplementedMethods, InvokeInheritedInterfaceExplcitlyImplementedMethods>());
-			var service = app.CreateProxy<IInvokeInheritedInterfaceExplcitlyImplementedMethods>();
+			var service = SetupProxy<IInvokeInheritedInterfaceExplcitlyImplementedMethods, InvokeInheritedInterfaceExplcitlyImplementedMethods>()();
 			((IExplicitInterface1)service).Method();
 			((IExplicitInterface2)service).Method();
 		}
@@ -487,10 +433,8 @@ namespace Compose.Tests
 		[Fact]
 		public void CanGenerateCovariantProxies()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => services.AddTransient<ICovariant<string>, Covariant>());
-			Action act = () => app.CreateProxy<ICovariant<string>>();
-			act.ShouldNotThrow<Exception>();
+			InvokeProxy<ICovariant<string>, Covariant>()
+				.ShouldNotThrow<Exception>();
 		}
 		#endregion
 
@@ -502,10 +446,8 @@ namespace Compose.Tests
 		[Fact]
 		public void CanGenerateProxyForSystemInterfaces()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => services.AddTransient<IDisposable, Disposable>());
-			Action act = () => app.CreateProxy<IDisposable>();
-			act.ShouldNotThrow<Exception>();
+			InvokeProxy<IDisposable, Disposable>()
+				.ShouldNotThrow<Exception>();
 		}
 		#endregion
 
@@ -515,56 +457,77 @@ namespace Compose.Tests
 		{
 			public void Method() { }
 		}
-
 		[Fact]
 		public void CanGenerateProxyForUntypedGenerics()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => services.AddTransient(typeof(IUntypedGeneric<>), typeof(UntypedGeneric<>)));
-			Action act = () => app.CreateProxy<IUntypedGeneric<string>>();
-			act.ShouldNotThrow<Exception>();
+			InvokeProxy<IUntypedGeneric<string>>(typeof(IUntypedGeneric<>), typeof(UntypedGeneric<>))
+				.ShouldNotThrow<Exception>();
 		}
 		#endregion
 
-		#region CanGenerateProxyForConfigureOptions
-		private class ConfigureOptions<T> : IConfigureOptions<T>
-		{
-			public int Order { get; }
-
-			public void Configure(T options, string name = "") { }
-		}
+		#region CanThrowInformativeExceptionWhenInterfaceIsInternal
+		public interface IInformativeExceptionThrownForInternalInterface<T> { }
+		private class InformativeExceptionThrownForInternalInterfaceGeneric { }
+		private class InformativeExceptionThrownForInternalInterface
+			: IInformativeExceptionThrownForInternalInterface<InformativeExceptionThrownForInternalInterfaceGeneric>
+		{ }
 		[Fact]
-		public void CanGenerateProxyForConfigureOptions()
+		public void CanThrowInformativeExceptionWhenInterfaceIsInternal()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => services.AddTransient(typeof(IConfigureOptions<>), typeof(ConfigureOptions<>)));
-			Action act = () => app.CreateProxy<IConfigureOptions<IOptions<object>>>();
-			act.ShouldNotThrow<Exception>();
+			InvokeProxy<IInformativeExceptionThrownForInternalInterface<InformativeExceptionThrownForInternalInterfaceGeneric>, InformativeExceptionThrownForInternalInterface>()
+				.ShouldThrow<InaccessibleTypeException>();
 		}
 		#endregion
 
-		#region CanGenerateProxyForOptions
-		private class Options { }
-		private class OptionsImplementation<T> : IOptions<T> where T : class, new()
-		{
-			public T Options { get; }
-
-			public T GetNamedOptions(string name) { return null; }
-		}
+		#region CanThrowInformativeExceptionWhenGenericTypeIsInternal
+		internal interface IInformativeExceptionThrownForInternalGeneric { }
+		private class InformativeExceptionThrownForInternalGeneric : IInformativeExceptionThrownForInternalGeneric { }
 		[Fact]
-		public void CanGenerateProxyForOptions()
+		public void CanThrowInformativeExceptionWhenGenericTypeIsInternal()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => services.AddSingleton(typeof(IOptions<>), typeof(OptionsImplementation<>)));
-			Action act = () => app.CreateProxy<IOptions<Options>>();
-			act.ShouldNotThrow<UnsupportedClassDefintionException>();
+			InvokeProxy<IInformativeExceptionThrownForInternalGeneric, InformativeExceptionThrownForInternalGeneric>()
+				.ShouldThrow<InaccessibleTypeException>();
 		}
 		#endregion
+
+		private static Action InvokeProxy<TInterface, TImplementation>()
+			where TImplementation : TInterface where TInterface : class
+		{
+			return () => SetupProxy<TInterface>(typeof(TImplementation))();
+		}
+
+		private static Action InvokeProxy<T>(Type implementationType) where T : class
+		{
+			return () => SetupProxy<T>(implementationType)();
+		}
+
+		private static Action InvokeProxy<T>(Type interfaceType, Type implementationType) where T : class
+		{
+			return () => SetupProxy<T>(interfaceType, implementationType);
+		}
+
+		private static Func<TInterface> SetupProxy<TInterface, TImplementation>()
+			where TImplementation : TInterface where TInterface : class
+		{
+			return SetupProxy<TInterface>(typeof(TImplementation));
+		}
+
+		private static Func<T> SetupProxy<T>(Type implementationType) where T : class
+		{
+			return SetupProxy<T>(typeof(T), implementationType);
+		}
+
+		private static Func<T> SetupProxy<T>(Type interfaceType, Type implementationType) where T : class
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => services.AddTransient(interfaceType, implementationType));
+			return app.CreateProxy<T>;
+		}
 
 		#region Common Classes
 		public abstract class Base { }
 
 		private class Derivative : Base { }
-		#endregion	
+		#endregion
 	}
 }
