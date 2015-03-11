@@ -52,13 +52,16 @@ namespace Compose
 
 		private void ValidateProxyIsPossible(Type serviceType)
 		{
+			if (!serviceType.IsPublic && !serviceType.IsNestedPublic)
+				throw new InaccessibleTypeException(serviceType);
 			if (serviceType.IsGenericType)
 				ValidateGenericTypesAccessible(serviceType);
 		}
 
 		private void ValidateGenericTypesAccessible(Type serviceType)
 		{
-			var inaccessibleGeneric = serviceType.GetGenericArguments().FirstOrDefault(x => x.IsNotPublic);
+			var inaccessibleGeneric = serviceType.GetGenericArguments()
+				.FirstOrDefault(x => !x.IsPublic && !x.IsNestedPublic);
 			if (inaccessibleGeneric != null)
 				throw new InaccessibleTypeException(serviceType, inaccessibleGeneric);
 		}

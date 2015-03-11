@@ -466,26 +466,25 @@ namespace Compose.Tests
 		#endregion
 
 		#region CanThrowInformativeExceptionWhenInterfaceIsInternal
-		public interface IInformativeExceptionThrownForInternalInterface<T> { }
-		private class InformativeExceptionThrownForInternalInterfaceGeneric { }
-		private class InformativeExceptionThrownForInternalInterface
-			: IInformativeExceptionThrownForInternalInterface<InformativeExceptionThrownForInternalInterfaceGeneric>
-		{ }
+		internal interface IInformativeExceptionThrownForInternalInterface { }
+		private class InformativeExceptionThrownForInternalInterface : IInformativeExceptionThrownForInternalInterface { }
 		[Fact]
 		public void CanThrowInformativeExceptionWhenInterfaceIsInternal()
 		{
-			InvokeProxy<IInformativeExceptionThrownForInternalInterface<InformativeExceptionThrownForInternalInterfaceGeneric>, InformativeExceptionThrownForInternalInterface>()
+			InvokeProxy<IInformativeExceptionThrownForInternalInterface, InformativeExceptionThrownForInternalInterface>()
 				.ShouldThrow<InaccessibleTypeException>();
 		}
 		#endregion
 
 		#region CanThrowInformativeExceptionWhenGenericTypeIsInternal
-		internal interface IInformativeExceptionThrownForInternalGeneric { }
-		private class InformativeExceptionThrownForInternalGeneric : IInformativeExceptionThrownForInternalGeneric { }
+		public interface IInformativeExceptionThrownForInternalGeneric<T> { }
+		private class InformativeExceptionThrownForInternalInterfaceGeneric { }
+		private class InformativeExceptionThrownForInternalGeneric 
+			: IInformativeExceptionThrownForInternalGeneric<InformativeExceptionThrownForInternalInterfaceGeneric> { }
 		[Fact]
 		public void CanThrowInformativeExceptionWhenGenericTypeIsInternal()
 		{
-			InvokeProxy<IInformativeExceptionThrownForInternalGeneric, InformativeExceptionThrownForInternalGeneric>()
+			InvokeProxy<IInformativeExceptionThrownForInternalGeneric<InformativeExceptionThrownForInternalInterfaceGeneric>, InformativeExceptionThrownForInternalGeneric>()
 				.ShouldThrow<InaccessibleTypeException>();
 		}
 		#endregion
