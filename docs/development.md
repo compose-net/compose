@@ -26,7 +26,7 @@ We will be following the [project structure] suggested by David Fowler for .Net 
 
 ## Documentation
 
-It is expected that documentation, samples and tests are updated and with each commit/pull request as required, as opposed to being completed in bulk as a separate issue (or documentation week).
+It is expected that documentation, samples and tests are updated alongside code changes as required, as opposed to being completed in bulk as a separate issue _(or documentation week)_.
 
 ##Roadmap
 
