@@ -22,7 +22,7 @@ namespace Compose
 		{
 			ValidateProxyIsPossible(serviceType);
 			/* C#: 
-			public sealed class WrapperName : TService, ITransition<TService>
+			public sealed class WrapperName[<TService>] : TService, ITransition<TService>
 			{
 				// AddDirectImplementation...
 			}

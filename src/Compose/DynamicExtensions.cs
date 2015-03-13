@@ -11,8 +11,11 @@ namespace Compose
 
 		internal static void AddGenericsFrom(this TypeBuilder typeBuilder, Type serviceType)
 		{
-			var serviceGenerics = serviceType.GetGenericArguments();
-			typeBuilder.DefineGenericParameters(serviceGenerics.Select(x => x.Name).ToArray());
+			var serviceGenerics = serviceType.GetGenericArguments().ToArray();
+			var genericBuilders = typeBuilder.DefineGenericParameters(serviceGenerics.Select(x => x.Name).ToArray());
+			for (var i = 0; i < genericBuilders.Length; i++)
+				if (serviceGenerics[i].IsGenericParameter)
+					genericBuilders[i].DefineGeneric(serviceGenerics[i], serviceGenerics, serviceType);
 		}
 
 		internal static void AddDirectImplementation(this TypeBuilder typeBuilder, Type serviceType)

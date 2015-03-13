@@ -174,6 +174,62 @@ namespace Compose.Tests
 		}
 		#endregion
 
+		#region CanGenerateProxyWithInterfaceConstrainedGenericArguments
+		public interface IInterfaceConstraint { }
+		public interface IInterfaceConstrainedGenericArgument<T> where T : IInterfaceConstraint { }
+		private class InterfaceConstrainedGenericArgument<T> : IInterfaceConstrainedGenericArgument<T> where T : IInterfaceConstraint { }
+		[Fact]
+		public void CanGenerateProxyWithInterfaceConstrainedGenericArguments()
+		{
+			CreateProxy(typeof(IInterfaceConstrainedGenericArgument<>), typeof(InterfaceConstrainedGenericArgument<>))
+				.ShouldNotThrow<Exception>();
+		}
+		#endregion
+
+		#region CanGenerateProxyWithBaseClassConstrainedGenericArguments
+		public interface IInterfaceWithBaseClassConstrainedGenericArgument<T> where T : Base { }
+		private class InterfaceWithBaseClassConstrainedGenericArgument<T> : IInterfaceWithBaseClassConstrainedGenericArgument<T> where T : Derivative { }
+		[Fact]
+		public void CanGenerateProxyWithBaseClassConstrainedGenericArguments()
+		{
+			CreateProxy(typeof(IInterfaceWithBaseClassConstrainedGenericArgument<>), typeof(InterfaceWithBaseClassConstrainedGenericArgument<>))
+				.ShouldNotThrow<Exception>();
+        }
+		#endregion
+
+		#region CanGenerateProxyWithDefaultConstructorConstrainedGenericArguments
+		public interface IInterfaceWithDefaultConstructorConstrainedGenericArgument<T> where T : new() { }
+		private class InterfaceWithDefaultConstructorConstrainedGenericArgument<T> : IInterfaceWithDefaultConstructorConstrainedGenericArgument<T> where T : new() { }
+		[Fact]
+		public void CanGenerateProxyWithDefaultConstructorConstrainedGenericArguments()
+		{
+			CreateProxy(typeof(IInterfaceWithDefaultConstructorConstrainedGenericArgument<>), typeof(InterfaceWithDefaultConstructorConstrainedGenericArgument<>))
+				.ShouldNotThrow<Exception>();
+        }
+		#endregion
+
+		#region CanGenerateProxyWithClassConstrainedGenericArguments
+		public interface IInterfaceWithClassConstrainedGenericArgument<T> where T : class { }
+		private class InterfaceWithClassConstrainedGenericArgument<T> : IInterfaceWithClassConstrainedGenericArgument<T> where T : class { }
+        [Fact]
+		public void CanGenerateProxyWithClassConstrainedGenericArguments()
+		{
+			CreateProxy(typeof(IInterfaceWithClassConstrainedGenericArgument<>), typeof(InterfaceWithClassConstrainedGenericArgument<>))
+				.ShouldNotThrow<Exception>();
+        }
+		#endregion
+
+		#region CanGenerateProxyWithStructConstrainedGenericArguments
+		public interface IInterfaceWithStructConstrainedGenericArgument<T> where T : struct { }
+		private class InterfaceWithStructConstrainedGenericArgument<T> : IInterfaceWithStructConstrainedGenericArgument<T> where T : struct { }
+		[Fact]
+		public void CanGenerateProxyWithStructConstrainedGenericArguments()
+		{
+			CreateProxy(typeof(IInterfaceWithStructConstrainedGenericArgument<>), typeof(InterfaceWithStructConstrainedGenericArgument<>))
+				.ShouldNotThrow<Exception>();
+        }
+		#endregion
+
 		#region CanInvokeVoidWithInterfaceConstrainedGenericArguments
 		public interface IInvokeWithInterfaceConstrainedGenericArguments { void Method<T>(T arg) where T : IDependency; }
 
@@ -245,6 +301,57 @@ namespace Compose.Tests
 		}
 		#endregion
 
+		#region CanInvokeWithClassGenericConstrainedGenericArguments
+		public interface IInvokeWithClassGenericConstrainedGenericArguments<TBase> { void Method<TDerivative>(TDerivative derivative) where TDerivative : TBase; }
+		private class InvokeWithClassGenericConstrainedGenericArguments<TBase> : IInvokeWithClassGenericConstrainedGenericArguments<TBase>
+		{
+			public void Method<TDerivative>(TDerivative derivative) where TDerivative : TBase { }
+		}
+		[Fact]
+		public void CanInvokeWithClassGenericConstrainedGenericArguments()
+		{
+			var service = SetupProxy<IInvokeWithClassGenericConstrainedGenericArguments<Base>, InvokeWithClassGenericConstrainedGenericArguments<Base>>()();
+			service.Method(new Derivative());
+		}
+		#endregion
+
+		#region CanInvokeWithMethodGenericConstrainedGenericArguments
+		public interface IInvokeWithMethodGenericConstrainedGenericArguments { void Method<TBase, TDerivative>(TBase arg1, TDerivative arg2) where TDerivative : TBase; }
+		private class InvokeWithMethodGenericConstrainedGenericArguments : IInvokeWithMethodGenericConstrainedGenericArguments
+		{
+			public void Method<TBase, TDerivative>(TBase arg1, TDerivative arg2) where TDerivative : TBase { }
+		}
+		[Fact]
+		public void CanInvokeWithMethodGenericConstrainedGenericArguments()
+		{
+			var service = SetupProxy<IInvokeWithMethodGenericConstrainedGenericArguments, InvokeWithMethodGenericConstrainedGenericArguments>()();
+			service.Method((Base)null, new Derivative());
+		}
+		#endregion
+
+		#region CanInvokeWithAllGenericConstraints
+		public interface IInvokeWithAllGenericConstraints<TClass>
+		{
+			void Method<TMethodBase, TMethodDerivative>(ref TMethodBase arg1, out TMethodDerivative arg2, params TMethodDerivative[] arg3)
+				where TMethodBase : TClass where TMethodDerivative : class, TMethodBase, IDisposable, new();
+		}
+		private class InvokeWithAllGenericConstraints<TClass> : IInvokeWithAllGenericConstraints<TClass>
+		{
+			public void Method<TMethodBase, TMethodDerivative>(ref TMethodBase arg1, out TMethodDerivative arg2, params TMethodDerivative[] arg3)
+				where TMethodBase : TClass where TMethodDerivative : class, TMethodBase, IDisposable, new()
+			{ arg2 = new TMethodDerivative(); }
+		}
+		private class LowerDerivative : Derivative, IDisposable { public void Dispose() { } }
+		[Fact]
+		public void CanInvokeWithAllGenericConstraints()
+		{
+			var service = SetupProxy<IInvokeWithAllGenericConstraints<Base>, InvokeWithAllGenericConstraints<Base>>()();
+			var arg1 = new Derivative();
+			var arg2 = new LowerDerivative();
+			service.Method(ref arg1, out arg2);
+		}
+		#endregion
+
 		#region CanInvokeOverloadedMethods
 		public interface IInvokeOverloadedMethods
 		{
@@ -293,34 +400,6 @@ namespace Compose.Tests
 		}
 		#endregion
 
-		#region CanInvokeWithClassGenericConstrainedGenericArguments
-		public interface IInvokeWithClassGenericConstrainedGenericArguments<TBase> { void Method<TDerivative>(TDerivative derivative) where TDerivative : TBase; }
-		private class InvokeWithClassGenericConstrainedGenericArguments<TBase> : IInvokeWithClassGenericConstrainedGenericArguments<TBase>
-		{
-			public void Method<TDerivative>(TDerivative derivative) where TDerivative : TBase { }
-		}
-		[Fact]
-		public void CanInvokeWithClassGenericConstrainedGenericArguments()
-		{
-			var service = SetupProxy<IInvokeWithClassGenericConstrainedGenericArguments<Base>, InvokeWithClassGenericConstrainedGenericArguments<Base>>()();
-			service.Method(new Derivative());
-		}
-		#endregion
-
-		#region CanInvokeWithMethodGenericConstrainedGenericArguments
-		public interface IInvokeWithMethodGenericConstrainedGenericArguments { void Method<TBase, TDerivative>(TBase arg1, TDerivative arg2) where TDerivative : TBase; }
-		private class InvokeWithMethodGenericConstrainedGenericArguments : IInvokeWithMethodGenericConstrainedGenericArguments
-		{
-			public void Method<TBase, TDerivative>(TBase arg1, TDerivative arg2) where TDerivative : TBase { }
-		}
-		[Fact]
-		public void CanInvokeWithMethodGenericConstrainedGenericArguments()
-		{
-			var service = SetupProxy<IInvokeWithMethodGenericConstrainedGenericArguments, InvokeWithMethodGenericConstrainedGenericArguments>()();
-			service.Method((Base)null, new Derivative());
-		}
-		#endregion
-
 		#region CanInvokeWithByRefArguments
 		public interface IInvokeWithByRefArgument { void Method(ref int arg); }
 		private class InvokeWithByRefArgument : IInvokeWithByRefArgument
@@ -362,29 +441,6 @@ namespace Compose.Tests
 		{
 			var service = SetupProxy<IInvokeWithParamsArguments, InvokeWithParamsArguments>()();
 			service.Method(1, 2, 3);
-		}
-		#endregion
-
-		#region CanInvokeWithAllGenericConstraints
-		public interface IInvokeWithAllGenericConstraints<TClass>
-		{
-			void Method<TMethodBase, TMethodDerivative>(ref TMethodBase arg1, out TMethodDerivative arg2, params TMethodDerivative[] arg3)
-				where TMethodBase : TClass where TMethodDerivative : class, TMethodBase, IDisposable, new();
-		}
-		private class InvokeWithAllGenericConstraints<TClass> : IInvokeWithAllGenericConstraints<TClass>
-		{
-			public void Method<TMethodBase, TMethodDerivative>(ref TMethodBase arg1, out TMethodDerivative arg2, params TMethodDerivative[] arg3)
-				where TMethodBase : TClass where TMethodDerivative : class, TMethodBase, IDisposable, new()
-			{ arg2 = new TMethodDerivative(); }
-		}
-		private class LowerDerivative : Derivative, IDisposable { public void Dispose() { } }
-		[Fact]
-		public void CanInvokeWithAllGenericConstraints()
-		{
-			var service = SetupProxy<IInvokeWithAllGenericConstraints<Base>, InvokeWithAllGenericConstraints<Base>>()();
-			var arg1 = new Derivative();
-			var arg2 = new LowerDerivative();
-			service.Method(ref arg1, out arg2);
 		}
 		#endregion
 
@@ -495,12 +551,17 @@ namespace Compose.Tests
 		[Fact]
 		public void CanGenerateGenericProxy()
 		{
-			var app = new Fake.Application();
-			app.UseServices(services => services.AddTransient(typeof(IGeneric<>), typeof(Generic<>)));
-			Action act = () => app.CreateProxy(typeof(IGeneric<>));
-			act.ShouldNotThrow<Exception>();
+			CreateProxy(typeof(IGeneric<>), typeof(Generic<>))
+				.ShouldNotThrow<Exception>();
 		}
 		#endregion
+
+		private static Action CreateProxy(Type interfaceType, Type implementationType)
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => services.AddTransient(interfaceType, implementationType));
+			return () => app.CreateProxy(interfaceType);
+		}
 
 		private static Action InvokeProxy<TInterface, TImplementation>()
 			where TImplementation : TInterface where TInterface : class
