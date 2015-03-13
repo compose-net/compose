@@ -230,6 +230,17 @@ namespace Compose.Tests
         }
 		#endregion
 
+		#region CanGenerateProxyWithCovariantConstrainedGenericsArguments
+		public interface IInterfaceWithCovariantConstrainedGenericArguments<in TIn, out TOut> { }
+		private class InterfaceWithCovariantConstrainedGenericArguments<TIn, TOut> : IInterfaceWithCovariantConstrainedGenericArguments<TIn, TOut> { }
+		[Fact]
+		public void CanGenerateProxyWithCovariantConstrainedGenericsArguments()
+		{
+			CreateProxy(typeof(IInterfaceWithCovariantConstrainedGenericArguments<,>), typeof(InterfaceWithCovariantConstrainedGenericArguments<,>))
+				.ShouldNotThrow<Exception>();
+        }
+		#endregion
+
 		#region CanInvokeVoidWithInterfaceConstrainedGenericArguments
 		public interface IInvokeWithInterfaceConstrainedGenericArguments { void Method<T>(T arg) where T : IDependency; }
 
