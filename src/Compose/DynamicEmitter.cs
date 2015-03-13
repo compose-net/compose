@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -19,8 +20,9 @@ namespace Compose
 
 		internal Type GetDirectTransitionImplementation(Type serviceType)
 		{
+			ValidateProxyIsPossible(serviceType);
 			/* C#: 
-			public sealed class WrapperName : TService, ITransition<TService>
+			public sealed class WrapperName[<TService>] : TService, ITransition<TService>
 			{
 				// AddDirectImplementation...
 			}
@@ -29,6 +31,8 @@ namespace Compose
 			typeBuilder.AddInterfaceImplementation(serviceType);
 			foreach (var implementedInterface in serviceType.GetInterfaces())
 				typeBuilder.AddInterfaceImplementation(implementedInterface);
+			if (serviceType.IsGenericType)
+				typeBuilder.AddGenericsFrom(serviceType);
 			typeBuilder.AddInterfaceImplementation(typeof(ITransition<>).MakeGenericType(serviceType));
 			try
 			{
@@ -39,13 +43,29 @@ namespace Compose
 				return type;
 			}
 #else
-					return typeBuilder.CreateType();
+				return typeBuilder.CreateType();
 			}
 #endif
 			catch(Exception ex)
 			{
-				throw new UnsupportedClassDefintionException(serviceType, ex);
+				throw new UnsupportedTypeDefintionException(serviceType, ex);
 			}
+		}
+
+		private void ValidateProxyIsPossible(Type serviceType)
+		{
+			if (!serviceType.IsPublic && !serviceType.IsNestedPublic)
+				throw new InaccessibleTypeException(serviceType);
+			if (serviceType.IsGenericType)
+				ValidateGenericTypesAccessible(serviceType);
+		}
+
+		private void ValidateGenericTypesAccessible(Type serviceType)
+		{
+			var inaccessibleGeneric = serviceType.GetGenericArguments()
+				.FirstOrDefault(x => !x.IsPublic && !x.IsNestedPublic);
+			if (inaccessibleGeneric != null)
+				throw new InaccessibleTypeException(serviceType, inaccessibleGeneric);
 		}
 
 		private AssemblyName CreateAssemblyName()

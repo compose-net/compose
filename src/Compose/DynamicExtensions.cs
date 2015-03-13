@@ -9,6 +9,15 @@ namespace Compose
 	{
 		private static Random random = new Random();
 
+		internal static void AddGenericsFrom(this TypeBuilder typeBuilder, Type serviceType)
+		{
+			var serviceGenerics = serviceType.GetGenericArguments().ToArray();
+			var genericBuilders = typeBuilder.DefineGenericParameters(serviceGenerics.Select(x => x.Name).ToArray());
+			for (var i = 0; i < genericBuilders.Length; i++)
+				if (serviceGenerics[i].IsGenericParameter)
+					genericBuilders[i].DefineGeneric(serviceGenerics[i], serviceGenerics, serviceType);
+		}
+
 		internal static void AddDirectImplementation(this TypeBuilder typeBuilder, Type serviceType)
 		{
 			var serviceName = GetRandomString();
@@ -24,13 +33,13 @@ namespace Compose
 			typeBuilder.AddRestoreImplementation(snapshotField, serviceField);
 		}
 
-		internal static string GetRandomString()
+		private static string GetRandomString()
 		{
 			const string Characters = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm";
 			return new string(Enumerable.Repeat(Characters, 16).Select(x => x[random.Next(x.Length)]).ToArray());
 		}
 
-		internal static void AddChangeImplementation(this TypeBuilder typeBuilder, FieldBuilder serviceField, Type serviceType)
+		private static void AddChangeImplementation(this TypeBuilder typeBuilder, FieldBuilder serviceField, Type serviceType)
 		{
 			/* C#: 
 			public virtual bool Change(TService arg1)
@@ -50,7 +59,7 @@ namespace Compose
 			typeBuilder.DefineMethodOverride(methodBuilder, methodInfo);
 		}
 
-		internal static void AddSnapshotImplementation(this TypeBuilder typeBuilder, FieldBuilder snapshotField, FieldBuilder serviceField)
+		private static void AddSnapshotImplementation(this TypeBuilder typeBuilder, FieldBuilder snapshotField, FieldBuilder serviceField)
 		{
 			/* C#:
 			public virtual void Snapshot()
@@ -68,7 +77,7 @@ namespace Compose
 			methodEmitter.Emit(OpCodes.Ret);
 		}
 
-		internal static void AddRestoreImplementation(this TypeBuilder typeBuilder, FieldBuilder snapshotField, FieldBuilder serviceField)
+		private static void AddRestoreImplementation(this TypeBuilder typeBuilder, FieldBuilder snapshotField, FieldBuilder serviceField)
 		{
 			var methodInfo = typeof(ITransition).GetMethod("Restore");
 			var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual, methodInfo.ReturnType, Type.EmptyTypes);
@@ -80,14 +89,14 @@ namespace Compose
 			methodEmitter.Emit(OpCodes.Ret);
 		}
 
-		internal static void AddMethodImplementations(this TypeBuilder typeBuilder, FieldBuilder serviceField, Type[] implementedInterfaces)
+		private static void AddMethodImplementations(this TypeBuilder typeBuilder, FieldBuilder serviceField, Type[] implementedInterfaces)
 		{
 			foreach (var implementedInterface in implementedInterfaces)
 				foreach (var methodInfo in implementedInterface.GetMethods(BindingFlags.Instance | BindingFlags.Public).Where(x => !x.IsSpecialName))
 					ExceptionHelpers.ReThrow(typeBuilder.AddMethodImplementation, methodInfo, serviceField, implementedInterface, inner => new UnsupportedMethodDefinitionException(methodInfo, inner));
 		}
 
-		internal static void AddMethodImplementation(this TypeBuilder typeBuilder, MethodInfo methodInfo, FieldBuilder serviceField, Type serviceType)
+		private static void AddMethodImplementation(this TypeBuilder typeBuilder, MethodInfo methodInfo, FieldBuilder serviceField, Type serviceType)
 		{
 			/* C#: 
 			public virtual ReturnType MethodName[<Generics>]([Args]) [where Generic : Constraints]
@@ -109,7 +118,7 @@ namespace Compose
 			typeBuilder.DefineMethodOverride(methodBuilder, methodInfo);
 		}
 
-        internal static void AddGenericParameters(this MethodBuilder methodBuilder, MethodInfo methodInfo, Type serviceType)
+        private static void AddGenericParameters(this MethodBuilder methodBuilder, MethodInfo methodInfo, Type serviceType)
         {
             var genericInfos = methodInfo.GetGenericArguments().ToArray();
             var genericBuilders = methodBuilder.DefineGenericParameters(genericInfos.Select(x => x.Name).ToArray());
@@ -117,7 +126,7 @@ namespace Compose
                 genericBuilders[i].DefineGeneric(genericInfos[i], genericInfos, serviceType);
         }
 
-        internal static GenericTypeParameterBuilder DefineGeneric(this GenericTypeParameterBuilder genericBuilder, Type genericType, Type[] methodGenerics, Type serviceType)
+        private static GenericTypeParameterBuilder DefineGeneric(this GenericTypeParameterBuilder genericBuilder, Type genericType, Type[] methodGenerics, Type serviceType)
         {
             var constraints = genericType.GetGenericParameterConstraints();
             genericBuilder.SetInterfaceConstraints(
@@ -129,7 +138,7 @@ namespace Compose
             return genericBuilder;
         }
 
-		internal static Type GetUnderlyingGenericType(this Type constraint, Type[] methodGenerics, Type serviceType)
+		private static Type GetUnderlyingGenericType(this Type constraint, Type[] methodGenerics, Type serviceType)
 		{
 			if (methodGenerics.Contains(constraint)) return constraint;
 
@@ -143,14 +152,14 @@ namespace Compose
 			throw new NotSupportedException("Generic constraint is not supported.");
 		}
 
-		internal static void AddPropertyImplementations(this TypeBuilder typeBuilder, FieldBuilder serviceField, Type[] implementedInterfaces)
+		private static void AddPropertyImplementations(this TypeBuilder typeBuilder, FieldBuilder serviceField, Type[] implementedInterfaces)
 		{
 			foreach (var implementedInterface in implementedInterfaces)
 				foreach (var propertyInfo in implementedInterface.GetProperties(BindingFlags.Instance | BindingFlags.Public))
 					ExceptionHelpers.ReThrow(typeBuilder.AddPropertyImplementation, propertyInfo, serviceField, inner => new UnsupportedPropertyDefinitionException(propertyInfo, inner));
 		}
 
-		internal static void AddPropertyImplementation(this TypeBuilder typeBuilder, PropertyInfo propertyInfo, FieldBuilder serviceField)
+		private static void AddPropertyImplementation(this TypeBuilder typeBuilder, PropertyInfo propertyInfo, FieldBuilder serviceField)
 		{
 			/* C#: 
 			public virtual ReturnType PropertyName
@@ -164,7 +173,7 @@ namespace Compose
 			if (propertyInfo.CanWrite) typeBuilder.AddPropertySetImplementation(propertyBuilder, propertyInfo, serviceField);
 		}
 
-		internal static void AddPropertyGetImplementation(this TypeBuilder typeBuilder, PropertyBuilder propertyBuilder, PropertyInfo propertyInfo, FieldBuilder serviceField)
+		private static void AddPropertyGetImplementation(this TypeBuilder typeBuilder, PropertyBuilder propertyBuilder, PropertyInfo propertyInfo, FieldBuilder serviceField)
 		{
 			var propertyInfoGetMethod = propertyInfo.GetGetMethod();
 			var propertyGetMethod = typeBuilder.DefineMethod(propertyInfoGetMethod.Name, MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig | MethodAttributes.Virtual, propertyInfo.PropertyType, Type.EmptyTypes);
@@ -177,7 +186,7 @@ namespace Compose
 			typeBuilder.DefineMethodOverride(propertyGetMethod, propertyInfoGetMethod);
 		}
 
-		internal static void AddPropertySetImplementation(this TypeBuilder typeBuilder, PropertyBuilder propertyBuilder, PropertyInfo propertyInfo, FieldBuilder serviceField)
+		private static void AddPropertySetImplementation(this TypeBuilder typeBuilder, PropertyBuilder propertyBuilder, PropertyInfo propertyInfo, FieldBuilder serviceField)
 		{
 			var propertyInfoSetMethod = propertyInfo.GetSetMethod();
 			var propertySetMethod = typeBuilder.DefineMethod(propertyInfoSetMethod.Name, MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig | MethodAttributes.Virtual, null, new[] { propertyInfo.PropertyType });
@@ -191,17 +200,17 @@ namespace Compose
 			typeBuilder.DefineMethodOverride(propertySetMethod, propertyInfoSetMethod);
 		}
 
-		internal static FieldBuilder AddServiceField(this TypeBuilder typeBuilder, string serviceName, Type serviceType)
+		private static FieldBuilder AddServiceField(this TypeBuilder typeBuilder, string serviceName, Type serviceType)
 		{
 			return typeBuilder.DefineField($"_{serviceName}", serviceType, FieldAttributes.Private);
 		}
 
-		internal static FieldBuilder AddSnapshotField(this TypeBuilder typeBuilder, string snapshotName, Type serviceType)
+		private static FieldBuilder AddSnapshotField(this TypeBuilder typeBuilder, string snapshotName, Type serviceType)
 		{
 			return typeBuilder.DefineField($"_{snapshotName}", serviceType, FieldAttributes.Private);
 		}
 
-		internal static ConstructorBuilder AddServiceConstructor(this TypeBuilder typeBuilder, FieldBuilder fieldBuilder, Type serviceType)
+		private static ConstructorBuilder AddServiceConstructor(this TypeBuilder typeBuilder, FieldBuilder fieldBuilder, Type serviceType)
 		{
 			/* C#: 
 			public Constructor(TService arg1)
