@@ -15,7 +15,7 @@ namespace Compose
 			var genericBuilders = typeBuilder.DefineGenericParameters(serviceGenerics.Select(x => x.Name).ToArray());
 			for (var i = 0; i < genericBuilders.Length; i++)
 				if (serviceGenerics[i].IsGenericParameter)
-					genericBuilders[i].DefineGeneric(serviceGenerics[i], serviceGenerics, serviceType);
+					genericBuilders[i].DefineGeneric(serviceGenerics[i], serviceGenerics, serviceType, false);
 		}
 
 		internal static void AddDirectImplementation(this TypeBuilder typeBuilder, Type serviceType)
@@ -123,10 +123,10 @@ namespace Compose
             var genericInfos = methodInfo.GetGenericArguments().ToArray();
             var genericBuilders = methodBuilder.DefineGenericParameters(genericInfos.Select(x => x.Name).ToArray());
             for (var i = 0; i < genericBuilders.Length; i++)
-                genericBuilders[i].DefineGeneric(genericInfos[i], genericInfos, serviceType);
+                genericBuilders[i].DefineGeneric(genericInfos[i], genericInfos, serviceType, true);
         }
 
-        private static GenericTypeParameterBuilder DefineGeneric(this GenericTypeParameterBuilder genericBuilder, Type genericType, Type[] methodGenerics, Type serviceType)
+        private static GenericTypeParameterBuilder DefineGeneric(this GenericTypeParameterBuilder genericBuilder, Type genericType, Type[] methodGenerics, Type serviceType, bool includeVariance)
         {
             var constraints = genericType.GetGenericParameterConstraints();
             genericBuilder.SetInterfaceConstraints(
@@ -134,8 +134,9 @@ namespace Compose
 				constraints.Where(x => x.IsGenericParameter).Select(x => x.GetUnderlyingGenericType(methodGenerics, serviceType)
 			)).ToArray());
 			genericBuilder.SetBaseTypeConstraint(genericType.BaseType);
-			genericBuilder.SetGenericParameterAttributes(genericType.GenericParameterAttributes);
-            return genericBuilder;
+			if (includeVariance) genericBuilder.SetGenericParameterAttributes(genericType.GenericParameterAttributes);
+			else genericBuilder.SetGenericParameterAttributes(genericType.GenericParameterAttributes & ~GenericParameterAttributes.Contravariant & ~GenericParameterAttributes.Covariant);
+			return genericBuilder;
         }
 
 		private static Type GetUnderlyingGenericType(this Type constraint, Type[] methodGenerics, Type serviceType)
