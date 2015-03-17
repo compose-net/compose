@@ -567,6 +567,16 @@ namespace Compose.Tests
 		}
 		#endregion
 
+		#region CanResolveGenericProxy
+		[Fact]
+		public void CanResolveGenericProxy()
+		{
+			InvokeProxy<IGeneric<object>>(typeof(IGeneric<>), typeof(Generic<>))
+				.ShouldNotThrow<Exception>();
+		}
+
+		#endregion
+
 		private static Action CreateProxy(Type interfaceType, Type implementationType)
 		{
 			var app = new Fake.Application();
