@@ -1,10 +1,10 @@
-#Development
-##Versioning
+# Development
+## Versioning
 
 Every project, team, developer has their own way of versioning software, we have decided to follow [Semantic Versioning] along with common [software release life cycle] naming, using the format Major.Minor.Patch.Build-Release.
 
+### Incrementing
 Version numbers will then be incremented with the following rules:
-
 - Major : Breaking changes to public classes/interfaces (eg. making a change to the signature of a method in application extensions)
 - Minor : Completed milestone
 - Patch : Completed issue
@@ -15,9 +15,18 @@ Version numbers will then be incremented with the following rules:
   - rc : ready for release, this is likely to go out unless significant bugs are found
   - The final released product will have no release name, just the version number
 
+### Examples
+ - 1.0.0.0
+ - 1.2.3.4-alpha
+ - 2.2.0.1-rc
+
 ##Project structure
 
-We will be following the [project structure] suggested by David Fowler for .Net projects. It is expected that documents, samples and automated tests are updated and with each commit/pull request as required, as opposed to being completed in bulk as a separate issue (or documentation week).
+We will be following the [project structure] suggested by David Fowler for .Net projects. 
+
+## Documentation
+
+It is expected that documentation, samples and tests are updated alongside code changes as required, as opposed to being completed in bulk as a separate issue _(or documentation week)_.
 
 ##Roadmap
 
