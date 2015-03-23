@@ -2,9 +2,9 @@
 
 namespace Compose
 {
-	public class UnsupportedClassDefintionException : Exception
+	public class UnsupportedTypeDefintionException : Exception
 	{
-		public UnsupportedClassDefintionException(Type definition, Exception inner)
+		public UnsupportedTypeDefintionException(Type definition, Exception inner)
 			: base($"Unable to create dynamic proxy. {definition.FullName} contains an unsupported defintion.", inner) { }
 	}
 }

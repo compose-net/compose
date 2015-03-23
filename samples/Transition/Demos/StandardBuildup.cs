@@ -10,7 +10,7 @@ namespace Transition.Demos
 			Name = "Standard Composition";
 			this.UseServices(services =>
 			{
-				services.AddSampleServices();
+				services.AddSampleService();
 			});
 			OnExecute<IHost>(Run);
 		}

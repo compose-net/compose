@@ -2,5 +2,5 @@
 
 namespace Compose
 {
-	public class ServiceApplication : Executable<CancellationToken> { }
+	public class ServiceApplication : Executable<CancellationTokenSource> { }
 }

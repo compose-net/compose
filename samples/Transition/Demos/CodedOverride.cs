@@ -11,7 +11,7 @@ namespace Transition.Demos
 			Name = "Coded Override";
 			this.UseServices(services =>
 			{
-				services.AddSampleServices();
+				services.AddSampleService();
 				services.AddTransient<IHost, UppercaseHost>();
 			});
 			OnExecute<IHost>(Run);

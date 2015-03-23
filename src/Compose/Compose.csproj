@@ -59,6 +59,7 @@
     <Compile Include="CommandLineApplication.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="IExtendableServiceProvider.cs" />
+    <Compile Include="InaccessibleTypeException.cs" />
     <Compile Include="IObserveServiceCollectionChanges.cs" />
     <Compile Include="ISingletonRepositoryServiceProvider.cs" />
     <Compile Include="ITransition.cs" />
@@ -69,7 +70,7 @@
     <Compile Include="TransitionalServiceProvider.cs" />
     <Compile Include="TransitionMarker.cs" />
     <Compile Include="TypeExtensions.cs" />
-    <Compile Include="UnsupportedClassDefintionException.cs" />
+    <Compile Include="UnsupportedTypeDefintionException.cs" />
     <Compile Include="UnsupportedMethodDefinitionException.cs" />
     <Compile Include="UnsupportedPropertyDefinitionException.cs" />
     <Compile Include="WrappedServiceProvider.cs" />
@@ -78,10 +79,14 @@
     <None Include="Compose.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="README.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>IF NOT EXIST "$(SolutionDir)artifacts\packages\$(ProjectName)\lib\" MKDIR "$(SolutionDir)artifacts\packages\$(ProjectName)\lib\net452\"
 COPY "$(TargetPath)" "$(SolutionDir)artifacts\packages\$(ProjectName)\lib\net452\"
+COPY "$(ProjectDir)README.txt" "$(SolutionDir)artifacts\packages\$(ProjectName)\"
 COPY "$(ProjectDir)$(ProjectName).nuspec" "$(SolutionDir)artifacts\packages\$(ProjectName)\"
 "$(SolutionDir)packages\NuGet.CommandLine.2.8.3\tools\NUGET" PACK "$(SolutionDir)artifacts\packages\$(ProjectName)\$(ProjectName).nuspec" -OutputDirectory "$(SolutionDir)artifacts\packages"</PostBuildEvent>
   </PropertyGroup>

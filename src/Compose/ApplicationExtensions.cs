@@ -45,7 +45,13 @@ namespace Compose
 
         internal static TService CreateProxy<TService>(this Application app) where TService : class
         {
-            return (TService)Activator.CreateInstance(app.CreateProxy(typeof(TService)), app.GetRequiredService<TService>());
+			var serviceType = typeof(TService);
+            var proxyType = app.CreateProxy(serviceType);
+			if (!proxyType.IsGenericType) return (TService)Activator.CreateInstance(proxyType, app.GetRequiredService<TService>());
+
+			var constructedProxy = proxyType.MakeGenericType(serviceType.GetGenericArguments());
+			var proxy = (ITransition<TService>)Activator.CreateInstance(constructedProxy, app.GetRequiredService<TService>());
+			return (TService)proxy;
         }
 
         private static DynamicEmitter GetRegisteredDynamicEmitter(this Application app)

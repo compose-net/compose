@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -19,19 +20,24 @@ namespace Compose
 
 		internal Type GetDirectTransitionImplementation(Type serviceType)
 		{
+			ValidateProxyIsPossible(serviceType);
 			/* C#: 
-			public sealed class WrapperName : TService, ITransition<TService>
+			public sealed class WrapperName[<TService>] : TService, ITransition<TService>
 			{
 				// AddDirectImplementation...
 			}
 			*/
 			var typeBuilder = _moduleBuilder.DefineType($"{_assemblyName.Name}+{serviceType.FullName}", TypeAttributes.Public | TypeAttributes.Sealed);
 			typeBuilder.AddInterfaceImplementation(serviceType);
+			foreach (var implementedInterface in serviceType.GetInterfaces())
+				typeBuilder.AddInterfaceImplementation(implementedInterface);
+			if (serviceType.IsGenericType)
+				typeBuilder.AddGenericsFrom(serviceType);
 			typeBuilder.AddInterfaceImplementation(typeof(ITransition<>).MakeGenericType(serviceType));
 			try
 			{
 				typeBuilder.AddDirectImplementation(serviceType);
-#if DEBUG
+#if ENABLE_SAVE_DYNAMIC_ASSEMBLY
 				var type = typeBuilder.CreateType();
 				_assemblyBuilder.Save($"{_assemblyName.Name}.dll");
 				return type;
@@ -42,8 +48,24 @@ namespace Compose
 #endif
 			catch(Exception ex)
 			{
-				throw new UnsupportedClassDefintionException(serviceType, ex);
+				throw new UnsupportedTypeDefintionException(serviceType, ex);
 			}
+		}
+
+		private void ValidateProxyIsPossible(Type serviceType)
+		{
+			if (!serviceType.IsPublic && !serviceType.IsNestedPublic)
+				throw new InaccessibleTypeException(serviceType);
+			if (serviceType.IsGenericType)
+				ValidateGenericTypesAccessible(serviceType);
+		}
+
+		private void ValidateGenericTypesAccessible(Type serviceType)
+		{
+			var inaccessibleGeneric = serviceType.GetGenericArguments()
+				.FirstOrDefault(x => !x.IsPublic && !x.IsNestedPublic);
+			if (inaccessibleGeneric != null)
+				throw new InaccessibleTypeException(serviceType, inaccessibleGeneric);
 		}
 
 		private AssemblyName CreateAssemblyName()

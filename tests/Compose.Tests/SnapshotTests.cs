@@ -71,7 +71,24 @@ namespace Compose.Tests
 			app.Execute();
 		}
 
-		public enum Type { One, Two }
+		[Fact]
+		public void CanRestoreLatestSnapshot()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => services.AddTransitional<IDependency, Dependency1>());
+			app.OnExecute<IDependency>(dependency =>
+			{
+				app.Snapshot();
+				app.Transition<IDependency, Dependency2>();
+				app.Snapshot();
+				app.Transition<IDependency, Dependency3>();
+				app.Restore();
+				dependency.Id.Should().Be(Type.Two);
+			});
+			app.Execute();
+		}
+
+		public enum Type { One, Two, Three }
 
 		public interface IDependency { Type Id { get; } }
 
@@ -83,6 +100,11 @@ namespace Compose.Tests
 		private sealed class Dependency2 : IDependency
 		{
 			public Type Id { get { return Type.Two; } }
+		}
+
+		private sealed class Dependency3 : IDependency
+		{
+			public Type Id { get { return Type.Three; } }
 		}
 	}
 }
