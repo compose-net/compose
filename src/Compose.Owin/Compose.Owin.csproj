@@ -64,9 +64,19 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Compose.Owin.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>IF EXIST "$(SolutionDir)artifacts\packages\$(ProjectName)" RD /s "$(SolutionDir)artifacts\packages\$(ProjectName)"</PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>COPY "$(TargetPath)" "$(SolutionDir)artifacts\packages\$(ProjectName)\lib\net452\"
+COPY "$(ProjectDir)README.txt" "$(SolutionDir)artifacts\packages\$(ProjectName)\"
+COPY "$(ProjectDir)$(ProjectName).nuspec" "$(SolutionDir)artifacts\packages\$(ProjectName)\"
+"$(SolutionDir)packages\NuGet.CommandLine.2.8.3\tools\NUGET" PACK "$(SolutionDir)artifacts\packages\$(ProjectName)\$(ProjectName).nuspec" -OutputDirectory "$(SolutionDir)artifacts\packages"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
