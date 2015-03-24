@@ -8,10 +8,54 @@ namespace Compose.Tests
 	public class TransitionTests
 	{
 		[Fact]
-		public void CanResolveServiceAddedAsTransitional()
+		public void CanResolveServicesAddedAsTransitional()
 		{
 			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransitional<IDependency, Dependency>(); });
+			app.UseServices(services =>
+			{
+				services
+					.AddTransitional<IDependency, Dependency>()
+					.AddTransitional<IOtherDependency, OtherDependency>();
+			});
+			app.OnExecute<IDependency>(dependency =>
+			{
+				dependency.Should().NotBeNull();
+				dependency.Id.Should().Be(Type.Dependency);
+			});
+			app.Execute();
+		}
+
+		[Fact]
+		public void CanResolveServicesWithTransitional()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services =>
+			{
+				services
+					.AddTransient<IDependency, Dependency>()
+					.AddTransient<IOtherDependency, OtherDependency>()
+					.WithTransitional<IDependency>()
+					.WithTransitional<IOtherDependency>();
+			});
+			app.OnExecute<IDependency>(dependency =>
+			{
+				dependency.Should().NotBeNull();
+				dependency.Id.Should().Be(Type.Dependency);
+			});
+			app.Execute();
+		}
+
+		[Fact]
+		public void CanResolveServicesAsTransitional()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services =>
+			{
+				services
+					.AddTransient<IDependency, Dependency>()
+					.AddTransient<IOtherDependency, OtherDependency>()
+					.AsTransitional();
+			});
 			app.OnExecute<IDependency>(dependency =>
 			{
 				dependency.Should().NotBeNull();
@@ -151,7 +195,9 @@ namespace Compose.Tests
 
 		private class Dependency : IDependency { public Type Id { get; private set; } = Type.Dependency; }
 
-		private class OtherDependency : IDependency { public Type Id { get; private set; } = Type.OtherDependency; }
+		public interface IOtherDependency : IDependency { }
+
+		private class OtherDependency : IOtherDependency { public Type Id { get; private set; } = Type.OtherDependency; }
 
 		public interface IGenericDependency<T> { Type Id { get; } }
 

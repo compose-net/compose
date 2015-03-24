@@ -41,7 +41,7 @@ namespace Compose
 		internal static Dictionary<Type, Type> GetTransitionalRedirects(this Application app, IServiceCollection services)
 		{
 			if (services.Any(x => x.ImplementationType == typeof(TransitionMarker)))
-				return services.BeforeMarker().Where(x => x.ServiceType.IsInterface).ToDictionary(x => x.ServiceType, x => app.CreateProxy(x.ServiceType));
+				return services.BeforeMarker().Where(x => x.ServiceType.IsInterface).ToList().ToDictionary(x => x.ServiceType, x => app.CreateProxy(x.ServiceType));
 			return services.Where(x => typeof(TransitionMarker<>).IsAssignableFromGeneric(x.ServiceType))
 				.Select(x => x.ServiceType.GetGenericArguments().Single()).ToList().ToDictionary(x => x, x => app.CreateProxy(x));
 		}
