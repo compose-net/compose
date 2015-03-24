@@ -89,11 +89,24 @@ namespace Compose.Tests
 		{
 			var app = new Fake.Application();
 			app.UseServices(services => { services.AddTransient(typeof(IGenericDependency<>), typeof(GenericDependency<>)); });
-			Action act = () => app.OnExecute<IGenericDependency<byte[]>>(dependency =>
+			app.OnExecute<IGenericDependency<byte[]>>(dependency =>
 			{
 				dependency.Id.Should().Be(Type.GenericDependency);
 			});
-			act.ShouldNotThrow<Exception>();
+			app.Execute();
+		}
+
+		[Fact]
+		public void CanTransitionUnresolvedService()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => services.AddTransient<IDependency, Dependency>().AsTransitional());
+			app.OnExecute(() =>
+			{
+				Action act = () => app.Transition<IDependency, OtherDependency>();
+				act.ShouldNotThrow<Exception>();
+			});
+			app.Execute();
 		}
 
 		public enum Type { Dependency, OtherDependency, GenericDependency }
