@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.Framework.DependencyInjection;
+using System;
 using Xunit;
 
 namespace Compose.Tests
@@ -83,12 +84,28 @@ namespace Compose.Tests
 			app.Execute();
 		}
 
-		public enum Type { Dependency, OtherDependency }
+		[Fact]
+		public void CanPassThroughGenericArgumentsForGenericProxies()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => { services.AddTransient(typeof(IGenericDependency<>), typeof(GenericDependency<>)); });
+			Action act = () => app.OnExecute<IGenericDependency<byte[]>>(dependency =>
+			{
+				dependency.Id.Should().Be(Type.GenericDependency);
+			});
+			act.ShouldNotThrow<Exception>();
+		}
+
+		public enum Type { Dependency, OtherDependency, GenericDependency }
 
 		public interface IDependency { Type Id { get; } }
 
 		private class Dependency : IDependency { public Type Id { get; private set; } = Type.Dependency; }
 
 		private class OtherDependency : IDependency { public Type Id { get; private set; } = Type.OtherDependency; }
+
+		public interface IGenericDependency<T> { Type Id { get; } }
+
+		private class GenericDependency<T> : IGenericDependency<T> { public Type Id { get; private set; } = Type.GenericDependency; }
 	}
 }
