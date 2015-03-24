@@ -141,7 +141,7 @@ namespace Compose.Tests
 			app.OnExecute(() =>
 			{
 				app.Transition<IDependency, OtherDependency>()
-				.Should().BeTrue();
+					.Should().BeTrue();
 			});
 		}
 
