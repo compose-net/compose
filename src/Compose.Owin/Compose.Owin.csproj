@@ -67,6 +67,9 @@
     <None Include="Compose.Owin.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="README.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>IF EXIST "$(SolutionDir)artifacts\packages\$(ProjectName)" RD /s "$(SolutionDir)artifacts\packages\$(ProjectName)"</PreBuildEvent>
