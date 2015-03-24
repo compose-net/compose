@@ -28,9 +28,9 @@ namespace Compose
 
 		#region Transitions
 
-		public static bool Transition<TService, TImplementation>(this Application app) where TImplementation : class, TService
+		public static bool Transition<TService, TImplementation>(this Application app) where TImplementation : class, TService where TService : class
 		{
-			var transitional = app.HostingServices.GetService<TService>() as ITransition<TService>;
+			var transitional = app.GetRequiredService<TService>() as ITransition<TService>;
 			if (transitional == null) throw new InvalidOperationException($"{typeof(TService).Name} must be registered as a Transitional Service (services.AddTransitional<{typeof(TService).Name}, TImplementation>()");
 			return transitional.Change(app.GetRequiredService<TImplementation>());
         }
