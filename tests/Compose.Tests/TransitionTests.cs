@@ -109,6 +109,42 @@ namespace Compose.Tests
 			app.Execute();
 		}
 
+		[Fact]
+		public void CannotTransitionServicesAddedAfterMarker()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services =>
+			{
+				services
+					.AsTransitional()
+					.AddTransient<IDependency, Dependency>();
+			});
+			app.OnExecute(() =>
+			{
+				app.Transition<IDependency, OtherDependency>();
+			});
+			Action act = app.Execute;
+			act.ShouldThrow<InvalidOperationException>();
+		}
+
+		[Fact]
+		public void CanTransitionServicesAddedBeforeLastMarker()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services =>
+			{
+				services
+					.AsTransitional()
+					.AddTransient<IDependency, Dependency>()
+					.AsTransitional();
+			});
+			app.OnExecute(() =>
+			{
+				app.Transition<IDependency, OtherDependency>()
+				.Should().BeTrue();
+			});
+		}
+
 		public enum Type { Dependency, OtherDependency, GenericDependency }
 
 		public interface IDependency { Type Id { get; } }
