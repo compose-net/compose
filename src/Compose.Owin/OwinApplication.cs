@@ -14,6 +14,11 @@ namespace Compose
             _execution = () => appbuilder.Run(invoke);
         }
 
+		public void OnExecute<TService>(IAppBuilder appbuilder, Func<TService, IOwinContext, Task> invoke) where TService : class
+		{
+			OnExecute(appbuilder, (context) => invoke(GetRequiredService<TService>(), context));
+		}
+
         public void Execute()
         {
             _execution();
