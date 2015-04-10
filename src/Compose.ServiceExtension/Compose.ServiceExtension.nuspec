@@ -2,9 +2,10 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>Compose.ServiceExtension</id>
-    <version>0.1.0-beta3</version>
+    <version>0.1.1-beta3</version>
     <authors>Tommy Long, 4Com plc</authors>
     <owners>Tommy Long</owners>
+    <iconUrl>https://raw.githubusercontent.com/Smudge202/Compose/master/Compose-Icon.png</iconUrl>
     <licenseUrl>https://raw.githubusercontent.com/Smudge202/Compose/master/LICENSE</licenseUrl>
     <projectUrl>http://github.com/smudge202/compose</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>

@@ -31,9 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Compose, Version=0.0.1.27371, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Compose.0.0.6-alpha\lib\net452\Compose.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Compose">
+      <HintPath>..\..\packages\Compose.0.1.0-beta3\lib\net452\Compose.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Framework.ConfigurationModel, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.Framework.ConfigurationModel.1.0.0-beta3\lib\net45\Microsoft.Framework.ConfigurationModel.dll</HintPath>

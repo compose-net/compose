@@ -2,16 +2,17 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>Compose.Owin</id>
-    <version>0.0.1-alpha</version>
-    <authors>Dan Kirkham, Tommy Long</authors>
+    <version>0.1.0-beta3</version>
+    <authors>Dan Kirkham, Tommy Long, 4Com plc</authors>
     <owners>Tommy Long</owners>
+    <iconUrl>https://raw.githubusercontent.com/Smudge202/Compose/master/Compose-Icon.png</iconUrl>
     <licenseUrl>https://raw.githubusercontent.com/Smudge202/Compose/master/LICENSE</licenseUrl>
     <projectUrl>http://github.com/smudge202/compose</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>The easy wasy to compose well formed application components in .Net</description>
     <tags>Compose</tags>
     <dependencies>
-      <dependency id="Compose" version="0.0.6-alpha" />
+      <dependency id="Compose" version="0.1.0-beta3" />
     </dependencies>
   </metadata>
   <files>
