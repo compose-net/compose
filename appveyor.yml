@@ -1,4 +1,5 @@
 version: 0.1.{build}
+skip_tags: true
 os: Previous Visual Studio 2015 CTP 6
 assembly_info:
   patch: true
