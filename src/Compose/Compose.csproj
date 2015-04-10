@@ -60,7 +60,6 @@
     <Compile Include="Constants.cs" />
     <Compile Include="IExtendableServiceProvider.cs" />
     <Compile Include="InaccessibleTypeException.cs" />
-    <Compile Include="IObserveServiceCollectionChanges.cs" />
     <Compile Include="ISingletonRepositoryServiceProvider.cs" />
     <Compile Include="ITransition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
