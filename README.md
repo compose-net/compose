@@ -1,5 +1,7 @@
 #Compose
 
+[![Build status](https://ci.appveyor.com/api/projects/status/2a52f9nlucas0jsn?svg=true)](https://ci.appveyor.com/project/Smudge202/compose)
+
 [TOC]
 
 ##<a name="description"></a>Description
