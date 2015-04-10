@@ -1,0 +1,29 @@
+version: 0.1.{build}
+skip_tags: true
+os: Previous Visual Studio 2015 CTP 6
+assembly_info:
+  patch: true
+  file: '**\AssemblyInfo.*'
+  assembly_version: '{version}'
+  assembly_file_version: '{version}'
+  assembly_informational_version: '{version}'
+install:
+- set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
+build_script:
+- nuget restore
+- msbuild "Compose.sln" /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Configuration=Release /p:DefineConstants="TRACE;ENABLE_COMPONENT_TESTS;ENABLE_INTEGRATION_TESTS"
+artifacts:
+- path: artifacts/packages/**.nupkg
+deploy:
+- provider: NuGet
+  name: development
+  server: https://ci.appveyor.com/nuget/smudge202-46am3soaut15
+  api_key:
+    secure: fi5rlfPkAQ9yKX5ffuRSykvWTQbUqTp95PjfD00So1M=
+- provider: NuGet
+  name: production
+  api_key:
+    secure: GauHc7DbZGcD8A4z+x6hToRqjurh0yQe/ky8TSjzBbRYug9ixYIsVnV/VDB8FT4H
+  on:
+    branch: master
+    appveyor_repo_tag: true
