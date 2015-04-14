@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>Compose</id>
-    <version>0.1.0-beta3</version>
+    <version>0.1.1-beta3</version>
     <authors>Tommy Long, 4Com plc</authors>
     <owners>Tommy Long</owners>
     <iconUrl>https://raw.githubusercontent.com/Smudge202/Compose/master/Compose-Icon.png</iconUrl>
@@ -12,11 +12,13 @@
     <description>The easy wasy to compose well formed application components in .Net</description>
     <tags>Compose</tags>
     <dependencies>
-      <dependency id="Microsoft.Framework.DependencyInjection" version="1.0.0-beta3" />
+      <group targetFramework="net45">
+        <dependency id="Microsoft.Framework.DependencyInjection" version="1.0.0-beta3" />
+      </group>
     </dependencies>
   </metadata>
   <files>
     <file src="README.txt" target="" />
-    <file src="lib\net452\Compose.dll" target="lib\net452\Compose.dll" />
+    <file src="lib\net45\Compose.dll" target="lib\net45\Compose.dll" />
   </files>
 </package>
