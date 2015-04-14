@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Compose</RootNamespace>
     <AssemblyName>Compose</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -83,8 +84,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>IF NOT EXIST "$(SolutionDir)artifacts\packages\$(ProjectName)\lib\" MKDIR "$(SolutionDir)artifacts\packages\$(ProjectName)\lib\net452\"
-COPY "$(TargetPath)" "$(SolutionDir)artifacts\packages\$(ProjectName)\lib\net452\"
+    <PostBuildEvent>IF NOT EXIST "$(SolutionDir)artifacts\packages\$(ProjectName)\lib\" MKDIR "$(SolutionDir)artifacts\packages\$(ProjectName)\lib\net45\"
+COPY "$(TargetPath)" "$(SolutionDir)artifacts\packages\$(ProjectName)\lib\net45\"
 COPY "$(ProjectDir)README.txt" "$(SolutionDir)artifacts\packages\$(ProjectName)\"
 COPY "$(ProjectDir)$(ProjectName).nuspec" "$(SolutionDir)artifacts\packages\$(ProjectName)\"
 "$(SolutionDir)packages\NuGet.CommandLine.2.8.3\tools\NUGET" PACK "$(SolutionDir)artifacts\packages\$(ProjectName)\$(ProjectName).nuspec" -OutputDirectory "$(SolutionDir)artifacts\packages"</PostBuildEvent>
