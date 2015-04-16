@@ -2,7 +2,7 @@
 
 namespace Compose
 {
-	public class CommandLineApplication : CommandLineApplciation<int> { }
-	public class CommandLineApplciation<TResult> : Executable<TResult> { }
+	public class CommandLineApplication : CommandLineApplication<int> { }
+	public class CommandLineApplication<TResult> : Executable<TResult> { }
 	public class CancellableCommandLineApplication : Executable<CancellationToken, int> { }
 }
