@@ -2,7 +2,7 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/2a52f9nlucas0jsn?svg=true)](https://ci.appveyor.com/project/Smudge202/compose)
 
-[TOC]
+[![Stories in Ready](https://badge.waffle.io/smudge202/compose.png?label=ready&title=Ready)](http://waffle.io/smudge202/compose) [![Stories in Progress](https://badge.waffle.io/smudge202/compose.png?label=in%20progress&title=In%20Progress)](http://waffle.io/smudge202/compose)
 
 ##<a name="description"></a>Description
 
