@@ -1,24 +1,22 @@
 ﻿<?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
-    <id>Compose</id>
-    <version>0.1.2-beta3</version>
+    <id>Compose.ApplicationExtension</id>
+    <version>0.1.0-beta3</version>
     <authors>Tommy Long, 4Com plc</authors>
     <owners>Tommy Long</owners>
     <iconUrl>https://raw.githubusercontent.com/Smudge202/Compose/master/Compose-Icon.png</iconUrl>
     <licenseUrl>https://raw.githubusercontent.com/Smudge202/Compose/master/LICENSE</licenseUrl>
     <projectUrl>http://github.com/smudge202/compose</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>The easy wasy to compose well formed application components in .Net</description>
+    <description>The easy wasy to compose application extensions in .Net</description>
     <tags>Compose</tags>
     <dependencies>
-      <group targetFramework="net45">
-        <dependency id="Microsoft.Framework.DependencyInjection" version="1.0.0-beta3" />
-      </group>
+      <dependency id="Compose" version="0.1.1-beta3" />
     </dependencies>
   </metadata>
   <files>
     <file src="README.txt" target="" />
-    <file src="lib\net45\Compose.dll" target="lib\net45\Compose.dll" />
+    <file src="content/ApplicationExtensions.cs.pp" target="content/" />
   </files>
 </package>
