@@ -56,7 +56,7 @@ namespace Compose
 
         private static DynamicEmitter GetRegisteredDynamicEmitter(this Application app)
         {
-            app.Provider.Extend(new ServiceDescriptor(typeof(DynamicEmitter), typeof(DynamicEmitter), LifecycleKind.Singleton));
+            app.Provider.Extend(new ServiceDescriptor(typeof(DynamicEmitter), typeof(DynamicEmitter), ServiceLifetime.Singleton));
             return app.GetRequiredService<DynamicEmitter>();
         }
 

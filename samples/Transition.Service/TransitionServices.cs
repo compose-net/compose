@@ -6,11 +6,9 @@ namespace Transition.Service
 {
 	public static class TransitionServices
 	{
-		internal static IEnumerable<IServiceDescriptor> GetDefaultServices(IConfiguration configuration)
+		internal static IEnumerable<ServiceDescriptor> GetDefaultServices()
 		{
-			var describe = new ServiceDescriber(configuration);
-
-			yield return describe.Transient<IHost, StandardHost>();
+			yield return ServiceDescriptor.Transient<IHost, StandardHost>();
 		}
 	}
 }

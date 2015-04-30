@@ -14,7 +14,7 @@ namespace Compose
 
 		public WrappedServiceProvider(IServiceCollection services)
 		{
-			_singletons = services.Where(x => x.Lifecycle == LifecycleKind.Singleton)
+			_singletons = services.Where(x => x.Lifetime == ServiceLifetime.Singleton)
 				.ToDictionary(x => x.ServiceType, x => x.ImplementationInstance);
 			_fallback = CreateFallbackProvider(services);
 			_services = services;

@@ -45,7 +45,7 @@ namespace Compose
 		private void ExtendTransition(Type serviceType)
 		{
 			_fallback.AppendSingleton(_redirects[serviceType]);
-			_fallback.Extend(new ServiceDescriptor(_redirects[serviceType], _redirects[serviceType], LifecycleKind.Singleton));
+			_fallback.Extend(new ServiceDescriptor(_redirects[serviceType], _redirects[serviceType], ServiceLifetime.Singleton));
 		}
 
 		public void Snapshot()

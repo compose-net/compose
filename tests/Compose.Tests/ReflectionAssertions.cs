@@ -17,7 +17,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanActivateMicrosoftFrameworkDepdencyInjectionServiceProvider()
 		{
-			Action act = () => Activator.CreateInstance(Constants.GetServiceProvider(), Enumerable.Empty<IServiceDescriptor>());
+			Action act = () => Activator.CreateInstance(Constants.GetServiceProvider(), Enumerable.Empty<ServiceDescriptor>());
 			act.ShouldNotThrow<Exception>();
         }
 
