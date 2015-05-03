@@ -9,6 +9,8 @@ assembly_info:
   assembly_informational_version: '{version}'
 install:
 - set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
+before_build:
+  - nuget restore
 build:
   publish_nuget: true
   publish_nuget_symbols: true
