@@ -12,30 +12,30 @@ namespace Compose
 			return services.Any(x => x.IsTransitionMarker());
 		}
 
-		internal static bool IsTransitionMarker(this IServiceDescriptor descriptor)
+		internal static bool IsTransitionMarker(this ServiceDescriptor descriptor)
 		{
 			return typeof(TransitionMarker).IsAssignableFrom(descriptor.ImplementationType);
 		}
 
-		internal static bool ContainsTransitions(this IServiceCollection services)
+		internal static bool ContainsTransitions(this ServiceCollection services)
 		{
 			return services.Any(x => x.IsTransition());
 		}
 
-		internal static bool IsTransition(this IServiceDescriptor descriptor)
+		internal static bool IsTransition(this ServiceDescriptor descriptor)
 		{
-			return typeof(ITransition<>).IsAssignableFromGeneric(descriptor.ImplementationType) && descriptor.Lifecycle == LifecycleKind.Singleton;
+			return typeof(ITransition<>).IsAssignableFromGeneric(descriptor.ImplementationType) && descriptor.Lifetime == ServiceLifetime.Singleton;
         }
 
-		internal static IEnumerable<IServiceDescriptor> WithSelfBoundTransitionals(this IEnumerable<IServiceDescriptor> services)
+		internal static IEnumerable<ServiceDescriptor> WithSelfBoundTransitionals(this IEnumerable<ServiceDescriptor> services)
 		{
 			return services.Where(x => !x.IsTransition())
 				.Union(services.Where(x => x.IsTransition()).Select(x => x.SelfBind()));
 		}
 
-		internal static IServiceDescriptor SelfBind(this IServiceDescriptor transitional)
+		internal static ServiceDescriptor SelfBind(this ServiceDescriptor transitional)
 		{
-			return new ServiceDescriptor(transitional.ImplementationType, transitional.ImplementationType, transitional.Lifecycle);
+			return new ServiceDescriptor(transitional.ImplementationType, transitional.ImplementationType, transitional.Lifetime);
 		}
 
 		internal static Dictionary<Type, Type> GetTransitionalRedirects(this Application app, IServiceCollection services)
@@ -46,7 +46,7 @@ namespace Compose
 				.Select(x => x.ServiceType.GetGenericArguments().Single()).ToList().ToDictionary(x => x, x => app.CreateProxy(x));
 		}
 
-		internal static IEnumerable<IServiceDescriptor> BeforeMarker(this IEnumerable<IServiceDescriptor> source)
+		internal static IEnumerable<ServiceDescriptor> BeforeMarker(this IEnumerable<ServiceDescriptor> source)
 		{
 			return source.Take(source.Select((x, i) => new { x, i, }).Last(x => x.x.ImplementationType == typeof(TransitionMarker)).i);
 		}

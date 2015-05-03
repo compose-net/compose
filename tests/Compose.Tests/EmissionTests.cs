@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using Microsoft.Framework.DependencyInjection;
-using Microsoft.Framework.OptionsModel;
 using System;
 using System.Collections.Generic;
 using Xunit;

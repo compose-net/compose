@@ -6,15 +6,15 @@ namespace Transition.Service
 {
 	public static class ServiceExtensions
 	{
-		public static IServiceCollection AddSampleService(this IServiceCollection services, IConfiguration configuration = null)
+		public static IServiceCollection AddSampleService(this IServiceCollection services)
 		{
-			services.TryAdd(GetDefaultServices(configuration));
+			services.TryAdd(GetDefaultServices());
 			return services;
 		}
 
-		private static IEnumerable<IServiceDescriptor> GetDefaultServices(IConfiguration configuration = null)
+		private static IEnumerable<ServiceDescriptor> GetDefaultServices()
 		{
-			return TransitionServices.GetDefaultServices(configuration);
+			return TransitionServices.GetDefaultServices();
 		}
 	}
 }
