@@ -19,6 +19,5 @@
   </metadata>
   <files>
     <file src="README.txt" target="" />
-    <file src="artifiacts\bin\Compose\$configuration$\Compose.dll" target="lib\net45\Compose.dll" />
   </files>
 </package>
