@@ -1,0 +1,24 @@
+﻿{
+  "version": "1.0.0-*",
+  "description": "",
+  "authors": [ "" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+
+  "dependencies": {
+    "Compose": "",
+    "FluentAssertions": "3.3.0",
+    "Microsoft.Framework.DependencyInjection": "1.0.0-beta4",
+    "Moq": "4.2.1502.911",
+    "xunit": "2.0.0"
+  },
+
+  "frameworks": {
+    "net45": {
+      "frameworkAssemblies": {
+        "System.Runtime": "4.0.0.0"
+      }
+    }
+  }
+}
