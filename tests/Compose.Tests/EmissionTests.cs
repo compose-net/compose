@@ -2,6 +2,7 @@
 using Microsoft.Framework.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Xunit;
 
 namespace Compose.Tests
@@ -580,7 +581,7 @@ namespace Compose.Tests
 		{
 			var app = new Fake.Application();
 			app.UseServices(services => services.AddTransient(interfaceType, implementationType));
-			return () => app.CreateProxy(interfaceType);
+			return () => app.CreateProxy(interfaceType.GetTypeInfo());
 		}
 
 		private static Action InvokeProxy<TInterface, TImplementation>()

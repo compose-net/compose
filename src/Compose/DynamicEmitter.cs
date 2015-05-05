@@ -18,9 +18,10 @@ namespace Compose
 			_moduleBuilder = CreateModuleBuilder();
 		}
 
-		internal Type GetDirectTransitionImplementation(Type serviceType)
+		internal TypeInfo GetDirectTransitionImplementation(TypeInfo serviceTypeInfo)
 		{
-			ValidateProxyIsPossible(serviceType);
+			var serviceType = serviceTypeInfo.AsType();
+            ValidateProxyIsPossible(serviceTypeInfo);
 			/* C#: 
 			public sealed class WrapperName[<TService>] : TService, ITransition<TService>
 			{
@@ -29,30 +30,23 @@ namespace Compose
 			*/
 			var typeBuilder = _moduleBuilder.DefineType($"{_assemblyName.Name}+{serviceType.FullName}", TypeAttributes.Public | TypeAttributes.Sealed);
 			typeBuilder.AddInterfaceImplementation(serviceType);
-			foreach (var implementedInterface in serviceType.GetInterfaces())
+			foreach (var implementedInterface in serviceTypeInfo.ImplementedInterfaces)
 				typeBuilder.AddInterfaceImplementation(implementedInterface);
-			if (serviceType.IsGenericType)
-				typeBuilder.AddGenericsFrom(serviceType);
+			if (serviceTypeInfo.IsGenericType)
+				typeBuilder.AddGenericsFrom(serviceTypeInfo);
 			typeBuilder.AddInterfaceImplementation(typeof(ITransition<>).MakeGenericType(serviceType));
 			try
 			{
-				typeBuilder.AddDirectImplementation(serviceType);
-#if ENABLE_SAVE_DYNAMIC_ASSEMBLY
-				var type = typeBuilder.CreateType();
-				_assemblyBuilder.Save($"{_assemblyName.Name}.dll");
-				return type;
+				typeBuilder.AddDirectImplementation(serviceTypeInfo);
+				return typeBuilder.CreateTypeInfo();
 			}
-#else
-				return typeBuilder.CreateType();
-			}
-#endif
 			catch(Exception ex)
 			{
 				throw new UnsupportedTypeDefintionException(serviceType, ex);
 			}
 		}
 
-		private void ValidateProxyIsPossible(Type serviceType)
+		private void ValidateProxyIsPossible(TypeInfo serviceType)
 		{
 			if (!serviceType.IsPublic && !serviceType.IsNestedPublic)
 				throw new InaccessibleTypeException(serviceType);
@@ -60,9 +54,10 @@ namespace Compose
 				ValidateGenericTypesAccessible(serviceType);
 		}
 
-		private void ValidateGenericTypesAccessible(Type serviceType)
+		private void ValidateGenericTypesAccessible(TypeInfo serviceType)
 		{
-			var inaccessibleGeneric = serviceType.GetGenericArguments()
+			var inaccessibleGeneric = serviceType.GenericTypeArguments
+				.Select(x => x.GetTypeInfo())
 				.FirstOrDefault(x => !x.IsPublic && !x.IsNestedPublic);
 			if (inaccessibleGeneric != null)
 				throw new InaccessibleTypeException(serviceType, inaccessibleGeneric);
@@ -76,12 +71,12 @@ namespace Compose
 
 		private AssemblyBuilder CreateAssemblyBuilder()
 		{
-			return AppDomain.CurrentDomain.DefineDynamicAssembly(_assemblyName, AssemblyBuilderAccess.RunAndSave);
+			return AssemblyBuilder.DefineDynamicAssembly(_assemblyName, AssemblyBuilderAccess.Run);
 		}
 
 		private ModuleBuilder CreateModuleBuilder()
 		{
-			return _assemblyBuilder.DefineDynamicModule(_assemblyName.Name, $"{_assemblyName.Name}.dll");
+			return _assemblyBuilder.DefineDynamicModule(_assemblyName.Name);
 		}
 	}
 }
