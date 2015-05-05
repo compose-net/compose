@@ -25,7 +25,7 @@ namespace Compose
 			var serviceType = serviceTypeInfo.AsType();
 			var serviceField = typeBuilder.AddServiceField(serviceName, serviceType);
 			var snapshotField = typeBuilder.AddSnapshotField(snapshotName, serviceType);
-			var implementedInterfaces = new[] { serviceTypeInfo }.Union(serviceTypeInfo.GetInterfaces()).ToArray();
+			var implementedInterfaces = new[] { serviceTypeInfo }.Union(serviceTypeInfo.ImplementedInterfaces.Select(x => x.GetTypeInfo()).ToArray()).ToArray();
 			typeBuilder.AddServiceConstructor(serviceField, serviceType);
 			typeBuilder.AddPropertyImplementations(serviceField, implementedInterfaces);
 			typeBuilder.AddMethodImplementations(serviceField, implementedInterfaces);
@@ -144,7 +144,7 @@ namespace Compose
 		{
 			if (methodGenerics.Contains(constraint)) return constraint;
 
-			var typedDefintions = serviceType.GetGenericArguments();
+			var typedDefintions = serviceType.GenericTypeArguments.Select(x => x.GetTypeInfo()).ToArray();
 			var genericDefinitions = serviceType.IsGenericType ? serviceType.GetGenericTypeDefinition().GetTypeInfo().GetGenericArguments() : new TypeInfo[0];
 
 			for (var i = 0; i < genericDefinitions.Length; i++)

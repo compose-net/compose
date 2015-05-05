@@ -13,8 +13,8 @@
   },
 
   "frameworks": {
-    //"net45": { },
-    //"dnx451": { },
+    "net45": { },
+    "dnx451": { },
     "dnxcore50": {
       "dependencies": {
         "Microsoft.CSharp": "4.0.0-beta-*",
