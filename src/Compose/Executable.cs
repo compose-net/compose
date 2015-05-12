@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Compose
 {
@@ -20,6 +22,11 @@ namespace Compose
 		{
 			Execution();
 		}
+
+		public virtual async Task ExecuteAsync(CancellationToken cancellationToken)
+		{
+			await Task.Run(Execution, cancellationToken);
+		}
 	}
 
 	public abstract class Executable<TResult> : Application
@@ -40,6 +47,11 @@ namespace Compose
 		{
 			return Execution();
 		}
+
+		public virtual async Task<TResult> ExecuteAsync(CancellationToken cancellationToken)
+		{
+			return await Task.Run(Execution, cancellationToken);
+		}
 	}
 
 	public abstract class Executable<TContext, TResult> : Application
@@ -59,6 +71,11 @@ namespace Compose
 		public virtual TResult Execute(TContext context)
 		{
 			return Execution(context);
+		}
+
+		public virtual async Task<TResult> ExecuteAsync(TContext context, CancellationToken cancellationToken)
+		{
+			return await Task.Run(() => Execution(context), cancellationToken);
 		}
 	}
 }
