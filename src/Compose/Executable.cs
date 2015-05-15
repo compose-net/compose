@@ -7,14 +7,14 @@ namespace Compose
 	public class Executable : Application
 	{
 		protected Action Execution { get; private set; }
-		protected Func<Task> ExecutionAsync { get; private set; }
+		protected Func<CancellationToken, Task> ExecutionAsync { get; private set; }
 
 		public void OnExecute(Action invoke)
 		{
 			Execution = invoke;
 		}
 
-		public void OnExecute(Func<Task> asyncInvoke)
+		public void OnExecute(Func<CancellationToken, Task> asyncInvoke)
 		{
 			ExecutionAsync = asyncInvoke;
 		}
@@ -29,7 +29,7 @@ namespace Compose
 			if (Execution != null)
 				Execution();
 			else if (ExecutionAsync != null)
-				ExecutionAsync().Wait();
+				ExecutionAsync(CancellationToken.None).Wait();
 			else
 				throw new InvalidOperationException("Cannot execute without invokable action");
 		}
@@ -37,7 +37,7 @@ namespace Compose
 		public virtual async Task ExecuteAsync(CancellationToken cancellationToken)
 		{
 			if (ExecutionAsync != null)
-				await ExecutionAsync();
+				await ExecutionAsync(cancellationToken);
 			else if (Execution != null)
 				await Task.Run(Execution, cancellationToken);
 			else
