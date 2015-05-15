@@ -78,7 +78,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EmissionTests.cs" />
+    <Compile Include="ExecutableTests.cs" />
     <Compile Include="Fake\Application.cs" />
+    <Compile Include="Fake\FakeContextExecutable.cs" />
+    <Compile Include="Fake\FakeExecutable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReflectionAssertions.cs" />
     <Compile Include="ServiceProviderTests.cs" />
