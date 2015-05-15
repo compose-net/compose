@@ -28,7 +28,7 @@ namespace Compose
 		{
 			if (Execution != null)
 				Execution();
-			else if (Execution != null)
+			else if (ExecutionAsync != null)
 				ExecutionAsync().Wait();
 			else
 				throw new InvalidOperationException("Cannot execute without invokable action");
