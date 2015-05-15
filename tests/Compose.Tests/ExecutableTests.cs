@@ -1,5 +1,6 @@
 ﻿using Compose.Tests.Fake;
 using FluentAssertions;
+using System;
 using System.Threading;
 using Xunit;
 
@@ -7,6 +8,16 @@ namespace Compose.Tests
 {
 	public class ExecutableTests
 	{
+		[Fact]
+		public void GivenOnExecuteNotInvokedWhenExecuteIsInvokedThenThrowsException()
+		{
+			var app = new Executable();
+
+			Action act = ()=> app.Execute();
+
+			act.ShouldThrow<InvalidOperationException>();
+		}
+
 		[Fact]
 		public void WhenExecuteIsInvokedThenActionIsInvoked()
 		{

@@ -7,10 +7,16 @@ namespace Compose
 	public class Executable : Application
 	{
 		protected Action Execution { get; private set; }
+		protected Func<Task> ExecutionAsync { get; private set; }
 
 		public void OnExecute(Action invoke)
 		{
 			Execution = invoke;
+		}
+
+		public void OnExecute(Func<Task> asyncInvoke)
+		{
+			ExecutionAsync = asyncInvoke;
 		}
 
 		public void OnExecute<TService>(Action<TService> invoke) where TService : class
@@ -20,12 +26,22 @@ namespace Compose
 
 		public virtual void Execute()
 		{
-			Execution();
+			if (Execution != null)
+				Execution();
+			else if (Execution != null)
+				ExecutionAsync().Wait();
+			else
+				throw new InvalidOperationException("Cannot execute without invokable action");
 		}
 
 		public virtual async Task ExecuteAsync(CancellationToken cancellationToken)
 		{
-			await Task.Run(Execution, cancellationToken);
+			if (ExecutionAsync != null)
+				await ExecutionAsync();
+			else if (Execution != null)
+				await Task.Run(Execution, cancellationToken);
+			else
+				throw new InvalidOperationException("Cannot execute without invokable action");
 		}
 	}
 
