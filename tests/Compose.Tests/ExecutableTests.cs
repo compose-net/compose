@@ -37,9 +37,9 @@ namespace Compose.Tests
 		{
 			var executed = false;
 			var app = new FakeExecutable();
-			app.OnExecute(() => { executed = true; return true; });
+			app.OnExecute(() => { return true; });
 
-			app.Execute();
+			executed = app.Execute();
 
 			executed.Should().BeTrue();
 		}
@@ -50,9 +50,9 @@ namespace Compose.Tests
 			var executed = false;
 			var app = new FakeExecutable();
 			var cts = new CancellationTokenSource();
-			app.OnExecute(() => { executed = true; return true; });
+			app.OnExecute(() => { return true; });
 
-			await app.ExecuteAsync(cts.Token);
+			executed = await app.ExecuteAsync(cts.Token);
 
 			executed.Should().BeTrue();
 		}
@@ -62,9 +62,9 @@ namespace Compose.Tests
 		{
 			var executed = false;
 			var app = new FakeContextExecutable();
-			app.OnExecute((x) => { executed = true; return x; });
+			app.OnExecute((x) => { return x; });
 
-			app.Execute(true);
+			executed = app.Execute(true);
 
 			executed.Should().BeTrue();
 		}
@@ -75,9 +75,9 @@ namespace Compose.Tests
 			var executed = false;
 			var app = new FakeContextExecutable();
 			var cts = new CancellationTokenSource();
-			app.OnExecute((x) => { executed = true; return x; });
+			app.OnExecute((x) => { return x; });
 
-			await app.ExecuteAsync(true, cts.Token);
+			executed = await app.ExecuteAsync(true, cts.Token);
 
 			executed.Should().BeTrue();
 		}
