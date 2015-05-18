@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.Framework.DependencyInjection;
+﻿using Microsoft.Framework.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -16,7 +15,7 @@ namespace Compose.Tests
 		public void CanGenerateDynamicProxy()
 		{
 			SetupProxy<IBlank, Dependency>()
-				.Should().NotBeNull();
+				.Must().NotBeNull();
 		}
 		#endregion
 
@@ -31,7 +30,7 @@ namespace Compose.Tests
 		public void CanGetProperty()
 		{
 			SetupProxy<IGetProperty, GetProperty>()()
-				.Property.Should().Be(GetProperty.Id);
+				.Property.Must().Be(GetProperty.Id);
 		}
 		#endregion
 
@@ -48,7 +47,7 @@ namespace Compose.Tests
 			var service = SetupProxy<ISetProperty, SetProperty>()();
 			var id = Guid.NewGuid().ToString();
 			service.Property = id;
-			SetProperty.Id.Should().Be(id);
+			SetProperty.Id.Must().Be(id);
 		}
 		#endregion
 
@@ -66,7 +65,7 @@ namespace Compose.Tests
 			var service = SetupProxy<IInvokeWithoutArguments, InvokeWithoutArguments>()();
 			InvokeWithoutArguments.Invoked = false;
 			service.Method();
-			InvokeWithoutArguments.Invoked.Should().BeTrue();
+			InvokeWithoutArguments.Invoked.Must().BeTrue();
 		}
 		#endregion
 
@@ -83,7 +82,7 @@ namespace Compose.Tests
 			var service = SetupProxy<IInvokeWithArguments, InvokeWithArguments>()();
 			InvokeWithArguments.Invoked = 0;
 			service.Method(1);
-			InvokeWithArguments.Invoked.Should().Be(1);
+			InvokeWithArguments.Invoked.Must().Be(1);
 		}
 		#endregion
 
@@ -99,7 +98,7 @@ namespace Compose.Tests
 		{
 			var service = SetupProxy<IReturnFromInvoke, ReturnFromInvoke>()();
 			ReturnFromInvoke.Return = 1;
-			service.Method().Should().Be(ReturnFromInvoke.Return);
+			service.Method().Must().Be(ReturnFromInvoke.Return);
 		}
 		#endregion
 
@@ -114,7 +113,7 @@ namespace Compose.Tests
 		public void CanPassThroughExceptions()
 		{
 			Action act = () => SetupProxy<IThrowException, ThrowException>()().Method();
-			act.ShouldThrow<TestException>();
+			act.MustThrow<TestException>();
 		}
 		#endregion
 
@@ -135,12 +134,12 @@ namespace Compose.Tests
 		{
 			var service = SetupProxy<IDependency, Dependency1>()();
 			Dependency1.Id = Guid.NewGuid().ToString();
-			service.GetId().Should().Be(Dependency1.Id);
+			service.GetId().Must().Be(Dependency1.Id);
 			var transition = service as ITransition<IDependency>;
-			transition.Should().NotBeNull();
+			transition.Must().NotBeNull();
 			transition.Change(new Dependency2());
 			Dependency2.Id = Guid.NewGuid().ToString();
-			service.GetId().Should().Be(Dependency2.Id);
+			service.GetId().Must().Be(Dependency2.Id);
 		}
 		#endregion
 
@@ -169,8 +168,8 @@ namespace Compose.Tests
 		public void CanReturnGenericInvocationResult()
 		{
 			var service = SetupProxy<IReturnGenericFromInvoke, ReturnGenericFromInvoke>()();
-			service.Method(true).Should().BeTrue();
-			service.Method(1).Should().Be(1);
+			service.Method(true).Must().BeTrue();
+			service.Method(1).Must().Be(1);
 		}
 		#endregion
 
@@ -182,7 +181,7 @@ namespace Compose.Tests
 		public void CanGenerateProxyWithInterfaceConstrainedGenericArguments()
 		{
 			CreateProxy(typeof(IInterfaceConstrainedGenericArgument<>), typeof(InterfaceConstrainedGenericArgument<>))
-				.ShouldNotThrow<Exception>();
+				.MustNotThrow<Exception>();
 		}
 		#endregion
 
@@ -193,7 +192,7 @@ namespace Compose.Tests
 		public void CanGenerateProxyWithBaseClassConstrainedGenericArguments()
 		{
 			CreateProxy(typeof(IInterfaceWithBaseClassConstrainedGenericArgument<>), typeof(InterfaceWithBaseClassConstrainedGenericArgument<>))
-				.ShouldNotThrow<Exception>();
+				.MustNotThrow<Exception>();
         }
 		#endregion
 
@@ -204,7 +203,7 @@ namespace Compose.Tests
 		public void CanGenerateProxyWithDefaultConstructorConstrainedGenericArguments()
 		{
 			CreateProxy(typeof(IInterfaceWithDefaultConstructorConstrainedGenericArgument<>), typeof(InterfaceWithDefaultConstructorConstrainedGenericArgument<>))
-				.ShouldNotThrow<Exception>();
+				.MustNotThrow<Exception>();
         }
 		#endregion
 
@@ -215,7 +214,7 @@ namespace Compose.Tests
 		public void CanGenerateProxyWithClassConstrainedGenericArguments()
 		{
 			CreateProxy(typeof(IInterfaceWithClassConstrainedGenericArgument<>), typeof(InterfaceWithClassConstrainedGenericArgument<>))
-				.ShouldNotThrow<Exception>();
+				.MustNotThrow<Exception>();
         }
 		#endregion
 
@@ -226,7 +225,7 @@ namespace Compose.Tests
 		public void CanGenerateProxyWithStructConstrainedGenericArguments()
 		{
 			CreateProxy(typeof(IInterfaceWithStructConstrainedGenericArgument<>), typeof(InterfaceWithStructConstrainedGenericArgument<>))
-				.ShouldNotThrow<Exception>();
+				.MustNotThrow<Exception>();
         }
 		#endregion
 
@@ -237,7 +236,7 @@ namespace Compose.Tests
 		public void CanGenerateProxyWithCovariantConstrainedGenericsArguments()
 		{
 			CreateProxy(typeof(IInterfaceWithCovariantConstrainedGenericArguments<,>), typeof(InterfaceWithCovariantConstrainedGenericArguments<,>))
-				.ShouldNotThrow<Exception>();
+				.MustNotThrow<Exception>();
         }
 		#endregion
 
@@ -501,7 +500,7 @@ namespace Compose.Tests
 		public void CanGenerateCovariantProxies()
 		{
 			InvokeProxy<ICovariant<string>, Covariant>()
-				.ShouldNotThrow<Exception>();
+				.MustNotThrow<Exception>();
 		}
 		#endregion
 
@@ -514,7 +513,7 @@ namespace Compose.Tests
 		public void CanGenerateProxyForSystemInterfaces()
 		{
 			InvokeProxy<IDisposable, Disposable>()
-				.ShouldNotThrow<Exception>();
+				.MustNotThrow<Exception>();
 		}
 		#endregion
 
@@ -528,7 +527,7 @@ namespace Compose.Tests
 		public void CanGenerateProxyForUntypedGenerics()
 		{
 			InvokeProxy<IUntypedGeneric<string>>(typeof(IUntypedGeneric<>), typeof(UntypedGeneric<>))
-				.ShouldNotThrow<Exception>();
+				.MustNotThrow<Exception>();
 		}
 		#endregion
 
@@ -539,7 +538,7 @@ namespace Compose.Tests
 		public void CanThrowInformativeExceptionWhenInterfaceIsInternal()
 		{
 			InvokeProxy<IInformativeExceptionThrownForInternalInterface, InformativeExceptionThrownForInternalInterface>()
-				.ShouldThrow<InaccessibleTypeException>();
+				.MustThrow<InaccessibleTypeException>();
 		}
 		#endregion
 
@@ -552,7 +551,7 @@ namespace Compose.Tests
 		public void CanThrowInformativeExceptionWhenGenericTypeIsInternal()
 		{
 			InvokeProxy<IInformativeExceptionThrownForInternalGeneric<InformativeExceptionThrownForInternalInterfaceGeneric>, InformativeExceptionThrownForInternalGeneric>()
-				.ShouldThrow<InaccessibleTypeException>();
+				.MustThrow<InaccessibleTypeException>();
 		}
 		#endregion
 
@@ -563,7 +562,7 @@ namespace Compose.Tests
 		public void CanGenerateGenericProxy()
 		{
 			CreateProxy(typeof(IGeneric<>), typeof(Generic<>))
-				.ShouldNotThrow<Exception>();
+				.MustNotThrow<Exception>();
 		}
 		#endregion
 
@@ -572,7 +571,7 @@ namespace Compose.Tests
 		public void CanResolveGenericProxy()
 		{
 			InvokeProxy<IGeneric<object>>(typeof(IGeneric<>), typeof(Generic<>))
-				.ShouldNotThrow<Exception>();
+				.MustNotThrow<Exception>();
 		}
 
 		#endregion

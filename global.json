@@ -1,1 +1,6 @@
-{ "sources": [ "src" ] }
+{
+	"projects": [
+		"src",
+		"../FluentTestHelpers/src"
+	]
+}
