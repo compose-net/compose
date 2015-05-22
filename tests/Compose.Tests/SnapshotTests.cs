@@ -11,7 +11,7 @@ namespace Compose.Tests
 			var app = new Fake.Application();
 			app.UseServices(services => services.AddTransitional<IDependency, Dependency1>());
 			Action act = app.Snapshot;
-			act.MustNotThrow<Exception>();
+			Assert.NotNull(Record.Exception(act));
 		}
 
 		[Fact]
@@ -19,7 +19,7 @@ namespace Compose.Tests
 		{
 			var app = new Fake.Application();
 			Action act = app.Snapshot;
-			act.MustNotThrow<Exception>();
+			Assert.NotNull(Record.Exception(act));
 		}
 
 		[Fact]
@@ -28,7 +28,7 @@ namespace Compose.Tests
 			var app = new Fake.Application();
 			app.UseServices(services => services.AddTransitional<IDependency, Dependency1>());
 			Action act = app.Restore;
-			act.MustNotThrow<Exception>();
+			Assert.NotNull(Record.Exception(act));
 		}
 
 		[Fact]
@@ -36,7 +36,7 @@ namespace Compose.Tests
 		{
 			var app = new Fake.Application();
 			Action act = app.Restore;
-			act.MustNotThrow<Exception>();
+			Assert.NotNull(Record.Exception(act));
 		}
 
 		[Fact]
@@ -48,9 +48,9 @@ namespace Compose.Tests
 			{
 				app.Snapshot();
 				app.Transition<IDependency, Dependency2>();
-				dependency.Id.Must().Be(Type.Two);
+				Assert.Equal(Type.Two, dependency.Id);
 				app.Restore();
-				dependency.Id.Must().Be(Type.One);
+				Assert.Equal(Type.One, dependency.Id);
 			});
 			app.Execute();
 		}
@@ -63,9 +63,9 @@ namespace Compose.Tests
 			app.OnExecute<IDependency>(dependency =>
 			{
 				app.Transition<IDependency, Dependency2>();
-				dependency.Id.Must().Be(Type.Two);
+				Assert.Equal(Type.Two, dependency.Id);
 				app.Restore();
-				dependency.Id.Must().Be(Type.One);
+				Assert.Equal(Type.One, dependency.Id);
 			});
 			app.Execute();
 		}
@@ -82,7 +82,7 @@ namespace Compose.Tests
 				app.Snapshot();
 				app.Transition<IDependency, Dependency3>();
 				app.Restore();
-				dependency.Id.Must().Be(Type.Two);
+				Assert.Equal(Type.Two, dependency.Id);
 			});
 			app.Execute();
 		}

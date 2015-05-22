@@ -10,21 +10,21 @@ namespace Compose.Tests
 		[Fact]
 		public void CanResolveMicrosoftFrameworkDependencyInjectionServiceProvider()
 		{
-			Constants.GetServiceProvider().Must().NotBeNull();
+			Assert.NotNull(Constants.GetServiceProvider());
 		}
 
 		[Fact]
 		public void CanActivateMicrosoftFrameworkDepdencyInjectionServiceProvider()
 		{
 			Action act = () => Activator.CreateInstance(Constants.GetServiceProvider(), Enumerable.Empty<ServiceDescriptor>());
-			act.MustNotThrow<Exception>();
+			Assert.NotNull(Record.Exception(act));
         }
 
 		[Fact]
 		public void CanActivateServiceProviderThroughWrappingFacade()
 		{
 			Action act = () => new WrappedServiceProvider(new ServiceCollection());
-			act.MustNotThrow<Exception>();
+			Assert.NotNull(Record.Exception(act));
 		}
     }
 }

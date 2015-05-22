@@ -7,7 +7,6 @@
 	"licenseUrl": "",
 
 	"dependencies": {
-		"FluentTestHelpers": "",
 		"Microsoft.Framework.DependencyInjection": "1.0.0-beta4",
 		"Moq": "4.2.1502.911",
 		"xunit": "2.1.0-beta2-build2981",
@@ -23,11 +22,6 @@
     "../../src/**/*.cs"
   ],
   "frameworks": {
-    "net45": {
-      "frameworkAssemblies": {
-        "System.Runtime": "4.0.0.0"
-      }
-    },
     "dnx451": { },
     "dnxcore50": {
       "dependencies": {
@@ -39,7 +33,8 @@
         "System.Reflection.Extensions": "4.0.0-beta-*",
         "System.Reflection.TypeExtensions": "4.0.0-beta-*",
         "System.Runtime": "4.0.20-beta-*",
-        "System.Threading": "4.0.10-beta-*"
+				"System.Threading": "4.0.10-beta-*",
+				"System.Threading.Tasks": "4.0.10-beta-*"
       }
     }
   }

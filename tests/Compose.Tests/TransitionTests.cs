@@ -18,8 +18,8 @@ namespace Compose.Tests
 			});
 			app.OnExecute<IDependency>(dependency =>
 			{
-				dependency.Must().NotBeNull();
-				dependency.Id.Must().Be(Type.Dependency);
+				Assert.NotNull(dependency);
+				Assert.Equal(Type.Dependency, dependency.Id);
 			});
 			app.Execute();
 		}
@@ -38,8 +38,8 @@ namespace Compose.Tests
 			});
 			app.OnExecute<IDependency>(dependency =>
 			{
-				dependency.Must().NotBeNull();
-				dependency.Id.Must().Be(Type.Dependency);
+				Assert.NotNull(dependency);
+				Assert.Equal(Type.Dependency, dependency.Id);
 			});
 			app.Execute();
 		}
@@ -57,8 +57,8 @@ namespace Compose.Tests
 			});
 			app.OnExecute<IDependency>(dependency =>
 			{
-				dependency.Must().NotBeNull();
-				dependency.Id.Must().Be(Type.Dependency);
+				Assert.NotNull(dependency);
+				Assert.Equal(Type.Dependency, dependency.Id);
 			});
 			app.Execute();
 		}
@@ -70,9 +70,9 @@ namespace Compose.Tests
 			app.UseServices(services => { services.AddTransitional<IDependency, Dependency>(); });
 			app.OnExecute<IDependency>(dependency =>
 			{
-				dependency.Id.Must().Be(Type.Dependency);
+				Assert.Equal(Type.Dependency, dependency.Id);
 				app.Transition<IDependency, OtherDependency>();
-				dependency.Id.Must().Be(Type.OtherDependency);
+				Assert.Equal(Type.OtherDependency, dependency.Id);
 			});
 			app.Execute();
 		}
@@ -88,9 +88,9 @@ namespace Compose.Tests
 			});
 			app.OnExecute<IDependency>(dependency =>
 			{
-				dependency.Id.Must().Be(Type.Dependency);
+				Assert.Equal(Type.Dependency, dependency.Id);
 				app.Transition<IDependency, OtherDependency>();
-				dependency.Id.Must().Be(Type.OtherDependency);
+				Assert.Equal(Type.OtherDependency, dependency.Id);
 			});
 			app.Execute();
 		}
@@ -106,9 +106,9 @@ namespace Compose.Tests
 			});
 			app.OnExecute<IDependency>(dependency =>
 			{
-				dependency.Id.Must().Be(Type.Dependency);
+				Assert.Equal(Type.Dependency, dependency.Id);
 				app.Transition<IDependency, OtherDependency>();
-				dependency.Id.Must().Be(Type.OtherDependency);
+				Assert.Equal(Type.OtherDependency, dependency.Id);
 			});
 			app.Execute();
 		}
@@ -122,7 +122,7 @@ namespace Compose.Tests
 			{
 				app.Transition<IDependency, OtherDependency>();
 				app.Transition<IDependency, Dependency>();
-				dependency.Id.Must().Be(Type.Dependency);
+				Assert.Equal(Type.Dependency, dependency.Id);
 			});
 			app.Execute();
 		}
@@ -134,7 +134,7 @@ namespace Compose.Tests
 			app.UseServices(services => { services.AddTransient(typeof(IGenericDependency<>), typeof(GenericDependency<>)); });
 			app.OnExecute<IGenericDependency<byte[]>>(dependency =>
 			{
-				dependency.Id.Must().Be(Type.GenericDependency);
+				Assert.Equal(Type.GenericDependency, dependency.Id);
 			});
 			app.Execute();
 		}
@@ -147,7 +147,7 @@ namespace Compose.Tests
 			app.OnExecute(() =>
 			{
 				Action act = () => app.Transition<IDependency, OtherDependency>();
-				act.MustNotThrow<Exception>();
+				Assert.NotNull(Record.Exception(act));
 			});
 			app.Execute();
 		}
@@ -167,7 +167,7 @@ namespace Compose.Tests
 				app.Transition<IDependency, OtherDependency>();
 			});
 			Action act = app.Execute;
-			act.MustThrow<InvalidOperationException>();
+			Assert.IsType(typeof(InvalidOperationException), Record.Exception(act));
 		}
 
 		[Fact]
@@ -183,8 +183,7 @@ namespace Compose.Tests
 			});
 			app.OnExecute(() =>
 			{
-				app.Transition<IDependency, OtherDependency>()
-					.Must().BeTrue();
+				Assert.True(app.Transition<IDependency, OtherDependency>());
 			});
 		}
 

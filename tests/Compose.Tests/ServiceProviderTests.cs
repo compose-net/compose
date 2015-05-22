@@ -12,7 +12,7 @@ namespace Compose.Tests
 			var app = new Fake.Application();
 			app.UseServices(services => services.AddInstance(typeof(string), "foo"));
 			Action act = app.Execute;
-			act.MustNotThrow<Exception>();
+			Assert.NotNull(Record.Exception(act));
 		}
 
 		[Fact]
@@ -26,7 +26,7 @@ namespace Compose.Tests
 				services.AddInstance<IService2>(service);
 			});
 			Action act = app.Execute;
-			act.MustNotThrow<Exception>();
+			Assert.NotNull(Record.Exception(act));
 		}
 
 		[Fact]
@@ -40,9 +40,8 @@ namespace Compose.Tests
 			});
 			app.OnExecute<Parent>(parent =>
 			{
-				parent.Service.Must().Be(instance);
-				app.HostingServices.GetService<IService1>()
-					.Must().Be(instance);
+				Assert.Equal(instance, parent.Service);
+				Assert.Equal(instance, app.HostingServices.GetService<IService1>());
 			});
 			app.Execute();
 		}
