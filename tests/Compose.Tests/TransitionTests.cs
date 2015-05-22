@@ -78,7 +78,7 @@ namespace Compose.Tests
 		}
 
 		[Fact]
-		public void CanTransitionSpecifcallyBoundService()
+		public void CanTransitionSpecificallyBoundService()
 		{
 			var app = new Fake.Application();
 			app.UseServices(services =>

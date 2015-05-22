@@ -24,7 +24,16 @@ namespace Compose
 		{
 			if (_singletons.ContainsKey(serviceType))
 				return ResolveSingleton(serviceType);
-			return _fallback.GetService(serviceType);
+			// exception logic - neccessary evil due to bug in beta 4 MS Provider
+			try
+			{
+				return _fallback.GetService(serviceType);
+			}
+			catch (ArgumentNullException anex)
+			{
+				if (anex.Message == "Object cannot be null.\r\nParameter name: source") return null;
+				throw;
+			}
 		}
 
 		public void Extend(ServiceDescriptor service)

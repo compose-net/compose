@@ -1,14 +1,22 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Compose
 {
 	public class Executable : Application
 	{
 		protected Action Execution { get; private set; }
+		protected Func<CancellationToken, Task> ExecutionAsync { get; private set; }
 
 		public void OnExecute(Action invoke)
 		{
 			Execution = invoke;
+		}
+
+		public void OnExecute(Func<CancellationToken, Task> asyncInvoke)
+		{
+			ExecutionAsync = asyncInvoke;
 		}
 
 		public void OnExecute<TService>(Action<TService> invoke) where TService : class
@@ -18,7 +26,22 @@ namespace Compose
 
 		public virtual void Execute()
 		{
-			Execution();
+			if (Execution != null)
+				Execution();
+			else if (ExecutionAsync != null)
+				ExecutionAsync(CancellationToken.None).Wait();
+			else
+				throw new InvalidOperationException("Cannot execute without invokable action");
+		}
+
+		public virtual async Task ExecuteAsync(CancellationToken cancellationToken)
+		{
+			if (ExecutionAsync != null)
+				await ExecutionAsync(cancellationToken);
+			else if (Execution != null)
+				await Task.Run(Execution, cancellationToken);
+			else
+				throw new InvalidOperationException("Cannot execute without invokable action");
 		}
 	}
 
@@ -40,6 +63,11 @@ namespace Compose
 		{
 			return Execution();
 		}
+
+		public virtual async Task<TResult> ExecuteAsync(CancellationToken cancellationToken)
+		{
+			return await Task.Run(Execution, cancellationToken);
+		}
 	}
 
 	public abstract class Executable<TContext, TResult> : Application
@@ -59,6 +87,11 @@ namespace Compose
 		public virtual TResult Execute(TContext context)
 		{
 			return Execution(context);
+		}
+
+		public virtual async Task<TResult> ExecuteAsync(TContext context, CancellationToken cancellationToken)
+		{
+			return await Task.Run(() => Execution(context), cancellationToken);
 		}
 	}
 }
