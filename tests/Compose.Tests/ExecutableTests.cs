@@ -1,5 +1,4 @@
 ﻿using Compose.Tests.Fake;
-using FluentAssertions;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +15,7 @@ namespace Compose.Tests
 
 			Action act = () => app.Execute();
 
-			act.ShouldThrow<InvalidOperationException>();
+			Assert.IsType(typeof(InvalidOperationException), Record.Exception(act));
 		}
 
 		[Fact]
@@ -28,7 +27,7 @@ namespace Compose.Tests
 
 			app.Execute();
 
-			executed.Should().BeTrue();
+			Assert.True(executed);
 		}
 
 		[Fact]
@@ -41,7 +40,7 @@ namespace Compose.Tests
 
 			app.Execute();
 
-			executed.Should().BeTrue();
+			Assert.True(executed);
 		}
 
 		[Fact]
@@ -55,7 +54,7 @@ namespace Compose.Tests
 
 			app.Execute();
 
-			executed.Should().Be(2);
+			Assert.Equal(2, executed);
 		}
 
 		[Fact]
@@ -64,9 +63,7 @@ namespace Compose.Tests
 			var app = new Executable();
 			var ct = new CancellationToken();
 
-			Func<Task> act = async () => await app.ExecuteAsync(ct);
-
-			act.ShouldThrow<InvalidOperationException>();
+			Assert.IsType<InvalidOperationException>(Record.ExceptionAsync(async () => await app.ExecuteAsync(ct)));
 		}
 
 		[Fact]
@@ -79,7 +76,7 @@ namespace Compose.Tests
 
 			await app.ExecuteAsync(cts.Token);
 
-			executed.Should().BeTrue();
+			Assert.True(executed);
 		}
 
 		[Fact]
@@ -92,7 +89,7 @@ namespace Compose.Tests
 
 			await app.ExecuteAsync(cts.Token);
 
-			executed.Should().BeTrue();
+			Assert.True(executed);
 		}
 
 		[Fact]
@@ -107,7 +104,7 @@ namespace Compose.Tests
 
 			await app.ExecuteAsync(cts.Token);
 
-			executed.Should().Be(1);
+			Assert.Equal(1, executed);
 		}
 
 		[Fact]
@@ -119,7 +116,7 @@ namespace Compose.Tests
 
 			executed = app.Execute();
 
-			executed.Should().BeTrue();
+			Assert.True(executed);
 		}
 
 		[Fact]
@@ -132,7 +129,7 @@ namespace Compose.Tests
 
 			executed = await app.ExecuteAsync(cts.Token);
 
-			executed.Should().BeTrue();
+			Assert.True(executed);
 		}
 
 		[Fact]
@@ -144,7 +141,7 @@ namespace Compose.Tests
 
 			executed = app.Execute(true);
 
-			executed.Should().BeTrue();
+			Assert.True(executed);
 		}
 
 		[Fact]
@@ -157,7 +154,7 @@ namespace Compose.Tests
 
 			executed = await app.ExecuteAsync(true, cts.Token);
 
-			executed.Should().BeTrue();
+			Assert.True(executed);
 		}
 	}
 }

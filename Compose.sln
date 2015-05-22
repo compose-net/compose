@@ -9,8 +9,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{3CA78452
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0508FF26-B09D-4DB5-9F7B-D14FE9F808AB}"
 	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		appveyor.yml = appveyor.yml
+		build.cmd = build.cmd
 		global.json = global.json
+		LICENSE = LICENSE
 		NuGet.config = NuGet.config
+		prebuild.cmd = prebuild.cmd
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Compose", "src\Compose\Compose.xproj", "{59E87FC9-B97D-4F70-8F4D-C5534440B943}"
