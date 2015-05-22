@@ -12,7 +12,7 @@ namespace Compose.Tests
 			var app = new Fake.Application();
 			app.UseServices(services => services.AddInstance(typeof(string), "foo"));
 			Action act = app.Execute;
-			Assert.NotNull(Record.Exception(act));
+			Assert.Null(Record.Exception(act));
 		}
 
 		[Fact]
@@ -26,7 +26,7 @@ namespace Compose.Tests
 				services.AddInstance<IService2>(service);
 			});
 			Action act = app.Execute;
-			Assert.NotNull(Record.Exception(act));
+			Assert.Null(Record.Exception(act));
 		}
 
 		[Fact]

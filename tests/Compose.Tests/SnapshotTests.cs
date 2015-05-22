@@ -11,7 +11,7 @@ namespace Compose.Tests
 			var app = new Fake.Application();
 			app.UseServices(services => services.AddTransitional<IDependency, Dependency1>());
 			Action act = app.Snapshot;
-			Assert.NotNull(Record.Exception(act));
+			Assert.Null(Record.Exception(act));
 		}
 
 		[Fact]
@@ -19,7 +19,7 @@ namespace Compose.Tests
 		{
 			var app = new Fake.Application();
 			Action act = app.Snapshot;
-			Assert.NotNull(Record.Exception(act));
+			Assert.Null(Record.Exception(act));
 		}
 
 		[Fact]
@@ -28,7 +28,7 @@ namespace Compose.Tests
 			var app = new Fake.Application();
 			app.UseServices(services => services.AddTransitional<IDependency, Dependency1>());
 			Action act = app.Restore;
-			Assert.NotNull(Record.Exception(act));
+			Assert.Null(Record.Exception(act));
 		}
 
 		[Fact]
@@ -36,7 +36,7 @@ namespace Compose.Tests
 		{
 			var app = new Fake.Application();
 			Action act = app.Restore;
-			Assert.NotNull(Record.Exception(act));
+			Assert.Null(Record.Exception(act));
 		}
 
 		[Fact]

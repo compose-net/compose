@@ -147,7 +147,7 @@ namespace Compose.Tests
 			app.OnExecute(() =>
 			{
 				Action act = () => app.Transition<IDependency, OtherDependency>();
-				Assert.NotNull(Record.Exception(act));
+				Assert.Null(Record.Exception(act));
 			});
 			app.Execute();
 		}

@@ -491,7 +491,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanGenerateCovariantProxies()
 		{
-            Assert.NotNull(Record.Exception(InvokeProxy<ICovariant<string>, Covariant>()));
+            Assert.Null(Record.Exception(InvokeProxy<ICovariant<string>, Covariant>()));
 		}
 		#endregion
 
@@ -503,7 +503,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanGenerateProxyForSystemInterfaces()
 		{
-			Assert.NotNull(Record.Exception(InvokeProxy<IDisposable, Disposable>()));
+			Assert.Null(Record.Exception(InvokeProxy<IDisposable, Disposable>()));
 		}
 		#endregion
 
@@ -516,7 +516,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanGenerateProxyForUntypedGenerics()
 		{
-			Assert.NotNull(Record.Exception(InvokeProxy<IUntypedGeneric<string>>(typeof(IUntypedGeneric<>), typeof(UntypedGeneric<>))));
+			Assert.Null(Record.Exception(InvokeProxy<IUntypedGeneric<string>>(typeof(IUntypedGeneric<>), typeof(UntypedGeneric<>))));
 		}
 		#endregion
 
@@ -563,7 +563,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanResolveGenericProxy()
 		{
-			Assert.NotNull(Record.Exception(InvokeProxy<IGeneric<object>>(typeof(IGeneric<>), typeof(Generic<>))));
+			Assert.Null(Record.Exception(InvokeProxy<IGeneric<object>>(typeof(IGeneric<>), typeof(Generic<>))));
 		}
 
 		#endregion

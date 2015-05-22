@@ -17,14 +17,14 @@ namespace Compose.Tests
 		public void CanActivateMicrosoftFrameworkDepdencyInjectionServiceProvider()
 		{
 			Action act = () => Activator.CreateInstance(Constants.GetServiceProvider(), Enumerable.Empty<ServiceDescriptor>());
-			Assert.NotNull(Record.Exception(act));
+			Assert.Null(Record.Exception(act));
         }
 
 		[Fact]
 		public void CanActivateServiceProviderThroughWrappingFacade()
 		{
 			Action act = () => new WrappedServiceProvider(new ServiceCollection());
-			Assert.NotNull(Record.Exception(act));
+			Assert.Null(Record.Exception(act));
 		}
     }
 }
