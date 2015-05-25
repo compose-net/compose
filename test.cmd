@@ -1,3 +1,3 @@
 @echo off
 
-dnx tests\Compose.Tests\ test
+%CACHED_DNU%\dnx tests\Compose.Tests\ test
