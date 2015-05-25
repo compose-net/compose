@@ -17,16 +17,16 @@ IF NOT EXIST %USERPROFILE%\.dnx\bin md %USERPROFILE%\.dnx\bin
 :installdnx
 %USERPROFILE%\.dnx\bin\dnvm install 1.0.0-beta4 -arch x86 -persistent -a beta4
 SET CACHED_DNU=%USERPROFILE%\.dnx\runtimes\dnx-clr-win-x86.1.0.0-beta4\bin
-echo Setting DNU Path to %CACHED_DNU%
+echo DNU Path set to %CACHED_DNU%
 
 :restore
-%CACHED_DNU%\dnu restore
+%CACHED_DNU%\dnu restore --quiet
 
 :clean
 IF EXIST src\Compose\bin\Release DEL src\Compose\bin\Release /Q
 
 :build
-%CACHED_DNU%\dnu pack src\Compose --configuration Release
+%CACHED_DNU%\dnu pack src\Compose --configuration Release --quiet
 
 :artifacts
 IF NOT EXIST artifacts md artifacts
