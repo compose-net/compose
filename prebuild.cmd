@@ -16,9 +16,10 @@ if %errorLevel% == 0 (
 
 :installdnx
 	%USERPROFILE%\.dnx\bin\dnvm install 1.0.0-beta4 -arch x64 -persistent -a beta4
+	SET DNX_BIN=%USERPROFILE%\.dnx\runtimes\dnx-clr-win-x64.1.0.0-beta4\bin
 
 :restore
-	dnu restore
+	%DNX_BIN%\dnu restore
 
 ) else (
 	echo Unable to complete. Insufficient privileges.
