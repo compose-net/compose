@@ -25,6 +25,9 @@ IF EXIST src\Compose\bin\Release DEL src\Compose\bin\Release /Q
 :build
 dnu pack src\Compose --configuration Release --quiet
 
+:test
+dnx tests\Compose.Tests\ test
+
 :artifacts
 IF NOT EXIST artifacts md artifacts
 IF NOT EXIST artifacts\packages md artifacts\packages

@@ -11,8 +11,7 @@ install:
 - set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
 build_script:
 - build.cmd
-test_script:
-- test.cmd
+test: off
 artifacts:
 - path: artifacts/packages/**.nupkg
 deploy:
