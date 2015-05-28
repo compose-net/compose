@@ -6,30 +6,32 @@ if %errorLevel% == 0 (
 cd %~dp0
 
 SETLOCAL
-SET CACHED_NUGET=%LocalAppData%\NuGet\NuGet.exe
+SET CACHED_DNVM=%USERPROFILE%\.dnx\bin\dnvm.cmd
 
-IF EXIST %CACHED_NUGET% goto copynuget
-echo Downloading latest version of NuGet.exe...
-IF NOT EXIST %LocalAppData%\NuGet md %LocalAppData%\NuGet
-@powershell -NoProfile -ExecutionPolicy unrestricted -Command "$ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest 'https://www.nuget.org/nuget.exe' -OutFile '%CACHED_NUGET%'"
+IF EXIST %CACHED_DNVM% goto installdnx
+echo Downloading latest version of DNVM...
+IF NOT EXIST %USERPROFILE%\.dnx md %USERPROFILE%\.dnx
+IF NOT EXIST %USERPROFILE%\.dnx\bin md %USERPROFILE%\.dnx\bin
+@powershell -NoProfile -ExecutionPolicy unrestricted -Command "&{$Branch='dev';iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/aspnet/Home/dev/dnvminstall.ps1'))}"
 
-:copynuget
-IF EXIST .nuget\nuget.exe goto restore
-md .nuget
-copy %CACHED_NUGET% .nuget\nuget.exe > nul
+:installdnx
+%USERPROFILE%\.dnx\bin\dnvm install 1.0.0-beta4 -arch x86 -persistent -a beta4
+SET XXXXXXXX=%USERPROFILE%\.dnx\runtimes\dnx-clr-win-x86.1.0.0-beta4\bin
+echo DNU Path set to %XXXXXXXX%
 
 :restore
-IF EXIST packages\KoreBuild goto run
-.nuget\NuGet.exe install KoreBuild -ExcludeVersion -o packages -nocache -pre
-.nuget\NuGet.exe install Sake -version 0.2 -o packages -ExcludeVersion
+%XXXXXXXX%\dnu restore --quiet
 
-IF "%SKIP_DNX_INSTALL%"=="1" goto run
-CALL packages\KoreBuild\build\dnvm upgrade -runtime CLR -arch x86
-CALL packages\KoreBuild\build\dnvm install default -runtime CoreCLR -arch x86
+:clean
+IF EXIST src\Compose\bin\Release DEL src\Compose\bin\Release /Q
 
-:run
-CALL packages\KoreBuild\build\dnvm use default -runtime CLR -arch x86
-packages\Sake\tools\Sake.exe -I packages\KoreBuild\build -f makefile.shade %*
+:build
+%XXXXXXXX%\dnu pack src\Compose --configuration Release --quiet
+
+:artifacts
+IF NOT EXIST artifacts md artifacts
+IF NOT EXIST artifacts\packages md artifacts\packages
+XCOPY src\Compose\bin\Release\*.nupkg artifacts\packages /y
 
 ) else (
 echo Unable to complete. Insufficient privileges.
