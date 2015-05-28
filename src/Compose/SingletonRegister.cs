@@ -19,15 +19,14 @@ namespace Compose
 			return _services.Any(x => x.Lifetime == ServiceLifetime.Singleton && serviceType.IsAssignableFrom(x.ServiceType));
 		}
 
-		public object Resolve(ref IServiceProvider provider, Type serviceType)
+		public object Resolve(IServiceProvider provider, Type serviceType)
 		{
 			var descriptor = _services.BestSingletonMatchFor(serviceType);
 			if (descriptor == null || descriptor.Lifetime != ServiceLifetime.Singleton)
 				throw new InvalidOperationException($"Cannot resolve {serviceType.FullName} as a singleton.");
 			if (descriptor.HasBeenRegistered())
 				return descriptor.Resolve(provider);
-			descriptor = descriptor.Register(_services);
-			provider = _services.BuildServiceProvider();
+			descriptor = descriptor.Register(provider, _services);
 			return descriptor.Resolve(provider);
         }
     }

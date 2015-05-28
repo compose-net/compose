@@ -10,13 +10,13 @@ namespace Compose
 			return descriptor.ImplementationInstance != null;
 		}
 
-		internal static ServiceDescriptor Register(this ServiceDescriptor descriptor, IServiceCollection services)
+		internal static ServiceDescriptor Register(this ServiceDescriptor descriptor, IServiceProvider provider, IServiceCollection services)
 		{
 			if (descriptor.ImplementationInstance != null || descriptor.ImplementationFactory != null)
 				return descriptor;
-            services.Replace(new ServiceDescriptor(descriptor.ServiceType, descriptor.ServiceType, descriptor.Lifetime));
-			descriptor = new ServiceDescriptor(descriptor.ServiceType, services.BuildServiceProvider().GetRequiredService(descriptor.ServiceType));
-            services.Replace(descriptor);
+			var instance = provider.GetService(descriptor.ServiceType);
+			if (instance == null) return descriptor;
+            services.Replace(new ServiceDescriptor(descriptor.ServiceType, instance));
 			return descriptor;
 		}
 

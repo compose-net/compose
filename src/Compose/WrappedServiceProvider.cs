@@ -22,7 +22,7 @@ namespace Compose
 		public object GetService(Type serviceType)
 		{
 			if (_singletons.CanResolveSingleton(serviceType))
-				return _singletons.Resolve(ref _fallback, serviceType);
+				return _singletons.Resolve(_fallback, serviceType);
 			// exception logic - neccessary evil due to bug in beta 4 MS Provider
 			try
 			{
