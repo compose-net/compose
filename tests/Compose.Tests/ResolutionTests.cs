@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.Framework.DependencyInjection;
+﻿using Microsoft.Framework.DependencyInjection;
 using System;
 using Xunit;
 
@@ -21,7 +20,7 @@ namespace Compose.Tests
 			app.UseServices(services => services.Add(ServiceDescriptor.Transient<IDependency, Dependency>()));
 
 			Action act = () => app.GetRequiredService<IDependency2>();
-			act.ShouldThrow<InvalidOperationException>();
+			Assert.IsType<InvalidOperationException>(Record.Exception(act));
 		}
 	}
 }

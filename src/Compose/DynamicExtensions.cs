@@ -9,26 +9,27 @@ namespace Compose
 	{
 		private static Random random = new Random();
 
-		internal static void AddGenericsFrom(this TypeBuilder typeBuilder, Type serviceType)
+		internal static void AddGenericsFrom(this TypeBuilder typeBuilder, TypeInfo serviceType)
 		{
-			var serviceGenerics = serviceType.GetGenericArguments().ToArray();
+			var serviceGenerics = serviceType.GenericTypeArguments.Select(x => x.GetTypeInfo()).ToArray();
 			var genericBuilders = typeBuilder.DefineGenericParameters(serviceGenerics.Select(x => x.Name).ToArray());
 			for (var i = 0; i < genericBuilders.Length; i++)
 				if (serviceGenerics[i].IsGenericParameter)
 					genericBuilders[i].DefineGeneric(serviceGenerics[i], serviceGenerics, serviceType, false);
 		}
 
-		internal static void AddDirectImplementation(this TypeBuilder typeBuilder, Type serviceType)
+		internal static void AddDirectImplementation(this TypeBuilder typeBuilder, TypeInfo serviceTypeInfo)
 		{
 			var serviceName = GetRandomString();
 			var snapshotName = GetRandomString();
+			var serviceType = serviceTypeInfo.AsType();
 			var serviceField = typeBuilder.AddServiceField(serviceName, serviceType);
 			var snapshotField = typeBuilder.AddSnapshotField(snapshotName, serviceType);
-			var implementedInterfaces = new[] { serviceType }.Union(serviceType.GetInterfaces()).ToArray();
+			var implementedInterfaces = new[] { serviceTypeInfo }.Union(serviceTypeInfo.ImplementedInterfaces.Select(x => x.GetTypeInfo()).ToArray()).ToArray();
 			typeBuilder.AddServiceConstructor(serviceField, serviceType);
 			typeBuilder.AddPropertyImplementations(serviceField, implementedInterfaces);
 			typeBuilder.AddMethodImplementations(serviceField, implementedInterfaces);
-			typeBuilder.AddChangeImplementation(serviceField, serviceType);
+			typeBuilder.AddChangeImplementation(serviceField, serviceTypeInfo);
 			typeBuilder.AddSnapshotImplementation(snapshotField, serviceField);
 			typeBuilder.AddRestoreImplementation(snapshotField, serviceField);
 		}
@@ -39,7 +40,7 @@ namespace Compose
 			return new string(Enumerable.Repeat(Characters, 16).Select(x => x[random.Next(x.Length)]).ToArray());
 		}
 
-		private static void AddChangeImplementation(this TypeBuilder typeBuilder, FieldBuilder serviceField, Type serviceType)
+		private static void AddChangeImplementation(this TypeBuilder typeBuilder, FieldBuilder serviceField, TypeInfo serviceType)
 		{
 			/* C#: 
 			public virtual bool Change(TService arg1)
@@ -48,8 +49,8 @@ namespace Compose
 				return true;
 			}
 			*/
-			var methodInfo = typeof(ITransition<>).MakeGenericType(serviceType).GetMethod("Change");
-			var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual, methodInfo.ReturnType, new[] { serviceType });
+			var methodInfo = typeof(ITransition<>).MakeGenericType(serviceType.AsType()).GetMethod("Change");
+			var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual, methodInfo.ReturnType, new[] { serviceType.AsType() });
             var methodEmitter = methodBuilder.GetILGenerator();
 			methodEmitter.Emit(OpCodes.Ldarg_0);
 			methodEmitter.Emit(OpCodes.Ldarg_1);
@@ -89,14 +90,14 @@ namespace Compose
 			methodEmitter.Emit(OpCodes.Ret);
 		}
 
-		private static void AddMethodImplementations(this TypeBuilder typeBuilder, FieldBuilder serviceField, Type[] implementedInterfaces)
+		private static void AddMethodImplementations(this TypeBuilder typeBuilder, FieldBuilder serviceField, TypeInfo[] implementedInterfaces)
 		{
 			foreach (var implementedInterface in implementedInterfaces)
-				foreach (var methodInfo in implementedInterface.GetMethods(BindingFlags.Instance | BindingFlags.Public).Where(x => !x.IsSpecialName))
+				foreach (var methodInfo in implementedInterface.DeclaredMethods.Where(x => x.IsPublic && !x.IsStatic && !x.IsSpecialName))
 					ExceptionHelpers.ReThrow(typeBuilder.AddMethodImplementation, methodInfo, serviceField, implementedInterface, inner => new UnsupportedMethodDefinitionException(methodInfo, inner));
 		}
 
-		private static void AddMethodImplementation(this TypeBuilder typeBuilder, MethodInfo methodInfo, FieldBuilder serviceField, Type serviceType)
+		private static void AddMethodImplementation(this TypeBuilder typeBuilder, MethodInfo methodInfo, FieldBuilder serviceField, TypeInfo serviceType)
 		{
 			/* C#: 
 			public virtual ReturnType MethodName[<Generics>]([Args]) [where Generic : Constraints]
@@ -118,20 +119,20 @@ namespace Compose
 			typeBuilder.DefineMethodOverride(methodBuilder, methodInfo);
 		}
 
-        private static void AddGenericParameters(this MethodBuilder methodBuilder, MethodInfo methodInfo, Type serviceType)
+        private static void AddGenericParameters(this MethodBuilder methodBuilder, MethodInfo methodInfo, TypeInfo serviceType)
         {
-            var genericInfos = methodInfo.GetGenericArguments().ToArray();
+            var genericInfos = methodInfo.GetGenericArguments().Select(x => x.GetTypeInfo()).ToArray();
             var genericBuilders = methodBuilder.DefineGenericParameters(genericInfos.Select(x => x.Name).ToArray());
             for (var i = 0; i < genericBuilders.Length; i++)
                 genericBuilders[i].DefineGeneric(genericInfos[i], genericInfos, serviceType, true);
         }
 
-        private static GenericTypeParameterBuilder DefineGeneric(this GenericTypeParameterBuilder genericBuilder, Type genericType, Type[] methodGenerics, Type serviceType, bool includeVariance)
+        private static GenericTypeParameterBuilder DefineGeneric(this GenericTypeParameterBuilder genericBuilder, TypeInfo genericType, TypeInfo[] methodGenerics, TypeInfo serviceType, bool includeVariance)
         {
             var constraints = genericType.GetGenericParameterConstraints();
             genericBuilder.SetInterfaceConstraints(
-				constraints.Where(x => x.IsInterface).Union(
-				constraints.Where(x => x.IsGenericParameter).Select(x => x.GetUnderlyingGenericType(methodGenerics, serviceType)
+				constraints.Where(x => x.GetTypeInfo().IsInterface).Union(
+				constraints.Where(x => x.IsGenericParameter).Select(x => x.GetTypeInfo().GetUnderlyingGenericType(methodGenerics, serviceType).AsType()
 			)).ToArray());
 			genericBuilder.SetBaseTypeConstraint(genericType.BaseType);
 			if (includeVariance) genericBuilder.SetGenericParameterAttributes(genericType.GenericParameterAttributes);
@@ -139,12 +140,12 @@ namespace Compose
 			return genericBuilder;
         }
 
-		private static Type GetUnderlyingGenericType(this Type constraint, Type[] methodGenerics, Type serviceType)
+		private static TypeInfo GetUnderlyingGenericType(this TypeInfo constraint, TypeInfo[] methodGenerics, TypeInfo serviceType)
 		{
 			if (methodGenerics.Contains(constraint)) return constraint;
 
-			var typedDefintions = serviceType.GetGenericArguments();
-			var genericDefinitions = serviceType.IsGenericType ? serviceType.GetGenericTypeDefinition().GetGenericArguments() : new Type[0];
+			var typedDefintions = serviceType.GenericTypeArguments.Select(x => x.GetTypeInfo()).ToArray();
+			var genericDefinitions = serviceType.IsGenericType ? serviceType.GetGenericTypeDefinition().GetTypeInfo().GetGenericArguments() : new TypeInfo[0];
 
 			for (var i = 0; i < genericDefinitions.Length; i++)
 				if (genericDefinitions[i] == constraint)
@@ -153,10 +154,10 @@ namespace Compose
 			throw new NotSupportedException("Generic constraint is not supported.");
 		}
 
-		private static void AddPropertyImplementations(this TypeBuilder typeBuilder, FieldBuilder serviceField, Type[] implementedInterfaces)
+		private static void AddPropertyImplementations(this TypeBuilder typeBuilder, FieldBuilder serviceField, TypeInfo[] implementedInterfaces)
 		{
 			foreach (var implementedInterface in implementedInterfaces)
-				foreach (var propertyInfo in implementedInterface.GetProperties(BindingFlags.Instance | BindingFlags.Public))
+				foreach (var propertyInfo in implementedInterface.DeclaredProperties)
 					ExceptionHelpers.ReThrow(typeBuilder.AddPropertyImplementation, propertyInfo, serviceField, inner => new UnsupportedPropertyDefinitionException(propertyInfo, inner));
 		}
 

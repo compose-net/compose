@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.Framework.DependencyInjection;
+﻿using Microsoft.Framework.DependencyInjection;
 using System;
 using Xunit;
 
@@ -19,8 +18,8 @@ namespace Compose.Tests
 			});
 			app.OnExecute<IDependency>(dependency =>
 			{
-				dependency.Should().NotBeNull();
-				dependency.Id.Should().Be(Type.Dependency);
+				Assert.NotNull(dependency);
+				Assert.Equal(Type.Dependency, dependency.Id);
 			});
 			app.Execute();
 		}
@@ -39,8 +38,8 @@ namespace Compose.Tests
 			});
 			app.OnExecute<IDependency>(dependency =>
 			{
-				dependency.Should().NotBeNull();
-				dependency.Id.Should().Be(Type.Dependency);
+				Assert.NotNull(dependency);
+				Assert.Equal(Type.Dependency, dependency.Id);
 			});
 			app.Execute();
 		}
@@ -58,8 +57,8 @@ namespace Compose.Tests
 			});
 			app.OnExecute<IDependency>(dependency =>
 			{
-				dependency.Should().NotBeNull();
-				dependency.Id.Should().Be(Type.Dependency);
+				Assert.NotNull(dependency);
+				Assert.Equal(Type.Dependency, dependency.Id);
 			});
 			app.Execute();
 		}
@@ -71,9 +70,9 @@ namespace Compose.Tests
 			app.UseServices(services => { services.AddTransitional<IDependency, Dependency>(); });
 			app.OnExecute<IDependency>(dependency =>
 			{
-				dependency.Id.Should().Be(Type.Dependency);
+				Assert.Equal(Type.Dependency, dependency.Id);
 				app.Transition<IDependency, OtherDependency>();
-				dependency.Id.Should().Be(Type.OtherDependency);
+				Assert.Equal(Type.OtherDependency, dependency.Id);
 			});
 			app.Execute();
 		}
@@ -89,9 +88,9 @@ namespace Compose.Tests
 			});
 			app.OnExecute<IDependency>(dependency =>
 			{
-				dependency.Id.Should().Be(Type.Dependency);
+				Assert.Equal(Type.Dependency, dependency.Id);
 				app.Transition<IDependency, OtherDependency>();
-				dependency.Id.Should().Be(Type.OtherDependency);
+				Assert.Equal(Type.OtherDependency, dependency.Id);
 			});
 			app.Execute();
 		}
@@ -107,9 +106,9 @@ namespace Compose.Tests
 			});
 			app.OnExecute<IDependency>(dependency =>
 			{
-				dependency.Id.Should().Be(Type.Dependency);
+				Assert.Equal(Type.Dependency, dependency.Id);
 				app.Transition<IDependency, OtherDependency>();
-				dependency.Id.Should().Be(Type.OtherDependency);
+				Assert.Equal(Type.OtherDependency, dependency.Id);
 			});
 			app.Execute();
 		}
@@ -123,7 +122,7 @@ namespace Compose.Tests
 			{
 				app.Transition<IDependency, OtherDependency>();
 				app.Transition<IDependency, Dependency>();
-				dependency.Id.Should().Be(Type.Dependency);
+				Assert.Equal(Type.Dependency, dependency.Id);
 			});
 			app.Execute();
 		}
@@ -135,7 +134,7 @@ namespace Compose.Tests
 			app.UseServices(services => { services.AddTransient(typeof(IGenericDependency<>), typeof(GenericDependency<>)); });
 			app.OnExecute<IGenericDependency<byte[]>>(dependency =>
 			{
-				dependency.Id.Should().Be(Type.GenericDependency);
+				Assert.Equal(Type.GenericDependency, dependency.Id);
 			});
 			app.Execute();
 		}
@@ -148,7 +147,7 @@ namespace Compose.Tests
 			app.OnExecute(() =>
 			{
 				Action act = () => app.Transition<IDependency, OtherDependency>();
-				act.ShouldNotThrow<Exception>();
+				Assert.Null(Record.Exception(act));
 			});
 			app.Execute();
 		}
@@ -168,7 +167,7 @@ namespace Compose.Tests
 				app.Transition<IDependency, OtherDependency>();
 			});
 			Action act = app.Execute;
-			act.ShouldThrow<InvalidOperationException>();
+			Assert.IsType(typeof(InvalidOperationException), Record.Exception(act));
 		}
 
 		[Fact]
@@ -184,8 +183,7 @@ namespace Compose.Tests
 			});
 			app.OnExecute(() =>
 			{
-				app.Transition<IDependency, OtherDependency>()
-					.Should().BeTrue();
+				Assert.True(app.Transition<IDependency, OtherDependency>());
 			});
 		}
 

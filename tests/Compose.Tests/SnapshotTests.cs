@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using System;
+﻿using System;
 using Xunit;
 
 namespace Compose.Tests
@@ -12,7 +11,7 @@ namespace Compose.Tests
 			var app = new Fake.Application();
 			app.UseServices(services => services.AddTransitional<IDependency, Dependency1>());
 			Action act = app.Snapshot;
-			act.ShouldNotThrow<Exception>();
+			Assert.Null(Record.Exception(act));
 		}
 
 		[Fact]
@@ -20,7 +19,7 @@ namespace Compose.Tests
 		{
 			var app = new Fake.Application();
 			Action act = app.Snapshot;
-			act.ShouldNotThrow<Exception>();
+			Assert.Null(Record.Exception(act));
 		}
 
 		[Fact]
@@ -29,7 +28,7 @@ namespace Compose.Tests
 			var app = new Fake.Application();
 			app.UseServices(services => services.AddTransitional<IDependency, Dependency1>());
 			Action act = app.Restore;
-			act.ShouldNotThrow<Exception>();
+			Assert.Null(Record.Exception(act));
 		}
 
 		[Fact]
@@ -37,7 +36,7 @@ namespace Compose.Tests
 		{
 			var app = new Fake.Application();
 			Action act = app.Restore;
-			act.ShouldNotThrow<Exception>();
+			Assert.Null(Record.Exception(act));
 		}
 
 		[Fact]
@@ -49,9 +48,9 @@ namespace Compose.Tests
 			{
 				app.Snapshot();
 				app.Transition<IDependency, Dependency2>();
-				dependency.Id.Should().Be(Type.Two);
+				Assert.Equal(Type.Two, dependency.Id);
 				app.Restore();
-				dependency.Id.Should().Be(Type.One);
+				Assert.Equal(Type.One, dependency.Id);
 			});
 			app.Execute();
 		}
@@ -64,9 +63,9 @@ namespace Compose.Tests
 			app.OnExecute<IDependency>(dependency =>
 			{
 				app.Transition<IDependency, Dependency2>();
-				dependency.Id.Should().Be(Type.Two);
+				Assert.Equal(Type.Two, dependency.Id);
 				app.Restore();
-				dependency.Id.Should().Be(Type.One);
+				Assert.Equal(Type.One, dependency.Id);
 			});
 			app.Execute();
 		}
@@ -83,7 +82,7 @@ namespace Compose.Tests
 				app.Snapshot();
 				app.Transition<IDependency, Dependency3>();
 				app.Restore();
-				dependency.Id.Should().Be(Type.Two);
+				Assert.Equal(Type.Two, dependency.Id);
 			});
 			app.Execute();
 		}

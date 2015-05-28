@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.Framework.DependencyInjection;
+﻿using Microsoft.Framework.DependencyInjection;
 using System;
 using System.Linq;
 using Xunit;
@@ -11,21 +10,21 @@ namespace Compose.Tests
 		[Fact]
 		public void CanResolveMicrosoftFrameworkDependencyInjectionServiceProvider()
 		{
-			Constants.GetServiceProvider().Should().NotBeNull();
+			Assert.NotNull(Constants.GetServiceProvider());
 		}
 
 		[Fact]
 		public void CanActivateMicrosoftFrameworkDepdencyInjectionServiceProvider()
 		{
 			Action act = () => Activator.CreateInstance(Constants.GetServiceProvider(), Enumerable.Empty<ServiceDescriptor>());
-			act.ShouldNotThrow<Exception>();
+			Assert.Null(Record.Exception(act));
         }
 
 		[Fact]
 		public void CanActivateServiceProviderThroughWrappingFacade()
 		{
 			Action act = () => new WrappedServiceProvider(new ServiceCollection());
-			act.ShouldNotThrow<Exception>();
+			Assert.Null(Record.Exception(act));
 		}
     }
 }

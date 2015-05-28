@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Compose
 {
@@ -24,7 +25,8 @@ namespace Compose
 
 		internal static bool IsTransition(this ServiceDescriptor descriptor)
 		{
-			return typeof(ITransition<>).IsAssignableFromGeneric(descriptor.ImplementationType) && descriptor.Lifetime == ServiceLifetime.Singleton;
+			return typeof(ITransition<>).GetTypeInfo()
+				.IsAssignableFromGeneric(descriptor.ImplementationType.GetTypeInfo()) && descriptor.Lifetime == ServiceLifetime.Singleton;
         }
 
 		internal static IEnumerable<ServiceDescriptor> WithSelfBoundTransitionals(this IEnumerable<ServiceDescriptor> services)
@@ -40,10 +42,13 @@ namespace Compose
 
 		internal static Dictionary<Type, Type> GetTransitionalRedirects(this Application app, IServiceCollection services)
 		{
-			if (services.Any(x => x.ImplementationType == typeof(TransitionMarker)))
-				return services.BeforeMarker().Where(x => x.ServiceType.IsInterface).ToList().ToDictionary(x => x.ServiceType, x => app.CreateProxy(x.ServiceType));
-			return services.Where(x => typeof(TransitionMarker<>).IsAssignableFromGeneric(x.ServiceType))
-				.Select(x => x.ServiceType.GetGenericArguments().Single()).ToList().ToDictionary(x => x, x => app.CreateProxy(x));
+			var transitionMarker = typeof(TransitionMarker<>).GetTypeInfo();
+            if (services.Any(x => x.ImplementationType == typeof(TransitionMarker)))
+				return services.BeforeMarker().Where(x => x.ServiceType.GetTypeInfo().IsInterface).ToList()
+					.ToDictionary(x => x.ServiceType, x => app.CreateProxy(x.ServiceType.GetTypeInfo()).AsType());
+			return services.Where(x => transitionMarker.IsAssignableFromGeneric(x.ServiceType.GetTypeInfo()))
+				.Select(x => x.ServiceType.GetGenericArguments().Single()).ToList()
+				.ToDictionary(x => x, x => app.CreateProxy(x.GetTypeInfo()).AsType());
 		}
 
 		internal static IEnumerable<ServiceDescriptor> BeforeMarker(this IEnumerable<ServiceDescriptor> source)

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Framework.DependencyInjection;
 using System;
+using System.Reflection;
 
 namespace Compose
 {
@@ -35,7 +36,7 @@ namespace Compose
 			return transitional.Change(app.GetRequiredService<TImplementation>());
         }
 
-        internal static Type CreateProxy(this Application app, Type service)
+        internal static TypeInfo CreateProxy(this Application app, TypeInfo service)
         {
             var emitter = app.HostingServices.GetService<DynamicEmitter>();
             if (emitter == null) emitter = app.GetRegisteredDynamicEmitter();
@@ -45,11 +46,11 @@ namespace Compose
 
         internal static TService CreateProxy<TService>(this Application app) where TService : class
         {
-			var serviceType = typeof(TService);
+			var serviceType = typeof(TService).GetTypeInfo();
             var proxyType = app.CreateProxy(serviceType);
-			if (!proxyType.IsGenericType) return (TService)Activator.CreateInstance(proxyType, app.GetRequiredService<TService>());
+			if (!proxyType.IsGenericType) return (TService)Activator.CreateInstance(proxyType.AsType(), app.GetRequiredService<TService>());
 
-			var constructedProxy = proxyType.MakeGenericType(serviceType.GetGenericArguments());
+			var constructedProxy = proxyType.MakeGenericType(serviceType.GenericTypeArguments);
 			var proxy = (ITransition<TService>)Activator.CreateInstance(constructedProxy, app.GetRequiredService<TService>());
 			return (TService)proxy;
         }

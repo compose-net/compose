@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace Compose
 {
@@ -6,7 +7,7 @@ namespace Compose
 	{
 		public static Type GetServiceProvider()
 		{
-            return typeof(Microsoft.Framework.DependencyInjection.ServiceCollection).Assembly.GetType("Microsoft.Framework.DependencyInjection.ServiceProvider", true);
+            return typeof(Microsoft.Framework.DependencyInjection.ServiceCollection).GetTypeInfo().Assembly.GetType("Microsoft.Framework.DependencyInjection.ServiceProvider", true, false);
 		}
 	}
 }
