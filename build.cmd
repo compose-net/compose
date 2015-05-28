@@ -5,7 +5,6 @@ if %errorLevel% == 0 (
 
 cd %~dp0
 
-SETLOCAL
 SET CACHED_DNVM=%USERPROFILE%\.dnx\bin\dnvm.cmd
 
 IF EXIST %CACHED_DNVM% goto installdnx
@@ -16,17 +15,17 @@ IF NOT EXIST %USERPROFILE%\.dnx\bin md %USERPROFILE%\.dnx\bin
 
 :installdnx
 %USERPROFILE%\.dnx\bin\dnvm install 1.0.0-beta4 -arch x86 -persistent -a beta4
-SET XXXXXXXX=%USERPROFILE%\.dnx\runtimes\dnx-clr-win-x86.1.0.0-beta4\bin
-echo DNU Path set to %XXXXXXXX%
+SET CACHED_DNX=%USERPROFILE%\.dnx\runtimes\dnx-clr-win-x86.1.0.0-beta4\bin
+echo DNU Path set to %CACHED_DNX%
 
 :restore
-%XXXXXXXX%\dnu restore --quiet
+%CACHED_DNX%\dnu restore --quiet
 
 :clean
 IF EXIST src\Compose\bin\Release DEL src\Compose\bin\Release /Q
 
 :build
-%XXXXXXXX%\dnu pack src\Compose --configuration Release --quiet
+%CACHED_DNX%\dnu pack src\Compose --configuration Release --quiet
 
 :artifacts
 IF NOT EXIST artifacts md artifacts
