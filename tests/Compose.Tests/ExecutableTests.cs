@@ -63,7 +63,7 @@ namespace Compose.Tests
 			var app = new Executable();
 			var ct = new CancellationToken();
 
-			Assert.IsType<InvalidOperationException>(Record.ExceptionAsync(async () => await app.ExecuteAsync(ct)));
+			Assert.IsType<InvalidOperationException>(Record.ExceptionAsync(async () => await app.ExecuteAsync(ct)).Result);
 		}
 
 		[Fact]
