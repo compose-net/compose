@@ -1,4 +1,7 @@
 ﻿using Microsoft.Framework.DependencyInjection;
+using System;
+using System.Linq;
+using System.Reflection;
 
 namespace Compose
 {
@@ -19,6 +22,18 @@ namespace Compose
 		public static IServiceCollection WithTransitional<TService>(this IServiceCollection services)
 		{
 			return services.AddTransient<TransitionMarker<TService>>();
+		}
+		
+		internal static SingletonRegister BuildSingletonRegister(this IServiceCollection services)
+		{
+			return new SingletonRegister(services);
+		}
+
+		internal static ServiceDescriptor BestSingletonMatchFor(this IServiceCollection services, Type serviceType)
+		{
+            return services.Where(x => x.Lifetime == ServiceLifetime.Singleton && serviceType.IsAssignableFrom(x.ServiceType))
+				.OrderByDescending(x => x.ServiceType == serviceType)
+				.LastOrDefault();
 		}
 	}
 }

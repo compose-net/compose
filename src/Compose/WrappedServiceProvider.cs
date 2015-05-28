@@ -8,22 +8,21 @@ namespace Compose
 	internal sealed class WrappedServiceProvider : ISingletonRepositoryServiceProvider
 	{
 		private readonly IServiceCollection _services;
-		private Dictionary<Type, object> _singletons;
+		private SingletonRegister _singletons;
 		private IServiceProvider _fallback;
 		private IServiceProvider _snapshot;
 
 		public WrappedServiceProvider(IServiceCollection services)
 		{
-			_singletons = services.Where(x => x.Lifetime == ServiceLifetime.Singleton)
-				.ToDictionary(x => x.ServiceType, x => x.ImplementationInstance);
-			_fallback = CreateFallbackProvider(services);
+			_fallback = services.BuildServiceProvider();
+			_singletons = services.BuildSingletonRegister();
 			_services = services;
         }
 
 		public object GetService(Type serviceType)
 		{
-			if (_singletons.ContainsKey(serviceType))
-				return ResolveSingleton(serviceType);
+			if (_singletons.CanResolveSingleton(serviceType))
+				return _singletons.Resolve(ref _fallback, serviceType);
 			// exception logic - neccessary evil due to bug in beta 4 MS Provider
 			try
 			{
@@ -39,30 +38,19 @@ namespace Compose
 		public void Extend(ServiceDescriptor service)
 		{
 			_services.Add(service);
-			_fallback = CreateFallbackProvider(_services);
+			_fallback = _services.BuildServiceProvider();
 		}
 
 		public void AppendSingleton(Type serviceType)
 		{
-			if (!_singletons.ContainsKey(serviceType))
-				_singletons.Add(serviceType, null);
-		}
-
-		private IServiceProvider CreateFallbackProvider(IServiceCollection services)
-		{
-			return (IServiceProvider)Activator.CreateInstance(Constants.GetServiceProvider(), services);
-		}
-
-		private object ResolveSingleton(Type serviceType)
-		{
-			if (_singletons[serviceType] == null)
-				_singletons[serviceType] = _fallback.GetService(serviceType);
-			return _singletons[serviceType];
+			if (_singletons.CanResolveSingleton(serviceType)) return;
+			_services.AddSingleton(serviceType);
+			_fallback = _services.BuildServiceProvider();
 		}
 
 		public void Snapshot()
 		{
-			_snapshot = CreateFallbackProvider(_services);
+			_snapshot = _services.BuildServiceProvider();
 		}
 
 		public void Restore()
