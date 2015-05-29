@@ -18,7 +18,7 @@ namespace Compose
 					genericBuilders[i].DefineGeneric(serviceGenerics[i], serviceGenerics, serviceType, false);
 		}
 
-		internal static void AddDirectImplementation(this TypeBuilder typeBuilder, TypeInfo serviceTypeInfo)
+		internal static void AddDirectImplementation(this TypeBuilder typeBuilder, TypeInfo serviceTypeInfo, TypeInfo injectionTypeInfo)
 		{
 			var serviceName = GetRandomString();
 			var snapshotName = GetRandomString();

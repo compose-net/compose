@@ -14,7 +14,7 @@ namespace Compose
 			{
 				configureServices(services);
 				if (services.ContainsTransitionMarkers())
-					return new TransitionalServiceProvider(app.GetTransitionalRedirects(services), new WrappedServiceProvider(services));
+					app.ApplyTransitions(services);
 				return new WrappedServiceProvider(services);
 			});
 		}
@@ -36,18 +36,21 @@ namespace Compose
 			return transitional.Change(app.GetRequiredService<TImplementation>());
         }
 
-        internal static TypeInfo CreateProxy(this Application app, TypeInfo service)
+        internal static TypeInfo CreateProxy(this Application app, TypeInfo serviceTypeInfo, TypeInfo injectionTypeInfo)
         {
             var emitter = app.HostingServices.GetService<DynamicEmitter>();
             if (emitter == null) emitter = app.GetRegisteredDynamicEmitter();
 
-            return emitter.GetDirectTransitionImplementation(service);
+            return emitter.GetDirectTransitionImplementation(serviceTypeInfo, injectionTypeInfo);
         }
 
-        internal static TService CreateProxy<TService>(this Application app) where TService : class
+		internal static TService CreateProxy<TService, TInjection>(this Application app) where TService : class where TInjection : TService
+			=> app.CreateProxy<TService>(typeof(TInjection).GetTypeInfo());
+
+        internal static TService CreateProxy<TService>(this Application app, TypeInfo injectionTypeInfo) where TService : class
         {
 			var serviceType = typeof(TService).GetTypeInfo();
-            var proxyType = app.CreateProxy(serviceType);
+            var proxyType = app.CreateProxy(serviceType, injectionTypeInfo);
 			if (!proxyType.IsGenericType) return (TService)Activator.CreateInstance(proxyType.AsType(), app.GetRequiredService<TService>());
 
 			var constructedProxy = proxyType.MakeGenericType(serviceType.GenericTypeArguments);

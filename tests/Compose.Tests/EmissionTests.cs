@@ -572,7 +572,7 @@ namespace Compose.Tests
 		{
 			var app = new Fake.Application();
 			app.UseServices(services => services.AddTransient(interfaceType, implementationType));
-			return () => app.CreateProxy(interfaceType.GetTypeInfo());
+			return () => app.CreateProxy(interfaceType.GetTypeInfo(), implementationType.GetTypeInfo());
 		}
 
 		private static Action InvokeProxy<TInterface, TImplementation>()

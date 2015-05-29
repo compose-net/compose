@@ -40,20 +40,51 @@ namespace Compose
 			return new ServiceDescriptor(transitional.ImplementationType, transitional.ImplementationType, transitional.Lifetime);
 		}
 
-		internal static Dictionary<Type, Type> GetTransitionalRedirects(this Application app, IServiceCollection services)
+		internal static void ApplyTransitions(this Application app, IServiceCollection services)
 		{
-			var transitionMarker = typeof(TransitionMarker<>).GetTypeInfo();
-            if (services.Any(x => x.ImplementationType == typeof(TransitionMarker)))
-				return services.BeforeMarker().Where(x => x.ServiceType.GetTypeInfo().IsInterface).ToList()
-					.ToDictionary(x => x.ServiceType, x => app.CreateProxy(x.ServiceType.GetTypeInfo()).AsType());
-			return services.Where(x => transitionMarker.IsAssignableFromGeneric(x.ServiceType.GetTypeInfo()))
-				.Select(x => x.ServiceType.GetGenericArguments().Single()).ToList()
-				.ToDictionary(x => x, x => app.CreateProxy(x.GetTypeInfo()).AsType());
+			var transitionalServices = services
+				.GetTransitionalServices()
+#if DEBUG
+				.ToList();
+#endif
+			foreach (var transitionalService in transitionalServices)
+				services.ApplyTransition(transitionalService);
 		}
 
-		internal static IEnumerable<ServiceDescriptor> BeforeMarker(this IEnumerable<ServiceDescriptor> source)
+		private static void ApplyTransition(this IServiceCollection services, ServiceDescriptor original)
 		{
-			return source.Take(source.Select((x, i) => new { x, i, }).Last(x => x.x.ImplementationType == typeof(TransitionMarker)).i);
+
+		}
+
+		private static IEnumerable<ServiceDescriptor> GetTransitionalServices(this IServiceCollection services)
+		{
+			var blanketMarkerType = typeof(TransitionMarker); // depicts all previous services in collection to be transitional
+			return services
+				.GetTargettedTransitionalServices().Union(
+					services.GetBlanketTransitionalServices(blanketMarkerType)
+				)
+				.Distinct()
+				.Where(service => !blanketMarkerType.IsAssignableFrom(service.ServiceType))
+				.ToList();
+		}
+
+		private static IEnumerable<ServiceDescriptor> GetTargettedTransitionalServices(this IServiceCollection services)
+		{
+			var targettedMarkerTypeInfo = typeof(TransitionMarker<>).GetTypeInfo(); // depicts a single service to be transitional
+			var targettedTransitionalMarkers = services
+				.Where(marker => targettedMarkerTypeInfo.IsAssignableFrom(marker.ServiceType.GetTypeInfo()))
+				.Select(marker => marker.ServiceType.GetGenericArguments().Single());
+			return services.Where(service => targettedTransitionalMarkers.Contains(service.ServiceType));
+		}
+
+		private static IEnumerable<ServiceDescriptor> GetBlanketTransitionalServices(this IServiceCollection services, Type blanketMarkerType)
+		{
+			return services.BeforeLast(blanketMarkerType);
+        }
+
+		internal static IEnumerable<ServiceDescriptor> BeforeLast(this IEnumerable<ServiceDescriptor> source, Type transitionMarkerType)
+		{
+			return source.Take(source.Select((x, i) => new { x, i, }).Last(x => x.x.ImplementationType == transitionMarkerType).i);
 		}
     }
 }

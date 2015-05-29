@@ -18,7 +18,7 @@ namespace Compose
 			_moduleBuilder = CreateModuleBuilder();
 		}
 
-		internal TypeInfo GetDirectTransitionImplementation(TypeInfo serviceTypeInfo)
+		internal TypeInfo GetDirectTransitionImplementation(TypeInfo serviceTypeInfo, TypeInfo injectionTypeInfo)
 		{
 			var serviceType = serviceTypeInfo.AsType();
             ValidateProxyIsPossible(serviceTypeInfo);
@@ -37,7 +37,7 @@ namespace Compose
 			typeBuilder.AddInterfaceImplementation(typeof(ITransition<>).MakeGenericType(serviceType));
 			try
 			{
-				typeBuilder.AddDirectImplementation(serviceTypeInfo);
+				typeBuilder.AddDirectImplementation(serviceTypeInfo, injectionTypeInfo);
 				return typeBuilder.CreateTypeInfo();
 			}
 			catch(Exception ex)
