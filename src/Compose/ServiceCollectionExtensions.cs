@@ -7,33 +7,27 @@ namespace Compose
 {
 	public static class ServiceCollectionExtensions
 	{
+		public static IServiceCollection AddTransitional(this IServiceCollection services, Type serviceType, Type implementationType)
+			=> services.AddTransient(serviceType, implementationType).WithTransitional(serviceType);
+
 		public static IServiceCollection AddTransitional<TService, TImplementation>(this IServiceCollection services) where TImplementation : TService
-		{
-			return services
-				.AddTransient<TService, TImplementation>()
-				.WithTransitional<TService>();
-		}
+			=> services.AddTransient<TService, TImplementation>().WithTransitional<TService>();
 
 		public static IServiceCollection AsTransitional(this IServiceCollection services)
-		{
-			return services.AddTransient<TransitionMarker>();
-		}
+			=> services.AddTransient<TransitionMarker>();
+
+		public static IServiceCollection WithTransitional(this IServiceCollection services, Type serviceType)
+			=> services.AddTransient(typeof(TransitionMarker<>).MakeGenericType(new[] { serviceType }));
 
 		public static IServiceCollection WithTransitional<TService>(this IServiceCollection services)
-		{
-			return services.AddTransient<TransitionMarker<TService>>();
-		}
+			=> services.AddTransient<TransitionMarker<TService>>();
 		
 		internal static SingletonRegister BuildSingletonRegister(this IServiceCollection services)
-		{
-			return new SingletonRegister(services);
-		}
+			=> new SingletonRegister(services);
 
 		internal static ServiceDescriptor BestSingletonMatchFor(this IServiceCollection services, Type serviceType)
-		{
-            return services.Where(x => x.Lifetime == ServiceLifetime.Singleton && serviceType.IsAssignableFrom(x.ServiceType))
+			=> services.Where(x => x.Lifetime == ServiceLifetime.Singleton && serviceType.IsAssignableFrom(x.ServiceType))
 				.OrderByDescending(x => x.ServiceType == serviceType)
 				.LastOrDefault();
-		}
 	}
 }
