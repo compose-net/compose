@@ -1,52 +1,66 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace Compose
 {
-	internal class DynamicManager<T> : ITransitionManager<T> where T : class
+	internal class DynamicManager<TInterface, TOriginal> : IDynamicRegister<TInterface>, ITransitionManager<TInterface> 
+		where TInterface : class where TOriginal : TInterface
 	{
-		private static List<WeakReference<DynamicManager<T>>> Managers 
-			= new List<WeakReference<DynamicManager<T>>>();
+		private static List<DynamicManager<TInterface, TOriginal>> Managers 
+			= new List<DynamicManager<TInterface, TOriginal>>();
 
 		private static TypeInfo Disposable = typeof(IDisposable).GetTypeInfo();
 
-		public T CurrentService { get; set; }
-		private T SnapshotService { get; set; }
+		public TInterface CurrentService { get; set; }
+		private TInterface SnapshotService { get; set; }
+		private WeakReference<TInterface> DynamicProxy { get; set; }
 
-		public DynamicManager(T original)
+		public DynamicManager(TOriginal original)
 		{
 			CurrentService = original;
-			Managers.Add(new WeakReference<DynamicManager<T>>(this));
+			Managers.Add(this);
 		}
 
-		protected DynamicManager(IServiceProvider provider, Func<IServiceProvider, T> factory)
+		protected DynamicManager(IServiceProvider provider, Func<IServiceProvider, TOriginal> factory)
 			: this(factory(provider))
 		{ }
 
-		public void Change(Func<T> service)
+		public void Register(TInterface dynamicProxy)
+		{
+			DynamicProxy = new WeakReference<TInterface>(dynamicProxy);
+		}
+
+		private bool IsActive
+		{
+			get
+			{
+				TInterface dynamic = null;
+				return DynamicProxy != null && DynamicProxy.TryGetTarget(out dynamic);
+			}
+		}
+
+		public void Change(Func<TInterface> service)
 		{
 			foreach (var instance in GetActiveManagers())
 				instance.Change(service());
 		}
 
-		private IEnumerable<DynamicManager<T>> GetActiveManagers()
+		private static IEnumerable<DynamicManager<TInterface, TOriginal>> GetActiveManagers()
 		{
-			var deadReferences = new List<WeakReference<DynamicManager<T>>>(Managers.Count);
+			var deadReferences = new List<DynamicManager<TInterface, TOriginal>>(Managers.Count);
 
-			DynamicManager<T> manager = null;
-			foreach (var reference in Managers)
-				if (reference.TryGetTarget(out manager))
+			foreach (var manager in Managers)
+				if (manager.IsActive)
 					yield return manager;
 				else
-					deadReferences.Add(reference);
+					deadReferences.Add(manager);
 
 			foreach (var deadReference in deadReferences)
 				Managers.Remove(deadReference);
 		}
 
-		private void Change(T service)
+		private void Change(TInterface service)
 		{
 			CurrentService = service;
 		}
@@ -57,7 +71,7 @@ namespace Compose
 				Snapshot(manager);
 		}
 
-		private void Snapshot(DynamicManager<T> manager)
+		private void Snapshot(DynamicManager<TInterface, TOriginal> manager)
 		{
 			if (SnapshotService != null && Disposable.IsAssignableFrom(SnapshotService.GetType().GetTypeInfo()))
 				((IDisposable)SnapshotService).Dispose();
@@ -70,7 +84,7 @@ namespace Compose
 				Restore(manager);
 		}
 
-		private void Restore(DynamicManager<T> manager)
+		private void Restore(DynamicManager<TInterface, TOriginal> manager)
 		{
 			if (CurrentService != null && Disposable.IsAssignableFrom(CurrentService.GetType().GetTypeInfo()))
 				((IDisposable)CurrentService).Dispose();
