@@ -130,12 +130,13 @@ namespace Compose.Tests
 		[Fact]
 		public void CanChangeImplementation()
 		{
-			var service = SetupProxy<IDependency, Dependency1>()();
+			var app = new Fake.Application();
+			app.UseServices(services => services.AddTransitional<IDependency, Dependency1>());
+			var service = app.GetRequiredService<IDependency>();
 			Dependency1.Id = Guid.NewGuid().ToString();
 			Assert.Equal(Dependency1.Id, service.GetId());
-			var transition = service as ITransition<IDependency>;
-			Assert.NotNull(transition);
-			transition.Change(new Dependency2());
+			var transition = app.GetRequiredService<ITransitionManager<IDependency>>();
+			transition.Change(() => new Dependency2());
 			Dependency2.Id = Guid.NewGuid().ToString();
 			Assert.Equal(Dependency2.Id, service.GetId());
 		}
