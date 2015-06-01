@@ -53,7 +53,7 @@ namespace Compose
 			var dynamicManager = DynamicManagerFactory.ForInstance(original.ServiceType, original.ImplementationInstance);
 			var dynamicManagerType = dynamicManager.GetType();
 			var dynamicProxyType = app.CreateProxy(original.ServiceType.GetTypeInfo(), dynamicManagerType.GetTypeInfo());
-            var dynamicProxy = Activator.CreateInstance(dynamicProxyType, dynamicManager);
+            var dynamicProxy = Activator.CreateInstance(dynamicProxyType.AsType(), dynamicManager);
 			services.Replace(new ServiceDescriptor(original.ServiceType, dynamicProxy));
 		}
 
@@ -61,7 +61,7 @@ namespace Compose
 		{
 			var dynamicManagerType = DynamicManagerFactory.ForType(original.ServiceType, original.ServiceType);
 			var dynamicProxyType = app.CreateProxy(original.ServiceType.GetTypeInfo(), dynamicManagerType.GetTypeInfo());
-			var dynamicFactory = DynamicManagerFactory.ForFactory(original.ImplementationFactory, dynamicManagerType, dynamicProxyType);
+			var dynamicFactory = DynamicManagerFactory.ForFactory(original.ImplementationFactory, dynamicManagerType, dynamicProxyType.AsType());
             services.Replace(new ServiceDescriptor(original.ServiceType, dynamicFactory, original.Lifetime));
 		}
 

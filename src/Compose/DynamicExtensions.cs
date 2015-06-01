@@ -18,20 +18,17 @@ namespace Compose
 					genericBuilders[i].DefineGeneric(serviceGenerics[i], serviceGenerics, serviceType, false);
 		}
 
-		internal static void AddDirectImplementation(this TypeBuilder typeBuilder, TypeInfo serviceTypeInfo, TypeInfo injectionTypeInfo)
+		internal static void AddDirectImplementation(this TypeBuilder typeBuilder, TypeInfo serviceTypeInfo, TypeInfo managerTypeInfo)
 		{
 			var serviceName = GetRandomString();
-			var snapshotName = GetRandomString();
 			var serviceType = serviceTypeInfo.AsType();
-			var serviceField = typeBuilder.AddServiceField(serviceName, serviceType);
-			var snapshotField = typeBuilder.AddSnapshotField(snapshotName, serviceType);
+			var managerType = managerTypeInfo.AsType();
+			var managerField = typeBuilder.AddManagerField(serviceName, managerType);
+			var managerCurrent = managerTypeInfo.GetDeclaredProperty("Current").GetGetMethod();
 			var implementedInterfaces = new[] { serviceTypeInfo }.Union(serviceTypeInfo.ImplementedInterfaces.Select(x => x.GetTypeInfo()).ToArray()).ToArray();
-			typeBuilder.AddServiceConstructor(serviceField, serviceType);
-			typeBuilder.AddPropertyImplementations(serviceField, implementedInterfaces);
-			typeBuilder.AddMethodImplementations(serviceField, implementedInterfaces);
-			typeBuilder.AddChangeImplementation(serviceField, serviceTypeInfo);
-			typeBuilder.AddSnapshotImplementation(snapshotField, serviceField);
-			typeBuilder.AddRestoreImplementation(snapshotField, serviceField);
+			typeBuilder.AddServiceConstructor(managerField, managerType);
+			typeBuilder.AddPropertyImplementations(managerField, managerCurrent, implementedInterfaces);
+			typeBuilder.AddMethodImplementations(managerField, managerCurrent, implementedInterfaces);
 		}
 
 		private static string GetRandomString()
@@ -40,69 +37,19 @@ namespace Compose
 			return new string(Enumerable.Repeat(Characters, 16).Select(x => x[random.Next(x.Length)]).ToArray());
 		}
 
-		private static void AddChangeImplementation(this TypeBuilder typeBuilder, FieldBuilder serviceField, TypeInfo serviceType)
-		{
-			/* C#: 
-			public virtual bool Change(TService arg1)
-			{
-				this._TServiceField = arg1;
-				return true;
-			}
-			*/
-			var methodInfo = typeof(ITransition<>).MakeGenericType(serviceType.AsType()).GetMethod("Change");
-			var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual, methodInfo.ReturnType, new[] { serviceType.AsType() });
-            var methodEmitter = methodBuilder.GetILGenerator();
-			methodEmitter.Emit(OpCodes.Ldarg_0);
-			methodEmitter.Emit(OpCodes.Ldarg_1);
-			methodEmitter.Emit(OpCodes.Stfld, serviceField);
-			methodEmitter.Emit(OpCodes.Ldc_I4_1);
-			methodEmitter.Emit(OpCodes.Ret);
-			typeBuilder.DefineMethodOverride(methodBuilder, methodInfo);
-		}
-
-		private static void AddSnapshotImplementation(this TypeBuilder typeBuilder, FieldBuilder snapshotField, FieldBuilder serviceField)
-		{
-			/* C#:
-			public virtual void Snapshot()
-			{
-				this._TSnapshotField = this._TServiceField;
-			}
-			*/
-			var methodInfo = typeof(ITransition).GetMethod("Snapshot");
-			var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual, methodInfo.ReturnType, Type.EmptyTypes);
-			var methodEmitter = methodBuilder.GetILGenerator();
-			methodEmitter.Emit(OpCodes.Ldarg_0);
-			methodEmitter.Emit(OpCodes.Ldarg_0);
-			methodEmitter.Emit(OpCodes.Ldfld, serviceField);
-			methodEmitter.Emit(OpCodes.Stfld, snapshotField);
-			methodEmitter.Emit(OpCodes.Ret);
-		}
-
-		private static void AddRestoreImplementation(this TypeBuilder typeBuilder, FieldBuilder snapshotField, FieldBuilder serviceField)
-		{
-			var methodInfo = typeof(ITransition).GetMethod("Restore");
-			var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual, methodInfo.ReturnType, Type.EmptyTypes);
-			var methodEmitter = methodBuilder.GetILGenerator();
-			methodEmitter.Emit(OpCodes.Ldarg_0);
-			methodEmitter.Emit(OpCodes.Ldarg_0);
-			methodEmitter.Emit(OpCodes.Ldfld, snapshotField);
-			methodEmitter.Emit(OpCodes.Stfld, serviceField);
-			methodEmitter.Emit(OpCodes.Ret);
-		}
-
-		private static void AddMethodImplementations(this TypeBuilder typeBuilder, FieldBuilder serviceField, TypeInfo[] implementedInterfaces)
+		private static void AddMethodImplementations(this TypeBuilder typeBuilder, FieldBuilder managerField, MethodInfo managerCurrent, TypeInfo[] implementedInterfaces)
 		{
 			foreach (var implementedInterface in implementedInterfaces)
 				foreach (var methodInfo in implementedInterface.DeclaredMethods.Where(x => x.IsPublic && !x.IsStatic && !x.IsSpecialName))
-					ExceptionHelpers.ReThrow(typeBuilder.AddMethodImplementation, methodInfo, serviceField, implementedInterface, inner => new UnsupportedMethodDefinitionException(methodInfo, inner));
+					ExceptionHelpers.ReThrow(typeBuilder.AddMethodImplementation, methodInfo, managerField, managerCurrent, implementedInterface, inner => new UnsupportedMethodDefinitionException(methodInfo, inner));
 		}
 
-		private static void AddMethodImplementation(this TypeBuilder typeBuilder, MethodInfo methodInfo, FieldBuilder serviceField, TypeInfo serviceType)
+		private static void AddMethodImplementation(this TypeBuilder typeBuilder, MethodInfo methodInfo, FieldBuilder managerField, MethodInfo managerCurrent, TypeInfo serviceType)
 		{
 			/* C#: 
 			public virtual ReturnType MethodName[<Generics>]([Args]) [where Generic : Constraints]
 			{
-				[return] this._TServiceField.MethodName([Args]);
+				[return] this._TManagerField.CurrentService.MethodName([Args]);
 			}
 			*/
 			var methodBuilder = typeBuilder.DefineMethod(methodInfo.Name, MethodAttributes.Public | MethodAttributes.Virtual);
@@ -111,7 +58,8 @@ namespace Compose
             if (methodInfo.IsGenericMethod) methodBuilder.AddGenericParameters(methodInfo, serviceType);
             var methodEmitter = methodBuilder.GetILGenerator();
 			methodEmitter.Emit(OpCodes.Ldarg_0);
-			methodEmitter.Emit(OpCodes.Ldfld, serviceField);
+			methodEmitter.Emit(OpCodes.Ldfld, managerField);
+			methodEmitter.Emit(OpCodes.Callvirt, managerCurrent);
 			for (var argIndex = 1; argIndex <= methodInfo.GetParameters().Length; argIndex++)
 				methodEmitter.Emit(OpCodes.Ldarg, argIndex);
 			methodEmitter.Emit(OpCodes.Callvirt, methodInfo);
@@ -154,14 +102,14 @@ namespace Compose
 			throw new NotSupportedException("Generic constraint is not supported.");
 		}
 
-		private static void AddPropertyImplementations(this TypeBuilder typeBuilder, FieldBuilder serviceField, TypeInfo[] implementedInterfaces)
+		private static void AddPropertyImplementations(this TypeBuilder typeBuilder, FieldBuilder managerField, MethodInfo managerCurrent, TypeInfo[] implementedInterfaces)
 		{
 			foreach (var implementedInterface in implementedInterfaces)
 				foreach (var propertyInfo in implementedInterface.DeclaredProperties)
-					ExceptionHelpers.ReThrow(typeBuilder.AddPropertyImplementation, propertyInfo, serviceField, inner => new UnsupportedPropertyDefinitionException(propertyInfo, inner));
+					ExceptionHelpers.ReThrow(typeBuilder.AddPropertyImplementation, propertyInfo, managerField, managerCurrent, inner => new UnsupportedPropertyDefinitionException(propertyInfo, inner));
 		}
 
-		private static void AddPropertyImplementation(this TypeBuilder typeBuilder, PropertyInfo propertyInfo, FieldBuilder serviceField)
+		private static void AddPropertyImplementation(this TypeBuilder typeBuilder, PropertyInfo propertyInfo, FieldBuilder managerField, MethodInfo managerCurrent)
 		{
 			/* C#: 
 			public virtual ReturnType PropertyName
@@ -171,30 +119,32 @@ namespace Compose
 			}
 			*/
 			var propertyBuilder = typeBuilder.DefineProperty(propertyInfo.Name, propertyInfo.Attributes, propertyInfo.PropertyType, null);
-			if (propertyInfo.CanRead) typeBuilder.AddPropertyGetImplementation(propertyBuilder, propertyInfo, serviceField);
-			if (propertyInfo.CanWrite) typeBuilder.AddPropertySetImplementation(propertyBuilder, propertyInfo, serviceField);
+			if (propertyInfo.CanRead) typeBuilder.AddPropertyGetImplementation(propertyBuilder, propertyInfo, managerField, managerCurrent);
+			if (propertyInfo.CanWrite) typeBuilder.AddPropertySetImplementation(propertyBuilder, propertyInfo, managerField, managerCurrent);
 		}
 
-		private static void AddPropertyGetImplementation(this TypeBuilder typeBuilder, PropertyBuilder propertyBuilder, PropertyInfo propertyInfo, FieldBuilder serviceField)
+		private static void AddPropertyGetImplementation(this TypeBuilder typeBuilder, PropertyBuilder propertyBuilder, PropertyInfo propertyInfo, FieldBuilder managerField, MethodInfo managerCurrent)
 		{
 			var propertyInfoGetMethod = propertyInfo.GetGetMethod();
 			var propertyGetMethod = typeBuilder.DefineMethod(propertyInfoGetMethod.Name, MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig | MethodAttributes.Virtual, propertyInfo.PropertyType, Type.EmptyTypes);
 			var propertyGetEmitter = propertyGetMethod.GetILGenerator();
 			propertyGetEmitter.Emit(OpCodes.Ldarg_0);
-			propertyGetEmitter.Emit(OpCodes.Ldfld, serviceField);
+			propertyGetEmitter.Emit(OpCodes.Ldfld, managerField);
+			propertyGetEmitter.Emit(OpCodes.Callvirt, managerCurrent);
 			propertyGetEmitter.Emit(OpCodes.Callvirt, propertyInfoGetMethod);
 			propertyGetEmitter.Emit(OpCodes.Ret);
 			propertyBuilder.SetGetMethod(propertyGetMethod);
 			typeBuilder.DefineMethodOverride(propertyGetMethod, propertyInfoGetMethod);
 		}
 
-		private static void AddPropertySetImplementation(this TypeBuilder typeBuilder, PropertyBuilder propertyBuilder, PropertyInfo propertyInfo, FieldBuilder serviceField)
+		private static void AddPropertySetImplementation(this TypeBuilder typeBuilder, PropertyBuilder propertyBuilder, PropertyInfo propertyInfo, FieldBuilder managerField, MethodInfo managerCurrent)
 		{
 			var propertyInfoSetMethod = propertyInfo.GetSetMethod();
 			var propertySetMethod = typeBuilder.DefineMethod(propertyInfoSetMethod.Name, MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig | MethodAttributes.Virtual, null, new[] { propertyInfo.PropertyType });
 			var propertySetEmitter = propertySetMethod.GetILGenerator();
 			propertySetEmitter.Emit(OpCodes.Ldarg_0);
-			propertySetEmitter.Emit(OpCodes.Ldfld, serviceField);
+			propertySetEmitter.Emit(OpCodes.Ldfld, managerField);
+			propertySetEmitter.Emit(OpCodes.Callvirt, managerCurrent);
 			propertySetEmitter.Emit(OpCodes.Ldarg_1);
 			propertySetEmitter.Emit(OpCodes.Callvirt, propertyInfoSetMethod);
 			propertySetEmitter.Emit(OpCodes.Ret);
@@ -202,29 +152,24 @@ namespace Compose
 			typeBuilder.DefineMethodOverride(propertySetMethod, propertyInfoSetMethod);
 		}
 
-		private static FieldBuilder AddServiceField(this TypeBuilder typeBuilder, string serviceName, Type serviceType)
+		private static FieldBuilder AddManagerField(this TypeBuilder typeBuilder, string serviceName, Type managerType)
 		{
-			return typeBuilder.DefineField($"_{serviceName}", serviceType, FieldAttributes.Private);
+			return typeBuilder.DefineField($"_{serviceName}", managerType, FieldAttributes.Private);
 		}
 
-		private static FieldBuilder AddSnapshotField(this TypeBuilder typeBuilder, string snapshotName, Type serviceType)
-		{
-			return typeBuilder.DefineField($"_{snapshotName}", serviceType, FieldAttributes.Private);
-		}
-
-		private static ConstructorBuilder AddServiceConstructor(this TypeBuilder typeBuilder, FieldBuilder fieldBuilder, Type serviceType)
+		private static ConstructorBuilder AddServiceConstructor(this TypeBuilder typeBuilder, FieldBuilder injectionField, Type injectionType)
 		{
 			/* C#: 
-			public Constructor(TService arg1)
+			public Constructor(TInjection arg1)
 			{
-				this._TServiceField = arg1;
+				this._TInjectionField = arg1;
 			}
 			*/
-			var ctorBuilder = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new[] { serviceType });
+			var ctorBuilder = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new[] { injectionType });
 			var ctorEmitter = ctorBuilder.GetILGenerator();
 			ctorEmitter.Emit(OpCodes.Ldarg_0);
 			ctorEmitter.Emit(OpCodes.Ldarg_1);
-			ctorEmitter.Emit(OpCodes.Stfld, fieldBuilder);
+			ctorEmitter.Emit(OpCodes.Stfld, injectionField);
 			ctorEmitter.Emit(OpCodes.Ret);
 			return ctorBuilder;
 		}

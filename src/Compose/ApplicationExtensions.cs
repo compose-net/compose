@@ -41,7 +41,7 @@ namespace Compose
             var emitter = app.HostingServices.GetService<DynamicEmitter>();
             if (emitter == null) emitter = app.GetRegisteredDynamicEmitter();
 
-            return emitter.GetDirectTransitionImplementation(serviceTypeInfo, injectionTypeInfo);
+            return emitter.GetManagedDynamicProxy(serviceTypeInfo, injectionTypeInfo);
         }
 
 		internal static TService CreateProxy<TService, TInjection>(this Application app) where TService : class where TInjection : TService

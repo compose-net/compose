@@ -18,7 +18,7 @@ namespace Compose
 			_moduleBuilder = CreateModuleBuilder();
 		}
 
-		internal TypeInfo GetDirectTransitionImplementation(TypeInfo serviceTypeInfo, TypeInfo injectionTypeInfo)
+		internal TypeInfo GetManagedDynamicProxy(TypeInfo serviceTypeInfo, TypeInfo injectionTypeInfo)
 		{
 			var serviceType = serviceTypeInfo.AsType();
             ValidateProxyIsPossible(serviceTypeInfo);
