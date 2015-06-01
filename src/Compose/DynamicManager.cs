@@ -17,6 +17,7 @@ namespace Compose
 		{
 			_container = container;
 			CurrentService = original;
+			SnapshotService = original;
 			_container.Add(this);
 		}
 

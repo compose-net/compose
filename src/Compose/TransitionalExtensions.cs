@@ -42,6 +42,7 @@ namespace Compose
 		}
 
 		private static Type TransitionManager = typeof(ITransitionManager<>);
+		private static Type DynamicRegister = typeof(IDynamicRegister<>);
 
 		private static void ApplyTypeTransition(this IServiceCollection services, Application app, ServiceDescriptor original)
 		{
@@ -49,6 +50,7 @@ namespace Compose
 			var dynamicManagerType = DynamicManagerFactory.ForType(original.ServiceType, original.ImplementationType);
 			services.Add(new ServiceDescriptor(dynamicManagerType, dynamicManagerType, original.Lifetime));
 			services.Add(new ServiceDescriptor(TransitionManager.MakeGenericType(original.ServiceType), dynamicManagerType, original.Lifetime));
+			services.Add(new ServiceDescriptor(DynamicRegister.MakeGenericType(original.ServiceType), dynamicManagerType, original.Lifetime));
 			var dynamicProxyType = app.CreateProxy(original.ServiceType.GetTypeInfo());
 			services.Replace(new ServiceDescriptor(original.ServiceType, dynamicProxyType, original.Lifetime));
 		}

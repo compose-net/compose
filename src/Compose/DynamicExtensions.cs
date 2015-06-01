@@ -15,8 +15,9 @@ namespace Compose
 			var managerType = managerTypeInfo.AsType();
 			var managerField = typeBuilder.AddManagerField(managerFieldName, managerType);
 			var managerCurrent = managerTypeInfo.GetDeclaredProperty("CurrentService").GetGetMethod();
+			var managerRegister = managerTypeInfo.GetDeclaredMethod("Register");
 			var implementedInterfaces = new[] { serviceTypeInfo }.Union(serviceTypeInfo.ImplementedInterfaces.Select(x => x.GetTypeInfo()).ToArray()).ToArray();
-			typeBuilder.AddServiceConstructor(managerField, managerType);
+			typeBuilder.AddServiceConstructor(managerField, managerType, managerRegister);
 			typeBuilder.AddPropertyImplementations(managerField, managerCurrent, implementedInterfaces);
 			typeBuilder.AddMethodImplementations(managerField, managerCurrent, implementedInterfaces);
 		}
@@ -156,7 +157,7 @@ namespace Compose
 			return typeBuilder.DefineField($"_{fieldName}", managerType, FieldAttributes.Private);
 		}
 
-		private static ConstructorBuilder AddServiceConstructor(this TypeBuilder typeBuilder, FieldBuilder injectionField, Type injectionType)
+		private static ConstructorBuilder AddServiceConstructor(this TypeBuilder typeBuilder, FieldBuilder managerField, Type managerType, MethodInfo managerRegister)
 		{
 			/* C#: 
 			public Constructor(TInjection arg1)
@@ -164,11 +165,14 @@ namespace Compose
 				this._TInjectionField = arg1;
 			}
 			*/
-			var ctorBuilder = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new[] { injectionType });
+			var ctorBuilder = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new[] { managerType });
 			var ctorEmitter = ctorBuilder.GetILGenerator();
 			ctorEmitter.Emit(OpCodes.Ldarg_0);
 			ctorEmitter.Emit(OpCodes.Ldarg_1);
-			ctorEmitter.Emit(OpCodes.Stfld, injectionField);
+			ctorEmitter.Emit(OpCodes.Stfld, managerField);
+			ctorEmitter.Emit(OpCodes.Ldarg_1);
+			ctorEmitter.Emit(OpCodes.Ldarg_0);
+			ctorEmitter.Emit(OpCodes.Callvirt, managerRegister);
 			ctorEmitter.Emit(OpCodes.Ret);
 			return ctorBuilder;
 		}
