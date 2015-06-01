@@ -22,10 +22,6 @@ namespace Compose
 			Managers.Add(this);
 		}
 
-		protected DynamicManager(IServiceProvider provider, Func<IServiceProvider, TOriginal> factory)
-			: this(factory(provider))
-		{ }
-
 		public void Register(TInterface dynamicProxy)
 		{
 			DynamicProxy = new WeakReference<TInterface>(dynamicProxy);
