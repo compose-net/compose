@@ -9,22 +9,12 @@ namespace Compose
 	{
 		private static Random random = new Random();
 
-		internal static void AddGenericsFrom(this TypeBuilder typeBuilder, TypeInfo serviceType)
-		{
-			var serviceGenerics = serviceType.GenericTypeArguments.Select(x => x.GetTypeInfo()).ToArray();
-			var genericBuilders = typeBuilder.DefineGenericParameters(serviceGenerics.Select(x => x.Name).ToArray());
-			for (var i = 0; i < genericBuilders.Length; i++)
-				if (serviceGenerics[i].IsGenericParameter)
-					genericBuilders[i].DefineGeneric(serviceGenerics[i], serviceGenerics, serviceType, false);
-		}
-
 		internal static void AddDirectImplementation(this TypeBuilder typeBuilder, TypeInfo serviceTypeInfo, TypeInfo managerTypeInfo)
 		{
-			var serviceName = GetRandomString();
-			var serviceType = serviceTypeInfo.AsType();
+			var managerFieldName = GetRandomString();
 			var managerType = managerTypeInfo.AsType();
-			var managerField = typeBuilder.AddManagerField(serviceName, managerType);
-			var managerCurrent = managerTypeInfo.GetDeclaredProperty("Current").GetGetMethod();
+			var managerField = typeBuilder.AddManagerField(managerFieldName, managerType);
+			var managerCurrent = managerTypeInfo.GetDeclaredProperty("CurrentService").GetGetMethod();
 			var implementedInterfaces = new[] { serviceTypeInfo }.Union(serviceTypeInfo.ImplementedInterfaces.Select(x => x.GetTypeInfo()).ToArray()).ToArray();
 			typeBuilder.AddServiceConstructor(managerField, managerType);
 			typeBuilder.AddPropertyImplementations(managerField, managerCurrent, implementedInterfaces);
@@ -35,6 +25,15 @@ namespace Compose
 		{
 			const string Characters = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm";
 			return new string(Enumerable.Repeat(Characters, 16).Select(x => x[random.Next(x.Length)]).ToArray());
+		}
+
+		internal static void AddGenericsFrom(this TypeBuilder typeBuilder, TypeInfo serviceType)
+		{
+			var serviceGenerics = serviceType.GenericTypeArguments.Select(x => x.GetTypeInfo()).ToArray();
+			var genericBuilders = typeBuilder.DefineGenericParameters(serviceGenerics.Select(x => x.Name).ToArray());
+			for (var i = 0; i < genericBuilders.Length; i++)
+				if (serviceGenerics[i].IsGenericParameter)
+					genericBuilders[i].DefineGeneric(serviceGenerics[i], serviceGenerics, serviceType, false);
 		}
 
 		private static void AddMethodImplementations(this TypeBuilder typeBuilder, FieldBuilder managerField, MethodInfo managerCurrent, TypeInfo[] implementedInterfaces)
@@ -92,12 +91,12 @@ namespace Compose
 		{
 			if (methodGenerics.Contains(constraint)) return constraint;
 
-			var typedDefintions = serviceType.GenericTypeArguments.Select(x => x.GetTypeInfo()).ToArray();
+			var typedDefinitions = serviceType.GenericTypeArguments.Select(x => x.GetTypeInfo()).ToArray();
 			var genericDefinitions = serviceType.IsGenericType ? serviceType.GetGenericTypeDefinition().GetTypeInfo().GetGenericArguments() : new TypeInfo[0];
 
 			for (var i = 0; i < genericDefinitions.Length; i++)
 				if (genericDefinitions[i] == constraint)
-					return typedDefintions[i];
+					return typedDefinitions[i];
 
 			throw new NotSupportedException("Generic constraint is not supported.");
 		}
@@ -152,9 +151,9 @@ namespace Compose
 			typeBuilder.DefineMethodOverride(propertySetMethod, propertyInfoSetMethod);
 		}
 
-		private static FieldBuilder AddManagerField(this TypeBuilder typeBuilder, string serviceName, Type managerType)
+		private static FieldBuilder AddManagerField(this TypeBuilder typeBuilder, string fieldName, Type managerType)
 		{
-			return typeBuilder.DefineField($"_{serviceName}", managerType, FieldAttributes.Private);
+			return typeBuilder.DefineField($"_{fieldName}", managerType, FieldAttributes.Private);
 		}
 
 		private static ConstructorBuilder AddServiceConstructor(this TypeBuilder typeBuilder, FieldBuilder injectionField, Type injectionType)

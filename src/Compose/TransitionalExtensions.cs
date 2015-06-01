@@ -39,29 +39,34 @@ namespace Compose
 				services.ApplyFactoryTransition(app, original);
 		}
 
+		private static Type TransitionManager = typeof(ITransitionManager<>);
+
 		private static void ApplyTypeTransition(this IServiceCollection services, Application app, ServiceDescriptor original)
 		{
 			services.Add(new ServiceDescriptor(original.ImplementationType, original.ImplementationType, original.Lifetime));
 			var dynamicManagerType = DynamicManagerFactory.ForType(original.ServiceType, original.ImplementationType);
 			services.Add(new ServiceDescriptor(dynamicManagerType, dynamicManagerType, original.Lifetime));
-			var dynamicProxyType = app.CreateProxy(original.ServiceType.GetTypeInfo(), dynamicManagerType.GetTypeInfo());
-			services.Replace(new ServiceDescriptor(original.ServiceType, dynamicProxyType.AsType(), original.Lifetime));
+			services.Add(new ServiceDescriptor(TransitionManager.MakeGenericType(original.ServiceType), dynamicManagerType, original.Lifetime));
+			var dynamicProxyType = app.CreateProxy(original.ServiceType.GetTypeInfo());
+			services.Replace(new ServiceDescriptor(original.ServiceType, dynamicProxyType, original.Lifetime));
 		}
 
 		private static void ApplyInstanceTransition(this IServiceCollection services, Application app, ServiceDescriptor original)
 		{
 			var dynamicManager = DynamicManagerFactory.ForInstance(original.ServiceType, original.ImplementationInstance);
 			var dynamicManagerType = dynamicManager.GetType();
-			var dynamicProxyType = app.CreateProxy(original.ServiceType.GetTypeInfo(), dynamicManagerType.GetTypeInfo());
-            var dynamicProxy = Activator.CreateInstance(dynamicProxyType.AsType(), dynamicManager);
+			var dynamicProxyType = app.CreateProxy(original.ServiceType.GetTypeInfo());
+            var dynamicProxy = Activator.CreateInstance(dynamicProxyType, dynamicManager);
+			services.Add(new ServiceDescriptor(TransitionManager.MakeGenericType(original.ServiceType), dynamicManager));
 			services.Replace(new ServiceDescriptor(original.ServiceType, dynamicProxy));
 		}
 
 		private static void ApplyFactoryTransition(this IServiceCollection services, Application app, ServiceDescriptor original)
 		{
 			var dynamicManagerType = DynamicManagerFactory.ForType(original.ServiceType, original.ServiceType);
-			var dynamicProxyType = app.CreateProxy(original.ServiceType.GetTypeInfo(), dynamicManagerType.GetTypeInfo());
-			var dynamicFactory = DynamicManagerFactory.ForFactory(original.ImplementationFactory, dynamicManagerType, dynamicProxyType.AsType());
+			var dynamicProxyType = app.CreateProxy(original.ServiceType.GetTypeInfo());
+			var dynamicFactory = DynamicManagerFactory.ForFactory(original.ImplementationFactory, dynamicManagerType, dynamicProxyType);
+			// TODO: Work out how to resolve ITransitionManager<original.ServiceType>
             services.Replace(new ServiceDescriptor(original.ServiceType, dynamicFactory, original.Lifetime));
 		}
 
@@ -81,7 +86,7 @@ namespace Compose
 		{
 			var targettedMarkerTypeInfo = typeof(TransitionMarker<>).GetTypeInfo(); // depicts a single service to be transitional
 			var targettedTransitionalMarkers = services
-				.Where(marker => targettedMarkerTypeInfo.IsAssignableFrom(marker.ServiceType.GetTypeInfo()))
+				.Where(marker => targettedMarkerTypeInfo.IsAssignableFromGeneric(marker.ServiceType.GetTypeInfo()))
 				.Select(marker => marker.ServiceType.GetGenericArguments().Single());
 			return services.Where(service => targettedTransitionalMarkers.Contains(service.ServiceType));
 		}
@@ -93,7 +98,10 @@ namespace Compose
 
 		internal static IEnumerable<ServiceDescriptor> BeforeLast(this IEnumerable<ServiceDescriptor> source, Type transitionMarkerType)
 		{
-			return source.Take(source.Select((x, i) => new { x, i, }).Last(x => x.x.ImplementationType == transitionMarkerType).i);
+			var lastMarkerIndex = source.Select((x, i) => new { x, i, }).LastOrDefault(x => x.x.ImplementationType == transitionMarkerType)?.i;
+			if (!lastMarkerIndex.HasValue)
+				return Enumerable.Empty<ServiceDescriptor>();
+            return source.Take(lastMarkerIndex.Value);
 		}
     }
 }

@@ -29,19 +29,18 @@ namespace Compose
 
 		#region Transitions
 
-		public static bool Transition<TService, TImplementation>(this Application app) where TImplementation : class, TService where TService : class
+		public static void Transition<TService, TImplementation>(this Application app) where TImplementation : class, TService where TService : class
 		{
-			var transitional = app.GetRequiredService<TService>() as ITransition<TService>;
+			var transitional = app.GetRequiredService<ITransitionManager<TService>>();
 			if (transitional == null) throw new InvalidOperationException($"{typeof(TService).Name} must be registered as a Transitional Service (services.AddTransitional<{typeof(TService).Name}, TImplementation>()");
-			return transitional.Change(app.GetRequiredService<TImplementation>());
+			transitional.Change(() => app.GetRequiredService<TImplementation>());
         }
 
-        internal static TypeInfo CreateProxy(this Application app, TypeInfo serviceTypeInfo, TypeInfo injectionTypeInfo)
+        internal static Type CreateProxy(this Application app, TypeInfo serviceTypeInfo)
         {
             var emitter = app.HostingServices.GetService<DynamicEmitter>();
             if (emitter == null) emitter = app.GetRegisteredDynamicEmitter();
-
-            return emitter.GetManagedDynamicProxy(serviceTypeInfo, injectionTypeInfo);
+			return emitter.GetManagedDynamicProxy(serviceTypeInfo);
         }
 
 		internal static TService CreateProxy<TService, TInjection>(this Application app) where TService : class where TInjection : TService
@@ -49,13 +48,16 @@ namespace Compose
 
         internal static TService CreateProxy<TService>(this Application app, TypeInfo injectionTypeInfo) where TService : class
         {
-			var serviceType = typeof(TService).GetTypeInfo();
-            var proxyType = app.CreateProxy(serviceType, injectionTypeInfo);
-			if (!proxyType.IsGenericType) return (TService)Activator.CreateInstance(proxyType.AsType(), app.GetRequiredService<TService>());
+			var serviceType = typeof(TService);
+			var serviceTypeInfo = serviceType.GetTypeInfo();
+			var injectionType = injectionTypeInfo.AsType();
+            var proxyType = app.CreateProxy(serviceTypeInfo);
+			var managerType = typeof(DynamicManager<,>).MakeGenericType(serviceType, injectionType);
+			var manager = Activator.CreateInstance(managerType, app.GetRequiredService<TService>());
+			if (!proxyType.GetTypeInfo().IsGenericType) return (TService)Activator.CreateInstance(proxyType, manager);
 
-			var constructedProxy = proxyType.MakeGenericType(serviceType.GenericTypeArguments);
-			var proxy = (ITransition<TService>)Activator.CreateInstance(constructedProxy, app.GetRequiredService<TService>());
-			return (TService)proxy;
+			var constructedProxyType = proxyType.MakeGenericType(serviceTypeInfo.GenericTypeArguments);
+			return (TService)Activator.CreateInstance(constructedProxyType, manager);
         }
 
         private static DynamicEmitter GetRegisteredDynamicEmitter(this Application app)

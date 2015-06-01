@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Compose
 {
-	internal class DynamicManager<TInterface, TOriginal> : IDynamicRegister<TInterface>, ITransitionManager<TInterface> 
+	internal sealed class DynamicManager<TInterface, TOriginal> : IDynamicRegister<TInterface>, ITransitionManager<TInterface> 
 		where TInterface : class where TOriginal : TInterface
 	{
 		private static List<DynamicManager<TInterface, TOriginal>> Managers 
@@ -12,7 +12,7 @@ namespace Compose
 
 		private static TypeInfo Disposable = typeof(IDisposable).GetTypeInfo();
 
-		public TInterface CurrentService { get; set; }
+		public TInterface CurrentService { get; private set; }
 		private TInterface SnapshotService { get; set; }
 		private WeakReference<TInterface> DynamicProxy { get; set; }
 

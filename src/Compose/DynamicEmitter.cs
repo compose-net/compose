@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
+using System.Security;
 
 namespace Compose
 {
@@ -18,7 +23,7 @@ namespace Compose
 			_moduleBuilder = CreateModuleBuilder();
 		}
 
-		internal TypeInfo GetManagedDynamicProxy(TypeInfo serviceTypeInfo, TypeInfo injectionTypeInfo)
+		internal Type GetManagedDynamicProxy(TypeInfo serviceTypeInfo)
 		{
 			var serviceType = serviceTypeInfo.AsType();
             ValidateProxyIsPossible(serviceTypeInfo);
@@ -34,15 +39,22 @@ namespace Compose
 				typeBuilder.AddInterfaceImplementation(implementedInterface);
 			if (serviceTypeInfo.IsGenericType)
 				typeBuilder.AddGenericsFrom(serviceTypeInfo);
-			typeBuilder.AddInterfaceImplementation(typeof(ITransition<>).MakeGenericType(serviceType));
 			try
 			{
-				typeBuilder.AddDirectImplementation(serviceTypeInfo, injectionTypeInfo);
-				return typeBuilder.CreateTypeInfo();
+				var managerTypeInfo = typeof(IDynamicRegister<>).MakeGenericType(serviceType).GetTypeInfo();
+                typeBuilder.AddDirectImplementation(serviceTypeInfo, managerTypeInfo);
+
+#if DEBUG && !DNXCORE
+				var dynamicType = typeBuilder.CreateType();
+                //_assemblyBuilder.Save($"{_assemblyName.Name}.dll");
+				return dynamicType;
+#else
+				return typeBuilder.CreateTypeInfo().AsType();
+#endif
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
-				throw new UnsupportedTypeDefintionException(serviceType, ex);
+				throw new UnsupportedTypeDefinitionException(serviceType, ex);
 			}
 		}
 
@@ -65,13 +77,26 @@ namespace Compose
 
 		private AssemblyName CreateAssemblyName()
 		{
-			var my = GetType();
-			return new AssemblyName($"{my.Namespace}.{my.Name}_{Guid.NewGuid().ToString()}");
+			//var my = GetType();
+			//return new AssemblyName($"{my.Namespace}.{my.Name}_{Guid.NewGuid().ToString()}");
+			return new AssemblyName("Compose.DynamicProxies");
 		}
 
 		private AssemblyBuilder CreateAssemblyBuilder()
 		{
-			return AssemblyBuilder.DefineDynamicAssembly(_assemblyName, AssemblyBuilderAccess.Run);
+			var attributes = new List<CustomAttributeBuilder>(7);
+			attributes.Add(new CustomAttributeBuilder(typeof(AssemblyTitleAttribute).GetConstructors().Single(), new object[] { "Compose.DynamicProxies" }));
+			attributes.Add(new CustomAttributeBuilder(typeof(AssemblyCompanyAttribute).GetConstructors().Single(), new object[] { "Devbot.Net" }));
+			attributes.Add(new CustomAttributeBuilder(typeof(AssemblyProductAttribute).GetConstructors().Single(), new object[] { "Compose.DynamicProxies" }));
+			attributes.Add(new CustomAttributeBuilder(typeof(AssemblyCopyrightAttribute).GetConstructors().Single(), new object[] { $"Devbot.Net {DateTime.Now.Year}" }));
+			attributes.Add(new CustomAttributeBuilder(typeof(ComVisibleAttribute).GetConstructors().Single(), new object[] { false }));
+			attributes.Add(new CustomAttributeBuilder(typeof(TargetFrameworkAttribute).GetConstructors().Single(), new object[] { ".NETFramework,Version=v4.5" }));
+#if DEBUG && !DNXCORE
+			attributes.Add(new CustomAttributeBuilder(typeof(DebuggableAttribute).GetConstructor(new[] { typeof(DebuggableAttribute.DebuggingModes) }), new object[] { DebuggableAttribute.DebuggingModes.Default | DebuggableAttribute.DebuggingModes.DisableOptimizations | DebuggableAttribute.DebuggingModes.IgnoreSymbolStoreSequencePoints | DebuggableAttribute.DebuggingModes.EnableEditAndContinue }));
+            return AppDomain.CurrentDomain.DefineDynamicAssembly(_assemblyName, AssemblyBuilderAccess.RunAndSave, attributes, SecurityContextSource.CurrentAppDomain);
+#else
+			return AssemblyBuilder.DefineDynamicAssembly(_assemblyName, AssemblyBuilderAccess.Run, attributes);
+#endif
 		}
 
 		private ModuleBuilder CreateModuleBuilder()

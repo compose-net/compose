@@ -10,7 +10,7 @@ namespace Compose.Tests
 	{
 		#region CanGenerateDynamicProxy
 		public interface IBlank { }
-		private class Dependency : IBlank { }
+		internal class Dependency : IBlank { }
 		[Fact]
 		public void CanGenerateDynamicProxy()
 		{
@@ -20,7 +20,7 @@ namespace Compose.Tests
 
 		#region CanGetProperty
 		public interface IGetProperty { string Property { get; } }
-		private class GetProperty : IGetProperty
+		internal class GetProperty : IGetProperty
 		{
 			internal static string Id { get; set; }
 			public string Property { get { return Id; } }
@@ -34,7 +34,7 @@ namespace Compose.Tests
 
 		#region CanSetProperty
 		public interface ISetProperty { string Property { set; } }
-		private class SetProperty : ISetProperty
+		internal class SetProperty : ISetProperty
 		{
 			internal static string Id { get; set; }
 			public string Property { set { Id = value; } }
@@ -51,7 +51,7 @@ namespace Compose.Tests
 
 		#region CanInvokeVoidWithoutArguments
 		public interface IInvokeWithoutArguments { void Method(); }
-		private class InvokeWithoutArguments : IInvokeWithoutArguments
+		internal class InvokeWithoutArguments : IInvokeWithoutArguments
 		{
 			internal static bool Invoked { get; set; }
 
@@ -69,7 +69,7 @@ namespace Compose.Tests
 
 		#region CanInvokeVoidWithArguments
 		public interface IInvokeWithArguments { void Method(int arg); }
-		private class InvokeWithArguments : IInvokeWithArguments
+		internal class InvokeWithArguments : IInvokeWithArguments
 		{
 			internal static int Invoked { get; set; }
 			public void Method(int arg) { Invoked = arg; }
@@ -86,7 +86,7 @@ namespace Compose.Tests
 
 		#region CanReturnInvocationResult
 		public interface IReturnFromInvoke { int Method(); }
-		private class ReturnFromInvoke : IReturnFromInvoke
+		internal class ReturnFromInvoke : IReturnFromInvoke
 		{
 			internal static int Return { get; set; }
 			public int Method() { return Return; }
@@ -103,7 +103,7 @@ namespace Compose.Tests
 		#region CanPassThroughExceptions
 		public interface IThrowException { void Method(); }
 		public class TestException : Exception { }
-		private class ThrowException : IThrowException
+		internal class ThrowException : IThrowException
 		{
 			public void Method() { throw new TestException(); }
 		}
@@ -117,12 +117,12 @@ namespace Compose.Tests
 
 		#region CanChangeImplementation
 		public interface IDependency { string GetId(); }
-		private class Dependency1 : IDependency
+		internal class Dependency1 : IDependency
 		{
 			internal static string Id { get; set; }
 			public string GetId() { return Id; }
 		}
-		private class Dependency2 : IDependency
+		internal class Dependency2 : IDependency
 		{
 			internal static string Id { get; set; }
 			public string GetId() { return Id; }
@@ -143,7 +143,7 @@ namespace Compose.Tests
 
 		#region CanInvokeVoidWithGenericArguments
 		public interface IInvokeWithGenericArguments { void Method<T1, T2, T3>(T1 a, T2 b, T3 c); }
-		private class InvokeWithGenericArguments : IInvokeWithGenericArguments
+		internal class InvokeWithGenericArguments : IInvokeWithGenericArguments
 		{
 			public void Method<T1, T2, T3>(T1 a, T2 b, T3 c) { }
 		}
@@ -158,7 +158,7 @@ namespace Compose.Tests
 		#region CanReturnGenericInvocationResult
 		public interface IReturnGenericFromInvoke { T Method<T>(T arg); }
 
-		private class ReturnGenericFromInvoke : IReturnGenericFromInvoke
+		internal class ReturnGenericFromInvoke : IReturnGenericFromInvoke
 		{
 			public T Method<T>(T arg) { return arg; }
 		}
@@ -174,7 +174,7 @@ namespace Compose.Tests
 		#region CanGenerateProxyWithInterfaceConstrainedGenericArguments
 		public interface IInterfaceConstraint { }
 		public interface IInterfaceConstrainedGenericArgument<T> where T : IInterfaceConstraint { }
-		private class InterfaceConstrainedGenericArgument<T> : IInterfaceConstrainedGenericArgument<T> where T : IInterfaceConstraint { }
+		internal class InterfaceConstrainedGenericArgument<T> : IInterfaceConstrainedGenericArgument<T> where T : IInterfaceConstraint { }
 		[Fact]
 		public void CanGenerateProxyWithInterfaceConstrainedGenericArguments()
 		{
@@ -184,7 +184,7 @@ namespace Compose.Tests
 
 		#region CanGenerateProxyWithBaseClassConstrainedGenericArguments
 		public interface IInterfaceWithBaseClassConstrainedGenericArgument<T> where T : Base { }
-		private class InterfaceWithBaseClassConstrainedGenericArgument<T> : IInterfaceWithBaseClassConstrainedGenericArgument<T> where T : Derivative { }
+		internal class InterfaceWithBaseClassConstrainedGenericArgument<T> : IInterfaceWithBaseClassConstrainedGenericArgument<T> where T : Derivative { }
 		[Fact]
 		public void CanGenerateProxyWithBaseClassConstrainedGenericArguments()
 		{
@@ -194,7 +194,7 @@ namespace Compose.Tests
 
 		#region CanGenerateProxyWithDefaultConstructorConstrainedGenericArguments
 		public interface IInterfaceWithDefaultConstructorConstrainedGenericArgument<T> where T : new() { }
-		private class InterfaceWithDefaultConstructorConstrainedGenericArgument<T> : IInterfaceWithDefaultConstructorConstrainedGenericArgument<T> where T : new() { }
+		internal class InterfaceWithDefaultConstructorConstrainedGenericArgument<T> : IInterfaceWithDefaultConstructorConstrainedGenericArgument<T> where T : new() { }
 		[Fact]
 		public void CanGenerateProxyWithDefaultConstructorConstrainedGenericArguments()
 		{
@@ -204,7 +204,7 @@ namespace Compose.Tests
 
 		#region CanGenerateProxyWithClassConstrainedGenericArguments
 		public interface IInterfaceWithClassConstrainedGenericArgument<T> where T : class { }
-		private class InterfaceWithClassConstrainedGenericArgument<T> : IInterfaceWithClassConstrainedGenericArgument<T> where T : class { }
+		internal class InterfaceWithClassConstrainedGenericArgument<T> : IInterfaceWithClassConstrainedGenericArgument<T> where T : class { }
         [Fact]
 		public void CanGenerateProxyWithClassConstrainedGenericArguments()
 		{
@@ -214,7 +214,7 @@ namespace Compose.Tests
 
 		#region CanGenerateProxyWithStructConstrainedGenericArguments
 		public interface IInterfaceWithStructConstrainedGenericArgument<T> where T : struct { }
-		private class InterfaceWithStructConstrainedGenericArgument<T> : IInterfaceWithStructConstrainedGenericArgument<T> where T : struct { }
+		internal class InterfaceWithStructConstrainedGenericArgument<T> : IInterfaceWithStructConstrainedGenericArgument<T> where T : struct { }
 		[Fact]
 		public void CanGenerateProxyWithStructConstrainedGenericArguments()
 		{
@@ -224,7 +224,7 @@ namespace Compose.Tests
 
 		#region CanGenerateProxyWithCovariantConstrainedGenericsArguments
 		public interface IInterfaceWithCovariantConstrainedGenericArguments<in TIn, out TOut> { }
-		private class InterfaceWithCovariantConstrainedGenericArguments<TIn, TOut> : IInterfaceWithCovariantConstrainedGenericArguments<TIn, TOut> { }
+		internal class InterfaceWithCovariantConstrainedGenericArguments<TIn, TOut> : IInterfaceWithCovariantConstrainedGenericArguments<TIn, TOut> { }
 		[Fact]
 		public void CanGenerateProxyWithCovariantConstrainedGenericsArguments()
 		{
@@ -235,7 +235,7 @@ namespace Compose.Tests
 		#region CanInvokeVoidWithInterfaceConstrainedGenericArguments
 		public interface IInvokeWithInterfaceConstrainedGenericArguments { void Method<T>(T arg) where T : IDependency; }
 
-		private class InvokeWithInterfaceConstrainedGenericArguments : IInvokeWithInterfaceConstrainedGenericArguments
+		internal class InvokeWithInterfaceConstrainedGenericArguments : IInvokeWithInterfaceConstrainedGenericArguments
 		{
 			public void Method<T>(T arg) where T : IDependency { }
 		}
@@ -249,7 +249,7 @@ namespace Compose.Tests
 
 		#region CanInvokeVoidWithBaseClassConstrainedGenericArguments
 		public interface IInvokeWithBaseClassConstrainedGenericArguments { void Method<T>(T arg) where T : Base; }
-		private class InvokeWithBaseClassConstrainedGenericArguments : IInvokeWithBaseClassConstrainedGenericArguments
+		internal class InvokeWithBaseClassConstrainedGenericArguments : IInvokeWithBaseClassConstrainedGenericArguments
 		{
 			public void Method<T>(T arg) where T : Base { }
 		}
@@ -263,7 +263,7 @@ namespace Compose.Tests
 
 		#region CanInvokeWithDefaultConstructorConstrainedGenericArgument
 		public interface IInvokeWithDefaultConstructorConstrainedGenericArguments { void Method<T>(T arg) where T : new(); }
-		private class InvokeWithDefaultConstructorConstrainedGenericArguments : IInvokeWithDefaultConstructorConstrainedGenericArguments
+		internal class InvokeWithDefaultConstructorConstrainedGenericArguments : IInvokeWithDefaultConstructorConstrainedGenericArguments
 		{
 			public void Method<T>(T arg) where T : new() { }
 		}
@@ -277,7 +277,7 @@ namespace Compose.Tests
 
 		#region CanInvokeWithClassConstrainedGenericArgument
 		public interface IInvokeWithClassConstrainedGenericArguments { void Method<T>(T arg) where T : class; }
-		private class InvokeWithClassConstrainedGenericArguments : IInvokeWithClassConstrainedGenericArguments
+		internal class InvokeWithClassConstrainedGenericArguments : IInvokeWithClassConstrainedGenericArguments
 		{
 			public void Method<T>(T arg) where T : class { }
 		}
@@ -291,7 +291,7 @@ namespace Compose.Tests
 
 		#region CanInvokeWithStructConstrainedGenericArgument
 		public interface IInvokeWithStructConstrainedGenericArguments { void Method<T>(T arg) where T : struct; }
-		private class InvokeWithStructConstrainedGenericArguments : IInvokeWithStructConstrainedGenericArguments
+		internal class InvokeWithStructConstrainedGenericArguments : IInvokeWithStructConstrainedGenericArguments
 		{
 			public void Method<T>(T arg) where T : struct { }
 		}
@@ -305,7 +305,7 @@ namespace Compose.Tests
 
 		#region CanInvokeWithClassGenericConstrainedGenericArguments
 		public interface IInvokeWithClassGenericConstrainedGenericArguments<TBase> { void Method<TDerivative>(TDerivative derivative) where TDerivative : TBase; }
-		private class InvokeWithClassGenericConstrainedGenericArguments<TBase> : IInvokeWithClassGenericConstrainedGenericArguments<TBase>
+		internal class InvokeWithClassGenericConstrainedGenericArguments<TBase> : IInvokeWithClassGenericConstrainedGenericArguments<TBase>
 		{
 			public void Method<TDerivative>(TDerivative derivative) where TDerivative : TBase { }
 		}
@@ -319,7 +319,7 @@ namespace Compose.Tests
 
 		#region CanInvokeWithMethodGenericConstrainedGenericArguments
 		public interface IInvokeWithMethodGenericConstrainedGenericArguments { void Method<TBase, TDerivative>(TBase arg1, TDerivative arg2) where TDerivative : TBase; }
-		private class InvokeWithMethodGenericConstrainedGenericArguments : IInvokeWithMethodGenericConstrainedGenericArguments
+		internal class InvokeWithMethodGenericConstrainedGenericArguments : IInvokeWithMethodGenericConstrainedGenericArguments
 		{
 			public void Method<TBase, TDerivative>(TBase arg1, TDerivative arg2) where TDerivative : TBase { }
 		}
@@ -337,13 +337,13 @@ namespace Compose.Tests
 			void Method<TMethodBase, TMethodDerivative>(ref TMethodBase arg1, out TMethodDerivative arg2, params TMethodDerivative[] arg3)
 				where TMethodBase : TClass where TMethodDerivative : class, TMethodBase, IDisposable, new();
 		}
-		private class InvokeWithAllGenericConstraints<TClass> : IInvokeWithAllGenericConstraints<TClass>
+		internal class InvokeWithAllGenericConstraints<TClass> : IInvokeWithAllGenericConstraints<TClass>
 		{
 			public void Method<TMethodBase, TMethodDerivative>(ref TMethodBase arg1, out TMethodDerivative arg2, params TMethodDerivative[] arg3)
 				where TMethodBase : TClass where TMethodDerivative : class, TMethodBase, IDisposable, new()
 			{ arg2 = new TMethodDerivative(); }
 		}
-		private class LowerDerivative : Derivative, IDisposable { public void Dispose() { } }
+		internal class LowerDerivative : Derivative, IDisposable { public void Dispose() { } }
 		[Fact]
 		public void CanInvokeWithAllGenericConstraints()
 		{
@@ -360,7 +360,7 @@ namespace Compose.Tests
 			void Method(int arg);
 			void Method(string arg);
 		}
-		private class InvokeOverloadedMethods : IInvokeOverloadedMethods
+		internal class InvokeOverloadedMethods : IInvokeOverloadedMethods
 		{
 			public void Method(int arg) { }
 			public void Method(string arg) { }
@@ -376,7 +376,7 @@ namespace Compose.Tests
 
 		#region CanInvokeWithNestedGenericArgument
 		public interface IInvokeWithNestedGenericArgument { void Method<T>(List<List<T>> arg); }
-		private class InvokeWithNestedGenericArgument : IInvokeWithNestedGenericArgument
+		internal class InvokeWithNestedGenericArgument : IInvokeWithNestedGenericArgument
 		{
 			public void Method<T>(List<List<T>> arg) { }
 		}
@@ -390,7 +390,7 @@ namespace Compose.Tests
 
 		#region CanInvokeWithClassDefinedGenericArgument
 		public interface IInvokeWithClassDefinedGenericArgument<T> { void Method(T arg); }
-		private class InvokeWithClassDefinedGenericArgument<T> : IInvokeWithClassDefinedGenericArgument<T>
+		internal class InvokeWithClassDefinedGenericArgument<T> : IInvokeWithClassDefinedGenericArgument<T>
 		{
 			public void Method(T arg) { }
 		}
@@ -404,7 +404,7 @@ namespace Compose.Tests
 
 		#region CanInvokeWithByRefArguments
 		public interface IInvokeWithByRefArgument { void Method(ref int arg); }
-		private class InvokeWithByRefArgument : IInvokeWithByRefArgument
+		internal class InvokeWithByRefArgument : IInvokeWithByRefArgument
 		{
 			public void Method(ref int arg) { }
 		}
@@ -419,7 +419,7 @@ namespace Compose.Tests
 
 		#region CanInvokeWithOutArguments
 		public interface IInvokeWithOutArguments { void Method(out int arg); }
-		private class InvokeWithOutArguments : IInvokeWithOutArguments
+		internal class InvokeWithOutArguments : IInvokeWithOutArguments
 		{
 			public void Method(out int arg) { arg = 4; }
 		}
@@ -434,7 +434,7 @@ namespace Compose.Tests
 
 		#region CanInvokeWithParamsArguments
 		public interface IInvokeWithParamsArguments { void Method<T>(params T[] arg); }
-		private class InvokeWithParamsArguments : IInvokeWithParamsArguments
+		internal class InvokeWithParamsArguments : IInvokeWithParamsArguments
 		{
 			public void Method<T>(params T[] arg) { }
 		}
@@ -449,7 +449,7 @@ namespace Compose.Tests
 		#region CanInvokeInheritedInterfaceMethods
 		public interface INestedInterface { void NestedMethod(); }
 		public interface IParentInterface : INestedInterface { void ParentMethod(); }
-		private class InvokeInheritedInterfaceMethods : IParentInterface
+		internal class InvokeInheritedInterfaceMethods : IParentInterface
 		{
 			public void NestedMethod() { }
 
@@ -468,7 +468,7 @@ namespace Compose.Tests
 		public interface IExplicitInterface1 { void Method(); }
 		public interface IExplicitInterface2 { void Method(); }
 		public interface IInvokeInheritedInterfaceExplcitlyImplementedMethods : IExplicitInterface1, IExplicitInterface2 { }
-		private class InvokeInheritedInterfaceExplcitlyImplementedMethods : IInvokeInheritedInterfaceExplcitlyImplementedMethods
+		internal class InvokeInheritedInterfaceExplcitlyImplementedMethods : IInvokeInheritedInterfaceExplcitlyImplementedMethods
 		{
 			void IExplicitInterface1.Method() { }
 			void IExplicitInterface2.Method() { }
@@ -484,7 +484,7 @@ namespace Compose.Tests
 
 		#region CanGenerateCovariantProxies
 		public interface ICovariant<out T> { T Method(); }
-		private class Covariant : ICovariant<string>
+		internal class Covariant : ICovariant<string>
 		{
 			public string Method() { return null; }
 		}
@@ -496,7 +496,7 @@ namespace Compose.Tests
 		#endregion
 
 		#region CanGenerateProxyForSystemInterfaces
-		private class Disposable : IDisposable
+		internal class Disposable : IDisposable
 		{
 			public void Dispose() { }
 		}
@@ -509,7 +509,7 @@ namespace Compose.Tests
 
 		#region CanGenerateProxyForUntypedGenerics
 		public interface IUntypedGeneric<T> { void Method(); }
-		private class UntypedGeneric<T> : IUntypedGeneric<T>
+		internal class UntypedGeneric<T> : IUntypedGeneric<T>
 		{
 			public void Method() { }
 		}
@@ -522,7 +522,7 @@ namespace Compose.Tests
 
 		#region CanThrowInformativeExceptionWhenInterfaceIsInternal
 		internal interface IInformativeExceptionThrownForInternalInterface { }
-		private class InformativeExceptionThrownForInternalInterface : IInformativeExceptionThrownForInternalInterface { }
+		internal class InformativeExceptionThrownForInternalInterface : IInformativeExceptionThrownForInternalInterface { }
 		[Fact]
 		public void CanThrowInformativeExceptionWhenInterfaceIsInternal()
 		{
@@ -536,8 +536,8 @@ namespace Compose.Tests
 
 		#region CanThrowInformativeExceptionWhenGenericTypeIsInternal
 		public interface IInformativeExceptionThrownForInternalGeneric<T> { }
-		private class InformativeExceptionThrownForInternalInterfaceGeneric { }
-		private class InformativeExceptionThrownForInternalGeneric 
+		internal class InformativeExceptionThrownForInternalInterfaceGeneric { }
+		internal class InformativeExceptionThrownForInternalGeneric 
 			: IInformativeExceptionThrownForInternalGeneric<InformativeExceptionThrownForInternalInterfaceGeneric> { }
 		[Fact]
 		public void CanThrowInformativeExceptionWhenGenericTypeIsInternal()
@@ -551,7 +551,7 @@ namespace Compose.Tests
 
 		#region CanGenerateGenericProxy
 		public interface IGeneric<T> { }
-		private class Generic<T> : IGeneric<T> { }
+		internal class Generic<T> : IGeneric<T> { }
 		[Fact]
 		public void CanGenerateGenericProxy()
 		{
@@ -572,7 +572,7 @@ namespace Compose.Tests
 		{
 			var app = new Fake.Application();
 			app.UseServices(services => services.AddTransient(interfaceType, implementationType));
-			return () => app.CreateProxy(interfaceType.GetTypeInfo(), implementationType.GetTypeInfo());
+			return () => app.CreateProxy(interfaceType.GetTypeInfo());
 		}
 
 		private static Action InvokeProxy<TInterface, TImplementation>()
@@ -606,13 +606,13 @@ namespace Compose.Tests
 		{
 			var app = new Fake.Application();
 			app.UseServices(services => services.AddTransient(interfaceType, implementationType));
-			return app.CreateProxy<T>;
+			return () => app.CreateProxy<T>(implementationType.GetTypeInfo());
 		}
 
 		#region Common Classes
 		public abstract class Base { }
 
-		private class Derivative : Base { }
+		internal class Derivative : Base { }
 		#endregion
 	}
 }

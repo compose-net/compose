@@ -17,7 +17,7 @@ namespace Compose
 			=> services.AddTransient<TransitionMarker>();
 
 		public static IServiceCollection WithTransitional(this IServiceCollection services, Type serviceType)
-			=> services.AddTransient(typeof(TransitionMarker<>).MakeGenericType(new[] { serviceType }));
+			=> services.AddTransient(typeof(TransitionMarker<>).MakeGenericType(serviceType));
 
 		public static IServiceCollection WithTransitional<TService>(this IServiceCollection services)
 			=> services.AddTransient<TransitionMarker<TService>>();

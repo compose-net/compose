@@ -230,7 +230,7 @@ namespace Compose.Tests
 			});
 			app.OnExecute(() =>
 			{
-				Assert.True(app.Transition<IDependency, OtherDependency>());
+				Assert.Null(Record.Exception(() => app.Transition<IDependency, OtherDependency>()));
 			});
 		}
 
@@ -238,19 +238,19 @@ namespace Compose.Tests
 
 		public interface IDependency { Type Id { get; } }
 
-		private class Dependency : IDependency { public Type Id { get; private set; } = Type.Dependency; }
+		internal class Dependency : IDependency { public Type Id { get; private set; } = Type.Dependency; }
 
 		public interface IOtherDependency : IDependency { }
 
-		private class OtherDependency : IOtherDependency { public Type Id { get; private set; } = Type.OtherDependency; }
+		internal class OtherDependency : IOtherDependency { public Type Id { get; private set; } = Type.OtherDependency; }
 
 		public interface IGenericDependency<T> { Type Id { get; } }
 
-		private class GenericDependency<T> : IGenericDependency<T> { public Type Id { get; private set; } = Type.GenericDependency; }
+		internal class GenericDependency<T> : IGenericDependency<T> { public Type Id { get; private set; } = Type.GenericDependency; }
 
 		public interface IConsumer { Type DependencyId { get; } }
 
-		private class Consumer : IConsumer
+		internal class Consumer : IConsumer
 		{
 			private readonly IDependency _dependency;
 

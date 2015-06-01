@@ -4,8 +4,6 @@ namespace Compose
 {
     public interface ITransitionManager<T>
     {
-		T CurrentService { get; }
-
 		void Snapshot();
 
 		void Restore();

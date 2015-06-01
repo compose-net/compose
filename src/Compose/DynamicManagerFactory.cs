@@ -8,12 +8,12 @@ namespace Compose
 
 		internal static Type ForType(Type serviceType, Type implementationType)
 		{
-			return DynamicManagerType.MakeGenericType(new[] { serviceType, implementationType });
+			return DynamicManagerType.MakeGenericType(serviceType, implementationType);
 		}
 
 		internal static object ForInstance(Type serviceType, object implementationInstance)
 		{
-			return Activator.CreateInstance(DynamicManagerType.MakeGenericType(new[] { serviceType, implementationInstance.GetType() }), implementationInstance);
+			return Activator.CreateInstance(DynamicManagerType.MakeGenericType(serviceType, implementationInstance.GetType()), implementationInstance);
 		}
 
 		internal static Func<IServiceProvider, object> ForFactory(Func<IServiceProvider, object> implementationFactory, Type dynamicManagerType, Type dynamicProxyType)
