@@ -25,9 +25,10 @@ namespace Compose
 #if DEBUG
 				.ToList();
 #endif
-			if (transitionalServices.Any())
-				services.AddSingleton(typeof(IDynamicManagerContainer<,>), typeof(SyncLockDynamicManagerContainer<,>));
-			foreach (var transitionalService in transitionalServices)
+			if (!transitionalServices.Any()) return;
+			services.AddSingleton(typeof(IDynamicManagerContainer<,>), typeof(SyncLockDynamicManagerContainer<,>));
+			services.AddSingleton<ITransitionManagerContainer, ConcurrentTransitionManagerContainer>();
+            foreach (var transitionalService in transitionalServices)
 				services.ApplyTransition(app, transitionalService);
 		}
 

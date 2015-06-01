@@ -24,9 +24,5 @@ namespace Compose
             Provider.Extend(new ServiceDescriptor(serviceType, serviceType, ServiceLifetime.Transient));
             return Provider.GetRequiredService<T>();
         }
-
-		internal void CreateSnapshot() { Provider?.Snapshot(); }
-
-		internal void RestoreSnapshot() { Provider?.Restore(); }
     }
 }

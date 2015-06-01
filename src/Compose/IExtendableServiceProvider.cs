@@ -6,7 +6,5 @@ namespace Compose
 	internal interface IExtendableServiceProvider : IServiceProvider
 	{
 		void Extend(ServiceDescriptor service);
-		void Snapshot();
-		void Restore();
 	}
 }

@@ -10,7 +10,6 @@ namespace Compose
 		private readonly IServiceCollection _services;
 		private SingletonRegister _singletons;
 		private IServiceProvider _fallback;
-		private IServiceProvider _snapshot;
 
 		public WrappedServiceProvider(IServiceCollection services)
 		{
@@ -46,16 +45,6 @@ namespace Compose
 			if (_singletons.CanResolveSingleton(serviceType)) return;
 			_services.AddSingleton(serviceType);
 			_fallback = _services.BuildServiceProvider();
-		}
-
-		public void Snapshot()
-		{
-			_snapshot = _services.BuildServiceProvider();
-		}
-
-		public void Restore()
-		{
-			_fallback = _snapshot ?? _fallback;
 		}
 	}
 }

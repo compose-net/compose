@@ -9,13 +9,14 @@ namespace Compose
 	{
 		private readonly IDynamicManagerContainer<TInterface, TOriginal> _container;
 
-		public TInterface CurrentService { get; internal set; }
-		internal TInterface SnapshotService { get; set; }
+		public TInterface CurrentService { get; set; }
+		public TInterface SnapshotService { get; set; }
 		private WeakReference<TInterface> DynamicProxy { get; set; }
 
-		public DynamicManager(IDynamicManagerContainer<TInterface, TOriginal> container, TOriginal original)
+		public DynamicManager(IDynamicManagerContainer<TInterface, TOriginal> dynamicContainer, ITransitionManagerContainer transitionContainer, TOriginal original)
 		{
-			_container = container;
+			_container = dynamicContainer;
+			transitionContainer.Add(this);
 			CurrentService = original;
 			SnapshotService = original;
 			_container.Add(this);
@@ -38,16 +39,6 @@ namespace Compose
 		public void Change(Func<TInterface> service)
 		{
 			_container.Change(service);
-		}
-
-		public void Snapshot()
-		{
-			_container.Snapshot();
-		}
-
-		public void Restore()
-		{
-			_container.Restore();
 		}
 	}
 }

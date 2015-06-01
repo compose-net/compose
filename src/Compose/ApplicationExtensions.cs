@@ -65,9 +65,15 @@ namespace Compose
 
 		#region Snapshotting
 
-		public static void Snapshot(this Application app) { app.CreateSnapshot(); }
+		public static void Snapshot(this Application app)
+		{
+			app.HostingServices.GetService<ITransitionManagerContainer>()?.Snapshot();
+		}
 
-		public static void Restore(this Application app) { app.RestoreSnapshot(); }
+		public static void Restore(this Application app)
+		{
+			app.HostingServices.GetService<ITransitionManagerContainer>()?.Restore();
+		}
 
 		#endregion
 	}
