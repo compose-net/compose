@@ -52,12 +52,7 @@ namespace Compose
 			var serviceTypeInfo = serviceType.GetTypeInfo();
 			var injectionType = injectionTypeInfo.AsType();
             var proxyType = app.CreateProxy(serviceTypeInfo);
-			var managerType = typeof(DynamicManager<,>).MakeGenericType(serviceType, injectionType);
-			var manager = Activator.CreateInstance(managerType, app.GetRequiredService<TService>());
-			if (!proxyType.GetTypeInfo().IsGenericType) return (TService)Activator.CreateInstance(proxyType, manager);
-
-			var constructedProxyType = proxyType.MakeGenericType(serviceTypeInfo.GenericTypeArguments);
-			return (TService)Activator.CreateInstance(constructedProxyType, manager);
+			return app.GetRequiredService<TService>();
         }
 
         private static DynamicEmitter GetRegisteredDynamicEmitter(this Application app)
