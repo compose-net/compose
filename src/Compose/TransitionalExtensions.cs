@@ -21,10 +21,7 @@ namespace Compose
 		internal static void ApplyTransitions(this Application app)
 		{
 			var transitionalServices = app.Services
-				.GetTransitionalServices()
-#if DEBUG
-				.ToList();
-#endif
+				.GetTransitionalServices();
 			if (!transitionalServices.Any()) return;
 			app.Services.TryAdd(ServiceDescriptor.Singleton(typeof(IDynamicManagerContainer<,>), typeof(SyncLockDynamicManagerContainer<,>)));
 			app.Services.TryAdd(ServiceDescriptor.Singleton<ITransitionManagerContainer, ConcurrentTransitionManagerContainer>());
