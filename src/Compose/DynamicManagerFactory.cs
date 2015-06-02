@@ -1,24 +1,25 @@
 ﻿using System;
+using System.Reflection;
 
 namespace Compose
 {
     internal static class DynamicManagerFactory
     {
-		private static Type DynamicManagerType = typeof(DynamicManager<,>);
+		private static Type Exposer = typeof(DynamicManagerExposer<,>);
 
-		internal static Type ForType(Type serviceType, Type implementationType)
+		internal static object ForFactory(TypeInfo dynamicManagerTypeInfo, object dynamicContainer, object transitionManager, object abstractFactory)
 		{
-			return DynamicManagerType.MakeGenericType(serviceType, implementationType);
+			return Activator.CreateInstance(Exposer.MakeGenericType(dynamicManagerTypeInfo.GenericTypeArguments),
+				dynamicContainer, transitionManager, abstractFactory
+			);
 		}
 
-		internal static object ForInstance(Type serviceType, object implementationInstance)
+		private class DynamicManagerExposer<TInterface, TOriginal> : DynamicManager<TInterface, TOriginal>
+			where TInterface : class where TOriginal : TInterface
 		{
-			return Activator.CreateInstance(DynamicManagerType.MakeGenericType(serviceType, implementationInstance.GetType()), implementationInstance);
-		}
-
-		internal static Func<IServiceProvider, object> ForFactory(Func<IServiceProvider, object> implementationFactory, Type dynamicManagerType, Type dynamicProxyType)
-		{
-			return new DynamicFactory(implementationFactory, dynamicManagerType, dynamicProxyType).Create;
-		}
+			public DynamicManagerExposer(IDynamicManagerContainer<TInterface, TOriginal> dynamicContainer, ITransitionManagerContainer transitionContainer, IAbstractFactory<TOriginal> factory)
+				: base(dynamicContainer, transitionContainer, (TOriginal)factory.Create())
+			{ }
+        }
     }
 }

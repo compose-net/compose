@@ -11,7 +11,6 @@
 	"dependencies": {
 		"Microsoft.Framework.DependencyInjection": "1.0.0-beta4"
 	},
-
 	"frameworks": {
 		"net45": { },
 		"dnx451": { },

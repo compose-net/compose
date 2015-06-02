@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Compose
 {
-	internal sealed class DynamicManager<TInterface, TOriginal> : IDynamicRegister<TInterface>, ITransitionManager<TInterface> 
+	internal class DynamicManager<TInterface, TOriginal> : IDynamicManager<TInterface, TOriginal>
 		where TInterface : class where TOriginal : TInterface
 	{
 		private readonly IDynamicManagerContainer<TInterface, TOriginal> _container;

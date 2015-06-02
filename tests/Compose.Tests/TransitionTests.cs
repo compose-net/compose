@@ -201,14 +201,14 @@ namespace Compose.Tests
 		}
 
 		[Fact]
-		public void CanTransitionUnresolvedService()
+		public void CanNotTransitionToUnresolvableService()
 		{
 			var app = new Fake.Application();
 			app.UseServices(services => services.AddTransient<IDependency, Dependency>().AsTransitional());
-			app.OnExecute(() =>
+			app.OnExecute<IDependency>(dependency =>
 			{
-				Action act = () => app.Transition<IDependency, OtherDependency>();
-				Assert.Null(Record.Exception(act));
+				Action act = () => app.Transition<IDependency, UnresolvableDependency>();
+				Assert.IsType<InvalidOperationException>(Record.Exception(act));
 			});
 			app.Execute();
 		}
@@ -274,6 +274,13 @@ namespace Compose.Tests
 			}
 
 			public Type DependencyId { get { return _dependency.Id; } }
+		}
+
+		internal class UnresolvableDependency : IDependency
+		{
+			public UnresolvableDependency(IConsumer consumer) { /* don't bind IConsumer */ }
+
+			public Type Id { get; } = Type.OtherDependency;
 		}
 	}
 }

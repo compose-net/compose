@@ -44,35 +44,61 @@ namespace Compose
 
 		private static Type TransitionManager = typeof(ITransitionManager<>);
 		private static Type DynamicRegister = typeof(IDynamicRegister<>);
+		private static Type DynamicContainer = typeof(IDynamicManagerContainer<,>);
+		private static Type FactoryInterface = typeof(IAbstractFactory<>);
+		private static Type FactoryImplementation = typeof(LambdaAbstractFactory<>);
+		private static Type DynamicManagerInterface = typeof(IDynamicManager<,>);
+		private static Type DynamicManagerImplementation = typeof(DynamicManager<,>);
+
 
 		private static void ApplyTypeTransition(this IServiceCollection services, Application app, ServiceDescriptor original)
 		{
 			services.Add(new ServiceDescriptor(original.ImplementationType, original.ImplementationType, original.Lifetime));
-			var dynamicManagerType = DynamicManagerFactory.ForType(original.ServiceType, original.ImplementationType);
-			services.Add(new ServiceDescriptor(dynamicManagerType, dynamicManagerType, original.Lifetime));
-			services.Add(new ServiceDescriptor(TransitionManager.MakeGenericType(original.ServiceType), dynamicManagerType, original.Lifetime));
-			services.Add(new ServiceDescriptor(DynamicRegister.MakeGenericType(original.ServiceType), dynamicManagerType, original.Lifetime));
-			var dynamicProxyType = app.CreateProxy(original.ServiceType.GetTypeInfo());
-			services.Replace(new ServiceDescriptor(original.ServiceType, dynamicProxyType, original.Lifetime));
+			var dynamicManagerInterface = DynamicManagerInterface.MakeGenericType(original.ServiceType, original.ImplementationType);
+			var dynamicManagerImplemenation = DynamicManagerImplementation.MakeGenericType(original.ServiceType, original.ImplementationType);
+			services.Add(new ServiceDescriptor(dynamicManagerInterface, dynamicManagerImplemenation, original.Lifetime));
+			services.ApplyTransition(app, original, dynamicManagerImplemenation);
 		}
 
 		private static void ApplyInstanceTransition(this IServiceCollection services, Application app, ServiceDescriptor original)
 		{
-			var dynamicManager = DynamicManagerFactory.ForInstance(original.ServiceType, original.ImplementationInstance);
-			var dynamicManagerType = dynamicManager.GetType();
-			var dynamicProxyType = app.CreateProxy(original.ServiceType.GetTypeInfo());
-            var dynamicProxy = Activator.CreateInstance(dynamicProxyType, dynamicManager);
-			services.Add(new ServiceDescriptor(TransitionManager.MakeGenericType(original.ServiceType), dynamicManager));
-			services.Replace(new ServiceDescriptor(original.ServiceType, dynamicProxy));
+			var implementationType = original.ImplementationInstance.GetType();
+            services.Add(new ServiceDescriptor(implementationType, original.ImplementationInstance));
+			var dynamicManagerInterface = DynamicManagerInterface.MakeGenericType(original.ServiceType, implementationType);
+			var dynamicManagerImplemenation = DynamicManagerImplementation.MakeGenericType(original.ServiceType, implementationType);
+			services.Add(new ServiceDescriptor(dynamicManagerInterface, dynamicManagerImplemenation, original.Lifetime));
+			services.ApplyTransition(app, original, dynamicManagerImplemenation);
 		}
 
 		private static void ApplyFactoryTransition(this IServiceCollection services, Application app, ServiceDescriptor original)
 		{
-			var dynamicManagerType = DynamicManagerFactory.ForType(original.ServiceType, original.ServiceType);
+			var implementationFactoryInterfaceType = FactoryInterface.MakeGenericType(original.ServiceType);
+			var implementationFactoryImplementationType = FactoryImplementation.MakeGenericType(original.ServiceType);
+			Func<IServiceProvider, object> implementationFactory = 
+				provider => Activator.CreateInstance(implementationFactoryImplementationType, 
+					(Func<object>)(() => original.ImplementationFactory(provider))
+				);
+            services.Add(new ServiceDescriptor(implementationFactoryInterfaceType, implementationFactory, original.Lifetime));
+			var dynamicManagerInterface = DynamicManagerInterface.MakeGenericType(original.ServiceType, original.ServiceType);
+			Func<IServiceProvider, object> dynamicManagerFactory =
+				provider => DynamicManagerFactory.ForFactory(dynamicManagerInterface.GetTypeInfo(),
+                    provider.GetRequiredService(DynamicContainer.MakeGenericType(original.ServiceType, original.ServiceType)),
+					provider.GetRequiredService<ITransitionManagerContainer>(),
+					provider.GetRequiredService(implementationFactoryInterfaceType)
+				);
+			services.Add(new ServiceDescriptor(dynamicManagerInterface, dynamicManagerFactory, original.Lifetime));
+			services.Add(new ServiceDescriptor(TransitionManager.MakeGenericType(original.ServiceType), dynamicManagerFactory, original.Lifetime));
+			services.Add(new ServiceDescriptor(DynamicRegister.MakeGenericType(original.ServiceType), dynamicManagerFactory, original.Lifetime));
 			var dynamicProxyType = app.CreateProxy(original.ServiceType.GetTypeInfo());
-			var dynamicFactory = DynamicManagerFactory.ForFactory(original.ImplementationFactory, dynamicManagerType, dynamicProxyType);
-			// TODO: Work out how to resolve ITransitionManager<original.ServiceType>
-            services.Replace(new ServiceDescriptor(original.ServiceType, dynamicFactory, original.Lifetime));
+			services.Replace(new ServiceDescriptor(original.ServiceType, dynamicProxyType, original.Lifetime));
+		}
+
+		private static void ApplyTransition(this IServiceCollection services, Application app, ServiceDescriptor original, Type dynamicManagerType)
+		{
+			services.Add(new ServiceDescriptor(TransitionManager.MakeGenericType(original.ServiceType), dynamicManagerType, original.Lifetime));
+			services.Add(new ServiceDescriptor(DynamicRegister.MakeGenericType(original.ServiceType), dynamicManagerType, original.Lifetime));
+			var dynamicProxyType = app.CreateProxy(original.ServiceType.GetTypeInfo());
+			services.Replace(new ServiceDescriptor(original.ServiceType, dynamicProxyType, original.Lifetime));
 		}
 
 		private static IEnumerable<ServiceDescriptor> GetTransitionalServices(this IServiceCollection services)
