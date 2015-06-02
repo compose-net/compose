@@ -21,7 +21,7 @@ namespace Compose.Tests
 			var app = new Fake.Application();
 			app.UseServices(services =>
 			{
-				var service = new Dependency();
+				var service = new Service();
 				services.AddInstance<IService1>(service);
 				services.AddInstance<IService2>(service);
 			});
@@ -33,7 +33,7 @@ namespace Compose.Tests
 		public void CanTreatInstancesAsSingletons()
 		{
 			var app = new Fake.Application();
-			var instance = new Dependency();
+			var instance = new Service();
 			app.UseServices(services =>
 			{
 				services.AddInstance<IService1>(instance);
@@ -56,9 +56,43 @@ namespace Compose.Tests
 			Assert.IsType<NotImplementedException>(Record.Exception(act));
 		}
 
+		[Fact]
+		public void CanResolveSingletonsIndirectly()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => services
+				.AddTransient<IConsumer, Consumer>()
+				.AddSingleton<IDependency, Dependency>()
+			);
+			app.OnExecute<IConsumer>(consumer =>
+			{
+				var newConsumer = app.ApplicationServices.GetRequiredService<IConsumer>();
+				Assert.Equal(consumer.Id, newConsumer.Id);
+				Assert.NotEqual(consumer, newConsumer);
+			});
+		}
+
 		private interface IService1 { }
 		private interface IService2 { }
-		private class Dependency : IService1, IService2 { }
+		private class Service : IService1, IService2 { }
+
+		private interface IConsumer { Guid Id { get; } }
+		private class Consumer : IConsumer
+		{
+			private readonly IDependency _dependency;
+			public Consumer(IDependency dependency)
+			{
+				_dependency = dependency;
+			}
+
+			public Guid Id { get { return _dependency.Id; } }
+		}
+
+		private interface IDependency { Guid Id { get; } }
+		private class Dependency : IDependency
+		{
+			public Guid Id { get; } = Guid.NewGuid();
+		}
 
 		private class CustomServiceProvider : IServiceProvider
 		{
