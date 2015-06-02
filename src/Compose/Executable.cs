@@ -108,6 +108,8 @@ namespace Compose
 
 		public void OnExecute<TService>(Func<TService, TContext, TResult> invoke) where TService : class
 		{
+			if (ApplicationServices == null) throw new InvalidOperationException($"{nameof(ApplicationServices)} was not registered; cannot execute action.");
+
 			OnExecute(context => invoke(ApplicationServices.GetRequiredService<TService>(), context));
 		}
 
