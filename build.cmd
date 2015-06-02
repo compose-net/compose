@@ -31,7 +31,7 @@ dnx tests\Compose.Tests\ test
 :artifacts
 IF NOT EXIST artifacts md artifacts
 IF NOT EXIST artifacts\packages md artifacts\packages
-XCOPY src\Compose\bin\Release\*.nupkg artifacts\packages /y
+XCOPY src\artifacts\bin\Compose\Release\*.nupkg artifacts\packages /y
 
 ) else (
 echo Unable to complete. Insufficient privileges.
