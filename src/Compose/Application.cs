@@ -7,26 +7,8 @@ namespace Compose
     {
 		public string Name { get; set; }
 
-		public IServiceProvider HostingServices { get { return Provider; } }
+		public IServiceProvider ApplicationServices { get; set; }
 
-		protected internal T GetRequiredService<T>() where T : class
-		{
-			return Provider.GetService<T>() ?? ResolveSelfBound<T>();
-		}
-
-        internal ServiceCollection Services { get; } = new ServiceCollection();
-
-        internal IExtendableServiceProvider Provider { get; set; }
-
-        internal T ResolveSelfBound<T>()
-        {
-            var serviceType = typeof(T);
-            Provider.Extend(new ServiceDescriptor(serviceType, serviceType, ServiceLifetime.Transient));
-            return Provider.GetRequiredService<T>();
-        }
-
-		internal void CreateSnapshot() { Provider?.Snapshot(); }
-
-		internal void RestoreSnapshot() { Provider?.Restore(); }
+        internal ServiceCollection Services { get; set; }
     }
 }

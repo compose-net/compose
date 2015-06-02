@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Framework.DependencyInjection;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,7 +22,7 @@ namespace Compose
 
 		public void OnExecute<TService>(Action<TService> invoke) where TService : class
 		{
-			OnExecute(() => invoke(GetRequiredService<TService>()));
+			OnExecute(() => invoke(ApplicationServices.GetRequiredService<TService>()));
 		}
 
 		public virtual void Execute()
@@ -56,7 +57,7 @@ namespace Compose
 
 		public void OnExecute<TService>(Func<TService, TResult> invoke) where TService : class
 		{
-			OnExecute(() => invoke(GetRequiredService<TService>()));
+			OnExecute(() => invoke(ApplicationServices.GetRequiredService<TService>()));
 		}
 
 		public virtual TResult Execute()
@@ -81,7 +82,7 @@ namespace Compose
 
 		public void OnExecute<TService>(Func<TService, TContext, TResult> invoke) where TService : class
 		{
-			OnExecute(context => invoke(GetRequiredService<TService>(), context));
+			OnExecute(context => invoke(ApplicationServices.GetRequiredService<TService>(), context));
 		}
 
 		public virtual TResult Execute(TContext context)
