@@ -46,13 +46,26 @@ namespace Compose.Tests
 			app.Execute();
 		}
 
+		[Fact]
+		public void CanUseCustomServiceProvider()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => new CustomServiceProvider());
+			app.OnExecute<IService1>(service => { });
+			Action act = app.Execute;
+			Assert.IsType<NotImplementedException>(Record.Exception(act));
+		}
+
 		private interface IService1 { }
 		private interface IService2 { }
 		private class Dependency : IService1, IService2 { }
-		private class Parent
+
+		private class CustomServiceProvider : IServiceProvider
 		{
-			public IService1 Service { get; private set; }
-			public Parent(IService1 service) { Service = service; }
+			public object GetService(Type serviceType)
+			{
+				throw new NotImplementedException();
+			}
 		}
 	}
 }
