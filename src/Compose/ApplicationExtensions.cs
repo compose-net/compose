@@ -10,19 +10,23 @@ namespace Compose
 
 		public static void UseServices(this Application app, Action<IServiceCollection> configureServices)
 		{
-			app.UseServices(services =>
-			{
-				configureServices(services);
-				if (services.ContainsTransitionMarkers())
-					app.ApplyTransitions(services);
-				return new WrappedServiceProvider(services);
-			});
+			app.Services = new ServiceCollection();
+			configureServices(app.Services);
+			app.Services.TryAdd(ServiceDescriptor.Singleton<DynamicEmitter, DynamicEmitter>());
+			app.ApplicationServices = new WrappedServiceProvider(app.Services);
+			if (app.ContainsTransitionMarkers())
+				app.ApplyTransitions();
+			app.ApplicationServices = new WrappedServiceProvider(app.Services);
 		}
 
-		internal static void UseServices(this Application app, Func<IServiceCollection, IExtendableServiceProvider> configureServices)
+		public static void UseServices(this Application app, Func<IServiceCollection, IServiceProvider> configureServices)
 		{
-			app.Provider = new WrappedServiceProvider(app.Services);
-            app.Provider = configureServices(app.Services);
+			app.Services = new ServiceCollection();
+			app.ApplicationServices = configureServices(app.Services);
+			app.Services.TryAdd(ServiceDescriptor.Singleton<DynamicEmitter, DynamicEmitter>());
+			if (app.ContainsTransitionMarkers())
+				app.ApplyTransitions();
+			app.ApplicationServices = new WrappedServiceProvider(app.ApplicationServices);
 		}
 
 		#endregion
@@ -31,14 +35,14 @@ namespace Compose
 
 		public static void Transition<TService, TImplementation>(this Application app) where TImplementation : class, TService where TService : class
 		{
-			var transitional = app.GetRequiredService<ITransitionManager<TService>>();
+			var transitional = app.ApplicationServices.GetRequiredService<ITransitionManager<TService>>();
 			if (transitional == null) throw new InvalidOperationException($"{typeof(TService).Name} must be registered as a Transitional Service (services.AddTransitional<{typeof(TService).Name}, TImplementation>()");
-			transitional.Change(() => app.GetRequiredService<TImplementation>());
+			transitional.Change(() => app.ApplicationServices.GetRequiredService<TImplementation>());
         }
 
         internal static Type CreateProxy(this Application app, TypeInfo serviceTypeInfo)
         {
-            var emitter = app.HostingServices.GetService<DynamicEmitter>();
+            var emitter = app.ApplicationServices.GetService<DynamicEmitter>();
             if (emitter == null) emitter = app.GetRegisteredDynamicEmitter();
 			return emitter.GetManagedDynamicProxy(serviceTypeInfo);
         }
@@ -52,13 +56,12 @@ namespace Compose
 			var serviceTypeInfo = serviceType.GetTypeInfo();
 			var injectionType = injectionTypeInfo.AsType();
             var proxyType = app.CreateProxy(serviceTypeInfo);
-			return app.GetRequiredService<TService>();
+			return app.ApplicationServices.GetRequiredService<TService>();
         }
 
         private static DynamicEmitter GetRegisteredDynamicEmitter(this Application app)
         {
-            app.Provider.Extend(new ServiceDescriptor(typeof(DynamicEmitter), typeof(DynamicEmitter), ServiceLifetime.Singleton));
-            return app.GetRequiredService<DynamicEmitter>();
+            return app.ApplicationServices.GetRequiredService<DynamicEmitter>();
         }
 
 		#endregion
@@ -67,12 +70,12 @@ namespace Compose
 
 		public static void Snapshot(this Application app)
 		{
-			app.HostingServices.GetService<ITransitionManagerContainer>()?.Snapshot();
+			app.ApplicationServices.GetService<ITransitionManagerContainer>()?.Snapshot();
 		}
 
 		public static void Restore(this Application app)
 		{
-			app.HostingServices.GetService<ITransitionManagerContainer>()?.Restore();
+			app.ApplicationServices.GetService<ITransitionManagerContainer>()?.Restore();
 		}
 
 		#endregion

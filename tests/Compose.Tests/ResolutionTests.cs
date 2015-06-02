@@ -19,7 +19,7 @@ namespace Compose.Tests
 
 			app.UseServices(services => services.Add(ServiceDescriptor.Transient<IDependency, Dependency>()));
 
-			Action act = () => app.GetRequiredService<IDependency2>();
+			Action act = () => app.ApplicationServices.GetRequiredService<IDependency2>();
 			Assert.IsType<InvalidOperationException>(Record.Exception(act));
 		}
 
@@ -38,11 +38,11 @@ namespace Compose.Tests
 				services.AddTransient<IService<int>, Service<int>>();
 			});
 
-			Action act = () => app.GetRequiredService<IService<string>>();
+			Action act = () => app.ApplicationServices.GetRequiredService<IService<string>>();
 			Assert.Null(Record.Exception(act));
-			act = () => app.GetRequiredService<IService<int>>();
+			act = () => app.ApplicationServices.GetRequiredService<IService<int>>();
 			Assert.Null(Record.Exception(act));
-			act = () => app.GetRequiredService<IService<object>>();
+			act = () => app.ApplicationServices.GetRequiredService<IService<object>>();
 			Assert.NotNull(Record.Exception(act));
 		}
 
@@ -57,11 +57,11 @@ namespace Compose.Tests
 				services.AddSingleton<IService<int>, Service<int>>();
 			});
 
-			Action act = () => app.GetRequiredService<IService<string>>();
+			Action act = () => app.ApplicationServices.GetRequiredService<IService<string>>();
 			Assert.Null(Record.Exception(act));
-			act = () => app.GetRequiredService<IService<int>>();
+			act = () => app.ApplicationServices.GetRequiredService<IService<int>>();
 			Assert.Null(Record.Exception(act));
-			act = () => app.GetRequiredService<IService<object>>();
+			act = () => app.ApplicationServices.GetRequiredService<IService<object>>();
 			Assert.NotNull(Record.Exception(act));
 		}
 
@@ -76,9 +76,9 @@ namespace Compose.Tests
 				services.AddTransient<IService<int>, Service<int>>();
 			});
 
-			Action act = () => app.GetRequiredService<IService<string>>();
+			Action act = () => app.ApplicationServices.GetRequiredService<IService<string>>();
 			Assert.Null(Record.Exception(act));
-			act = () => app.GetRequiredService<IService<int>>();
+			act = () => app.ApplicationServices.GetRequiredService<IService<int>>();
 			Assert.Null(Record.Exception(act));
 		}
 
@@ -93,9 +93,9 @@ namespace Compose.Tests
 				services.AddSingleton<IService<int>, Service<int>>();
 			});
 
-			Action act = () => app.GetRequiredService<IService<string>>();
+			Action act = () => app.ApplicationServices.GetRequiredService<IService<string>>();
 			Assert.Null(Record.Exception(act));
-			act = () => app.GetRequiredService<IService<int>>();
+			act = () => app.ApplicationServices.GetRequiredService<IService<int>>();
 			Assert.Null(Record.Exception(act));
 		}
 

@@ -1,27 +1,24 @@
 ﻿using Microsoft.Framework.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Compose
 {
-	internal sealed class WrappedServiceProvider : ISingletonRepositoryServiceProvider
+	internal sealed class WrappedServiceProvider : IServiceProvider
 	{
-		private readonly IServiceCollection _services;
-		private SingletonRegister _singletons;
 		private IServiceProvider _fallback;
 
 		public WrappedServiceProvider(IServiceCollection services)
 		{
 			_fallback = services.BuildServiceProvider();
-			_singletons = services.BuildSingletonRegister();
-			_services = services;
         }
+
+		public WrappedServiceProvider(IServiceProvider fallback)
+		{
+			_fallback = fallback;
+		}
 
 		public object GetService(Type serviceType)
 		{
-			if (_singletons.CanResolveSingleton(serviceType))
-				return _singletons.Resolve(_fallback, serviceType);
 			// exception logic - neccessary evil due to bug in beta 4 MS Provider
 			try
 			{
@@ -32,19 +29,6 @@ namespace Compose
 				if (anex.Message == "Object cannot be null.\r\nParameter name: source") return null;
 				throw;
 			}
-		}
-
-		public void Extend(ServiceDescriptor service)
-		{
-			_services.Add(service);
-			_fallback = _services.BuildServiceProvider();
-		}
-
-		public void AppendSingleton(Type serviceType)
-		{
-			if (_singletons.CanResolveSingleton(serviceType)) return;
-			_services.AddSingleton(serviceType);
-			_fallback = _services.BuildServiceProvider();
 		}
 	}
 }

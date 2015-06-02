@@ -8,9 +8,9 @@ namespace Compose
 {
 	internal static class TransitionalExtensions
 	{
-		internal static bool ContainsTransitionMarkers(this IServiceCollection services)
+		internal static bool ContainsTransitionMarkers(this Application app)
 		{
-			return services.Any(x => x.IsTransitionMarker());
+			return app.Services.Any(x => x.IsTransitionMarker());
 		}
 
 		internal static bool IsTransitionMarker(this ServiceDescriptor descriptor)
@@ -18,18 +18,18 @@ namespace Compose
 			return typeof(TransitionMarker).IsAssignableFrom(descriptor.ImplementationType);
 		}
 
-		internal static void ApplyTransitions(this Application app, IServiceCollection services)
+		internal static void ApplyTransitions(this Application app)
 		{
-			var transitionalServices = services
+			var transitionalServices = app.Services
 				.GetTransitionalServices()
 #if DEBUG
 				.ToList();
 #endif
 			if (!transitionalServices.Any()) return;
-			services.AddSingleton(typeof(IDynamicManagerContainer<,>), typeof(SyncLockDynamicManagerContainer<,>));
-			services.AddSingleton<ITransitionManagerContainer, ConcurrentTransitionManagerContainer>();
+			app.Services.TryAdd(ServiceDescriptor.Singleton(typeof(IDynamicManagerContainer<,>), typeof(SyncLockDynamicManagerContainer<,>)));
+			app.Services.TryAdd(ServiceDescriptor.Singleton<ITransitionManagerContainer, ConcurrentTransitionManagerContainer>());
             foreach (var transitionalService in transitionalServices)
-				services.ApplyTransition(app, transitionalService);
+				app.Services.ApplyTransition(app, transitionalService);
 		}
 
 		private static void ApplyTransition(this IServiceCollection services, Application app, ServiceDescriptor original)

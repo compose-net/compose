@@ -8,34 +8,34 @@ namespace Compose
 	internal sealed class SyncLockDynamicManagerContainer<TInterface, TOriginal> : IDynamicManagerContainer<TInterface, TOriginal>
 		where TInterface : class where TOriginal : TInterface
 	{
-		private readonly List<DynamicManager<TInterface, TOriginal>> Managers
+		private readonly List<DynamicManager<TInterface, TOriginal>> _managers
 			= new List<DynamicManager<TInterface, TOriginal>>();
-		private readonly object SyncLock = new object();
+		private readonly object _sync = new object();
 
 		private static TypeInfo Disposable = typeof(IDisposable).GetTypeInfo();
 
 		public void Add(DynamicManager<TInterface, TOriginal> manager)
 		{
-			lock (SyncLock)
+			lock (_sync)
 			{
-				Managers.Add(manager);
+				_managers.Add(manager);
 			}
 		}
 
 		private IEnumerable<DynamicManager<TInterface, TOriginal>> GetActiveManagers()
 		{
-			var deadReferences = new List<DynamicManager<TInterface, TOriginal>>(Managers.Count);
+			var deadReferences = new List<DynamicManager<TInterface, TOriginal>>(_managers.Count);
 
-			lock (SyncLock)
+			lock (_sync)
 			{
-				foreach (var manager in Managers)
+				foreach (var manager in _managers)
 					if (manager.IsActive)
 						yield return manager;
 					else
 						deadReferences.Add(manager);
 
 				foreach (var deadReference in deadReferences)
-					Managers.Remove(deadReference);
+					_managers.Remove(deadReference);
 			}
 		}
 

@@ -132,10 +132,10 @@ namespace Compose.Tests
 		{
 			var app = new Fake.Application();
 			app.UseServices(services => services.AddTransitional<IDependency, Dependency1>());
-			var service = app.GetRequiredService<IDependency>();
+			var service = app.ApplicationServices.GetRequiredService<IDependency>();
 			Dependency1.Id = Guid.NewGuid().ToString();
 			Assert.Equal(Dependency1.Id, service.GetId());
-			var transition = app.GetRequiredService<ITransitionManager<IDependency>>();
+			var transition = app.ApplicationServices.GetRequiredService<ITransitionManager<IDependency>>();
 			transition.Change(() => new Dependency2());
 			Dependency2.Id = Guid.NewGuid().ToString();
 			Assert.Equal(Dependency2.Id, service.GetId());

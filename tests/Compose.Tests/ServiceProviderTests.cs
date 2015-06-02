@@ -41,7 +41,7 @@ namespace Compose.Tests
 			app.OnExecute<Parent>(parent =>
 			{
 				Assert.Equal(instance, parent.Service);
-				Assert.Equal(instance, app.HostingServices.GetService<IService1>());
+				Assert.Equal(instance, app.ApplicationServices.GetService<IService1>());
 			});
 			app.Execute();
 		}
