@@ -8,9 +8,9 @@ namespace Compose
 {
 	internal static class TransitionalExtensions
 	{
-		internal static bool ContainsTransitionMarkers(this IServiceCollection services)
+		internal static bool ContainsTransitionMarkers(this Application app)
 		{
-			return services.Any(x => x.IsTransitionMarker());
+			return app.Services.Any(x => x.IsTransitionMarker());
 		}
 
 		internal static bool IsTransitionMarker(this ServiceDescriptor descriptor)
@@ -18,42 +18,122 @@ namespace Compose
 			return typeof(TransitionMarker).IsAssignableFrom(descriptor.ImplementationType);
 		}
 
-		internal static bool ContainsTransitions(this ServiceCollection services)
+		internal static void ApplyTransitions(this Application app)
 		{
-			return services.Any(x => x.IsTransition());
+			var transitionalServices = app.Services
+				.GetTransitionalServices()
+#if DEBUG
+				.ToList();
+#endif
+			if (!transitionalServices.Any()) return;
+			app.Services.TryAdd(ServiceDescriptor.Singleton(typeof(IDynamicManagerContainer<,>), typeof(SyncLockDynamicManagerContainer<,>)));
+			app.Services.TryAdd(ServiceDescriptor.Singleton<ITransitionManagerContainer, ConcurrentTransitionManagerContainer>());
+            foreach (var transitionalService in transitionalServices)
+				app.Services.ApplyTransition(app, transitionalService);
 		}
 
-		internal static bool IsTransition(this ServiceDescriptor descriptor)
+		private static void ApplyTransition(this IServiceCollection services, Application app, ServiceDescriptor original)
 		{
-			return typeof(ITransition<>).GetTypeInfo()
-				.IsAssignableFromGeneric(descriptor.ImplementationType.GetTypeInfo()) && descriptor.Lifetime == ServiceLifetime.Singleton;
+			if (original.ImplementationType != null)
+				services.ApplyTypeTransition(app, original);
+			else if (original.ImplementationInstance != null)
+				services.ApplyInstanceTransition(app, original);
+			else if (original.ImplementationFactory != null)
+				services.ApplyFactoryTransition(app, original);
+		}
+
+		private static Type TransitionManager = typeof(ITransitionManager<>);
+		private static Type DynamicRegister = typeof(IDynamicRegister<>);
+		private static Type DynamicContainer = typeof(IDynamicManagerContainer<,>);
+		private static Type FactoryInterface = typeof(IAbstractFactory<>);
+		private static Type FactoryImplementation = typeof(LambdaAbstractFactory<>);
+		private static Type DynamicManagerInterface = typeof(IDynamicManager<,>);
+		private static Type DynamicManagerImplementation = typeof(DynamicManager<,>);
+
+
+		private static void ApplyTypeTransition(this IServiceCollection services, Application app, ServiceDescriptor original)
+		{
+			services.Add(new ServiceDescriptor(original.ImplementationType, original.ImplementationType, original.Lifetime));
+			var dynamicManagerInterface = DynamicManagerInterface.MakeGenericType(original.ServiceType, original.ImplementationType);
+			var dynamicManagerImplemenation = DynamicManagerImplementation.MakeGenericType(original.ServiceType, original.ImplementationType);
+			services.Add(new ServiceDescriptor(dynamicManagerInterface, dynamicManagerImplemenation, original.Lifetime));
+			services.ApplyTransition(app, original, dynamicManagerImplemenation);
+		}
+
+		private static void ApplyInstanceTransition(this IServiceCollection services, Application app, ServiceDescriptor original)
+		{
+			var implementationType = original.ImplementationInstance.GetType();
+            services.Add(new ServiceDescriptor(implementationType, original.ImplementationInstance));
+			var dynamicManagerInterface = DynamicManagerInterface.MakeGenericType(original.ServiceType, implementationType);
+			var dynamicManagerImplemenation = DynamicManagerImplementation.MakeGenericType(original.ServiceType, implementationType);
+			services.Add(new ServiceDescriptor(dynamicManagerInterface, dynamicManagerImplemenation, original.Lifetime));
+			services.ApplyTransition(app, original, dynamicManagerImplemenation);
+		}
+
+		private static void ApplyFactoryTransition(this IServiceCollection services, Application app, ServiceDescriptor original)
+		{
+			var implementationFactoryInterfaceType = FactoryInterface.MakeGenericType(original.ServiceType);
+			var implementationFactoryImplementationType = FactoryImplementation.MakeGenericType(original.ServiceType);
+			Func<IServiceProvider, object> implementationFactory = 
+				provider => Activator.CreateInstance(implementationFactoryImplementationType, 
+					(Func<object>)(() => original.ImplementationFactory(provider))
+				);
+            services.Add(new ServiceDescriptor(implementationFactoryInterfaceType, implementationFactory, original.Lifetime));
+			var dynamicManagerInterface = DynamicManagerInterface.MakeGenericType(original.ServiceType, original.ServiceType);
+			Func<IServiceProvider, object> dynamicManagerFactory =
+				provider => DynamicManagerFactory.ForFactory(dynamicManagerInterface.GetTypeInfo(),
+                    provider.GetRequiredService(DynamicContainer.MakeGenericType(original.ServiceType, original.ServiceType)),
+					provider.GetRequiredService<ITransitionManagerContainer>(),
+					provider.GetRequiredService(implementationFactoryInterfaceType)
+				);
+			services.Add(new ServiceDescriptor(dynamicManagerInterface, dynamicManagerFactory, original.Lifetime));
+			services.Add(new ServiceDescriptor(TransitionManager.MakeGenericType(original.ServiceType), dynamicManagerFactory, original.Lifetime));
+			services.Add(new ServiceDescriptor(DynamicRegister.MakeGenericType(original.ServiceType), dynamicManagerFactory, original.Lifetime));
+			var dynamicProxyType = app.CreateProxy(original.ServiceType.GetTypeInfo());
+			services.Replace(new ServiceDescriptor(original.ServiceType, dynamicProxyType, original.Lifetime));
+		}
+
+		private static void ApplyTransition(this IServiceCollection services, Application app, ServiceDescriptor original, Type dynamicManagerType)
+		{
+			services.Add(new ServiceDescriptor(TransitionManager.MakeGenericType(original.ServiceType), dynamicManagerType, original.Lifetime));
+			services.Add(new ServiceDescriptor(DynamicRegister.MakeGenericType(original.ServiceType), dynamicManagerType, original.Lifetime));
+			var dynamicProxyType = app.CreateProxy(original.ServiceType.GetTypeInfo());
+			services.Replace(new ServiceDescriptor(original.ServiceType, dynamicProxyType, original.Lifetime));
+		}
+
+		private static IEnumerable<ServiceDescriptor> GetTransitionalServices(this IServiceCollection services)
+		{
+			var blanketMarkerType = typeof(TransitionMarker); // depicts all previous services in collection to be transitional
+			return services
+				.GetTargettedTransitionalServices().Union(
+					services.GetBlanketTransitionalServices(blanketMarkerType)
+				)
+				.Distinct()
+				.Where(service => !blanketMarkerType.IsAssignableFrom(service.ServiceType))
+				.Where(service => service.ServiceType.GetTypeInfo().IsInterface)
+				.ToList();
+		}
+
+		private static IEnumerable<ServiceDescriptor> GetTargettedTransitionalServices(this IServiceCollection services)
+		{
+			var targettedMarkerTypeInfo = typeof(TransitionMarker<>).GetTypeInfo(); // depicts a single service to be transitional
+			var targettedTransitionalMarkers = services
+				.Where(marker => targettedMarkerTypeInfo.IsAssignableFromGeneric(marker.ServiceType.GetTypeInfo()))
+				.Select(marker => marker.ServiceType.GetGenericArguments().Single());
+			return services.Where(service => targettedTransitionalMarkers.Contains(service.ServiceType));
+		}
+
+		private static IEnumerable<ServiceDescriptor> GetBlanketTransitionalServices(this IServiceCollection services, Type blanketMarkerType)
+		{
+			return services.BeforeLast(blanketMarkerType);
         }
 
-		internal static IEnumerable<ServiceDescriptor> WithSelfBoundTransitionals(this IEnumerable<ServiceDescriptor> services)
+		internal static IEnumerable<ServiceDescriptor> BeforeLast(this IEnumerable<ServiceDescriptor> source, Type transitionMarkerType)
 		{
-			return services.Where(x => !x.IsTransition())
-				.Union(services.Where(x => x.IsTransition()).Select(x => x.SelfBind()));
-		}
-
-		internal static ServiceDescriptor SelfBind(this ServiceDescriptor transitional)
-		{
-			return new ServiceDescriptor(transitional.ImplementationType, transitional.ImplementationType, transitional.Lifetime);
-		}
-
-		internal static Dictionary<Type, Type> GetTransitionalRedirects(this Application app, IServiceCollection services)
-		{
-			var transitionMarker = typeof(TransitionMarker<>).GetTypeInfo();
-            if (services.Any(x => x.ImplementationType == typeof(TransitionMarker)))
-				return services.BeforeMarker().Where(x => x.ServiceType.GetTypeInfo().IsInterface).ToList()
-					.ToDictionary(x => x.ServiceType, x => app.CreateProxy(x.ServiceType.GetTypeInfo()).AsType());
-			return services.Where(x => transitionMarker.IsAssignableFromGeneric(x.ServiceType.GetTypeInfo()))
-				.Select(x => x.ServiceType.GetGenericArguments().Single()).ToList()
-				.ToDictionary(x => x, x => app.CreateProxy(x.GetTypeInfo()).AsType());
-		}
-
-		internal static IEnumerable<ServiceDescriptor> BeforeMarker(this IEnumerable<ServiceDescriptor> source)
-		{
-			return source.Take(source.Select((x, i) => new { x, i, }).Last(x => x.x.ImplementationType == typeof(TransitionMarker)).i);
+			var lastMarkerIndex = source.Select((x, i) => new { x, i, }).LastOrDefault(x => x.x.ImplementationType == transitionMarkerType)?.i;
+			if (!lastMarkerIndex.HasValue)
+				return Enumerable.Empty<ServiceDescriptor>();
+            return source.Take(lastMarkerIndex.Value);
 		}
     }
 }

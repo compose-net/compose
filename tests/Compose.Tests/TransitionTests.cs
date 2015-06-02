@@ -7,14 +7,27 @@ namespace Compose.Tests
 	public class TransitionTests
 	{
 		[Fact]
-		public void CanResolveServicesAddedAsTransitional()
+		public void CanResolveServicesWhenAddedAsTransitional()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => services.AddTransitional<IDependency, Dependency>());
+			app.OnExecute<IDependency>(dependency =>
+			{
+				Assert.NotNull(dependency);
+				Assert.Equal(Type.Dependency, dependency.Id);
+			});
+			app.Execute();
+		}
+
+		[Fact]
+		public void CanResolveServicesWhenWithTransitional()
 		{
 			var app = new Fake.Application();
 			app.UseServices(services =>
 			{
 				services
-					.AddTransitional<IDependency, Dependency>()
-					.AddTransitional<IOtherDependency, OtherDependency>();
+					.AddTransient<IDependency, Dependency>()
+					.WithTransitional<IDependency>();
 			});
 			app.OnExecute<IDependency>(dependency =>
 			{
@@ -25,34 +38,13 @@ namespace Compose.Tests
 		}
 
 		[Fact]
-		public void CanResolveServicesWithTransitional()
+		public void CanResolveServicesWhenAsTransitional()
 		{
 			var app = new Fake.Application();
 			app.UseServices(services =>
 			{
 				services
 					.AddTransient<IDependency, Dependency>()
-					.AddTransient<IOtherDependency, OtherDependency>()
-					.WithTransitional<IDependency>()
-					.WithTransitional<IOtherDependency>();
-			});
-			app.OnExecute<IDependency>(dependency =>
-			{
-				Assert.NotNull(dependency);
-				Assert.Equal(Type.Dependency, dependency.Id);
-			});
-			app.Execute();
-		}
-
-		[Fact]
-		public void CanResolveServicesAsTransitional()
-		{
-			var app = new Fake.Application();
-			app.UseServices(services =>
-			{
-				services
-					.AddTransient<IDependency, Dependency>()
-					.AddTransient<IOtherDependency, OtherDependency>()
 					.AsTransitional();
 			});
 			app.OnExecute<IDependency>(dependency =>
@@ -64,10 +56,70 @@ namespace Compose.Tests
 		}
 
 		[Fact]
+		public void CanResolveServicesIndirectlyWhenAddedAsTransitional()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services =>
+			{
+				services.AddTransient<IConsumer, Consumer>();
+				services.AddTransitional<IDependency, Dependency>();
+			});
+			app.OnExecute<IConsumer>(consumer =>
+			{
+				Assert.NotNull(consumer);
+				Assert.Equal(Type.Dependency, consumer.DependencyId);
+			});
+			app.Execute();
+		}
+
+		[Fact]
+		public void CanResolveServicesIndirectlyWhenWithTransitional()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services =>
+			{
+				services
+					.AddTransient<IConsumer, Consumer>()
+					.AddTransient<IDependency, Dependency>()
+					.WithTransitional<IDependency>();
+			});
+			app.OnExecute<IConsumer>(consumer =>
+			{
+				Assert.NotNull(consumer);
+				Assert.Equal(Type.Dependency, consumer.DependencyId);
+			});
+			app.Execute();
+		}
+
+		[Fact]
+		public void CanResolveServicesIndirectlyWhenAsTransitional()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services =>
+			{
+				services
+					.AddTransient<IDependency, Dependency>()
+					.AsTransitional()
+					.AddTransient<IConsumer, Consumer>();
+			});
+			app.OnExecute<IConsumer>(consumer =>
+			{
+				Assert.NotNull(consumer);
+				Assert.Equal(Type.Dependency, consumer.DependencyId);
+			});
+			app.Execute();
+		}
+
+		[Fact]
 		public void CanTransitionService()
 		{
 			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransitional<IDependency, Dependency>(); });
+			app.UseServices(services => 
+			{
+				services
+					.AddTransitional<IDependency, Dependency>()
+					.AddTransient<OtherDependency>();
+			});
 			app.OnExecute<IDependency>(dependency =>
 			{
 				Assert.Equal(Type.Dependency, dependency.Id);
@@ -83,7 +135,9 @@ namespace Compose.Tests
 			var app = new Fake.Application();
 			app.UseServices(services =>
 			{
-				services.AddTransient<IDependency, Dependency>()
+				services
+					.AddTransient<IDependency, Dependency>()
+					.AddTransient<OtherDependency>()
 					.WithTransitional<IDependency>();
 			});
 			app.OnExecute<IDependency>(dependency =>
@@ -101,7 +155,9 @@ namespace Compose.Tests
 			var app = new Fake.Application();
 			app.UseServices(services =>
 			{
-				services.AddTransient<IDependency, Dependency>()
+				services
+					.AddTransient<IDependency, Dependency>()
+					.AddTransient<OtherDependency>()
 					.AsTransitional();
 			});
 			app.OnExecute<IDependency>(dependency =>
@@ -117,7 +173,12 @@ namespace Compose.Tests
 		public void CanTransitionBackToOriginalService()
 		{
 			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransitional<IDependency, Dependency>(); });
+			app.UseServices(services =>
+			{
+				services
+					.AddTransitional<IDependency, Dependency>()
+					.AddTransient<OtherDependency>();
+			});
 			app.OnExecute<IDependency>(dependency =>
 			{
 				app.Transition<IDependency, OtherDependency>();
@@ -140,14 +201,14 @@ namespace Compose.Tests
 		}
 
 		[Fact]
-		public void CanTransitionUnresolvedService()
+		public void CanNotTransitionToUnresolvableService()
 		{
 			var app = new Fake.Application();
 			app.UseServices(services => services.AddTransient<IDependency, Dependency>().AsTransitional());
-			app.OnExecute(() =>
+			app.OnExecute<IDependency>(dependency =>
 			{
-				Action act = () => app.Transition<IDependency, OtherDependency>();
-				Assert.Null(Record.Exception(act));
+				Action act = () => app.Transition<IDependency, UnresolvableDependency>();
+				Assert.IsType<InvalidOperationException>(Record.Exception(act));
 			});
 			app.Execute();
 		}
@@ -183,22 +244,61 @@ namespace Compose.Tests
 			});
 			app.OnExecute(() =>
 			{
-				Assert.True(app.Transition<IDependency, OtherDependency>());
+				Assert.Null(Record.Exception(() => app.Transition<IDependency, OtherDependency>()));
 			});
+		}
+
+		[Fact]
+		public void CanTransitionIndirectService()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => services
+				.AddTransitional<IDependency, Dependency>()
+				.AddTransient<IConsumer, Consumer>()
+				.AddTransient<OtherDependency, OtherDependency>()
+			);
+			app.OnExecute<IConsumer>(consumer =>
+			{
+				Assert.Equal(Type.Dependency, consumer.DependencyId);
+				app.Transition<IDependency, OtherDependency>();
+				Assert.Equal(Type.OtherDependency, consumer.DependencyId);
+			});
+			app.Execute();
 		}
 
 		public enum Type { Dependency, OtherDependency, GenericDependency }
 
 		public interface IDependency { Type Id { get; } }
 
-		private class Dependency : IDependency { public Type Id { get; private set; } = Type.Dependency; }
+		internal class Dependency : IDependency { public Type Id { get; private set; } = Type.Dependency; }
 
 		public interface IOtherDependency : IDependency { }
 
-		private class OtherDependency : IOtherDependency { public Type Id { get; private set; } = Type.OtherDependency; }
+		internal class OtherDependency : IOtherDependency { public Type Id { get; private set; } = Type.OtherDependency; }
 
 		public interface IGenericDependency<T> { Type Id { get; } }
 
-		private class GenericDependency<T> : IGenericDependency<T> { public Type Id { get; private set; } = Type.GenericDependency; }
+		internal class GenericDependency<T> : IGenericDependency<T> { public Type Id { get; private set; } = Type.GenericDependency; }
+
+		public interface IConsumer { Type DependencyId { get; } }
+
+		internal class Consumer : IConsumer
+		{
+			private readonly IDependency _dependency;
+
+			public Consumer(IDependency dependency)
+			{
+				_dependency = dependency;
+			}
+
+			public Type DependencyId { get { return _dependency.Id; } }
+		}
+
+		internal class UnresolvableDependency : IDependency
+		{
+			public UnresolvableDependency(IConsumer consumer) { /* don't bind IConsumer */ }
+
+			public Type Id { get; } = Type.OtherDependency;
+		}
 	}
 }

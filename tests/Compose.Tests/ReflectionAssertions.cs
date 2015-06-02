@@ -1,6 +1,5 @@
 ﻿using Microsoft.Framework.DependencyInjection;
 using System;
-using System.Linq;
 using Xunit;
 
 namespace Compose.Tests
@@ -8,17 +7,10 @@ namespace Compose.Tests
     public class ReflectionAssertions
     {
 		[Fact]
-		public void CanResolveMicrosoftFrameworkDependencyInjectionServiceProvider()
+		public void CanBuildMicrosoftFrameworkDependencyInjectionServiceProvider()
 		{
-			Assert.NotNull(Constants.GetServiceProvider());
+			Assert.NotNull(new ServiceCollection().BuildServiceProvider());
 		}
-
-		[Fact]
-		public void CanActivateMicrosoftFrameworkDepdencyInjectionServiceProvider()
-		{
-			Action act = () => Activator.CreateInstance(Constants.GetServiceProvider(), Enumerable.Empty<ServiceDescriptor>());
-			Assert.Null(Record.Exception(act));
-        }
 
 		[Fact]
 		public void CanActivateServiceProviderThroughWrappingFacade()
