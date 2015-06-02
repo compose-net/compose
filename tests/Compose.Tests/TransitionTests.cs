@@ -248,6 +248,24 @@ namespace Compose.Tests
 			});
 		}
 
+		[Fact]
+		public void CanTransitionIndirectService()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => services
+				.AddTransitional<IDependency, Dependency>()
+				.AddTransient<IConsumer, Consumer>()
+				.AddTransient<OtherDependency, OtherDependency>()
+			);
+			app.OnExecute<IConsumer>(consumer =>
+			{
+				Assert.Equal(Type.Dependency, consumer.DependencyId);
+				app.Transition<IDependency, OtherDependency>();
+				Assert.Equal(Type.OtherDependency, consumer.DependencyId);
+			});
+			app.Execute();
+		}
+
 		public enum Type { Dependency, OtherDependency, GenericDependency }
 
 		public interface IDependency { Type Id { get; } }
