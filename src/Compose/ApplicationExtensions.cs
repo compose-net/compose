@@ -47,9 +47,6 @@ namespace Compose
 			return emitter.GetManagedDynamicProxy(serviceTypeInfo);
         }
 
-		internal static TService CreateProxy<TService, TInjection>(this Application app) where TService : class where TInjection : TService
-			=> app.CreateProxy<TService>(typeof(TInjection).GetTypeInfo());
-
         internal static TService CreateProxy<TService>(this Application app, TypeInfo injectionTypeInfo) where TService : class
         {
 			var serviceType = typeof(TService);

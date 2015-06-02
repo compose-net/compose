@@ -51,29 +51,5 @@ namespace Compose
 				((IDisposable)manager.CurrentService).Dispose();
 			manager.CurrentService = service;
 		}
-
-		public void Snapshot()
-		{
-			foreach (var manager in GetActiveManagers())
-				Snapshot(manager);
-		}
-
-		private void Snapshot(DynamicManager<TInterface, TOriginal> manager)
-		{
-			if (manager.SnapshotService != null && Disposable.IsAssignableFrom(manager.SnapshotService.GetType().GetTypeInfo()))
-				((IDisposable)manager.SnapshotService).Dispose();
-			manager.SnapshotService = manager.CurrentService;
-		}
-
-		public void Restore()
-		{
-			foreach (var manager in GetActiveManagers())
-				Restore(manager);
-		}
-
-		private void Restore(DynamicManager<TInterface, TOriginal> manager)
-		{
-			Change(manager, manager.SnapshotService);
-		}
 	}
 }
