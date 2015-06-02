@@ -5,7 +5,7 @@ using Xunit;
 namespace Compose.Tests
 {
     public class DisposableTests
-    {
+	{
 		[Fact]
 		public void WhenTransitioningAwayFromDirectlyImplementedDisposableThenDisposesCurrentService()
 		{
@@ -18,7 +18,7 @@ namespace Compose.Tests
 			{
 				Action act = app.Transition<IDependency, Dependency>;
 				Assert.Throws<NotImplementedException>(act);
-            });
+			});
 		}
 
 		[Fact]
@@ -32,6 +32,66 @@ namespace Compose.Tests
 			app.OnExecute<IDependency>(dependency =>
 			{
 				Action act = app.Transition<IDependency, Dependency>;
+				Assert.Throws<NotImplementedException>(act);
+			});
+		}
+
+		[Fact]
+		public void WhenSnapshottingAwayFromDirectlyImplementedDisposableThenDisposesCurrentService()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => services
+				.AddTransitional<IDependency, DirectlyDisposableDependency>()
+				.AddTransient<Dependency, Dependency>()
+			);
+			app.OnExecute<IDependency>(dependency =>
+			{
+				Action act = app.Snapshot;
+				Assert.Throws<NotImplementedException>(act);
+			});
+		}
+
+		[Fact]
+		public void WhenSnapshottingAwayFromIndirectlyImplementedDisposableThenDisposesCurrentService()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => services
+				.AddTransitional<IDependency, IndirectlyDisposableDependency>()
+				.AddTransient<Dependency, Dependency>()
+			);
+			app.OnExecute<IDependency>(dependency =>
+			{
+				Action act = app.Snapshot;
+				Assert.Throws<NotImplementedException>(act);
+			});
+		}
+
+		[Fact]
+		public void WhenRestoringAwayFromDirectlyImplementedDisposableThenDisposesCurrentService()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => services
+				.AddTransitional<IDependency, DirectlyDisposableDependency>()
+				.AddTransient<Dependency, Dependency>()
+			);
+			app.OnExecute<IDependency>(dependency =>
+			{
+				Action act = app.Restore;
+				Assert.Throws<NotImplementedException>(act);
+			});
+		}
+
+		[Fact]
+		public void WhenRestoringAwayFromIndirectlyImplementedDisposableThenDisposesCurrentService()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => services
+				.AddTransitional<IDependency, IndirectlyDisposableDependency>()
+				.AddTransient<Dependency, Dependency>()
+			);
+			app.OnExecute<IDependency>(dependency =>
+			{
+				Action act = app.Restore;
 				Assert.Throws<NotImplementedException>(act);
 			});
 		}
