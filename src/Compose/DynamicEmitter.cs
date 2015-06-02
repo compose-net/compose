@@ -12,6 +12,8 @@ namespace Compose
 {
 	internal sealed class DynamicEmitter
 	{
+		public const string AssemblyName = "Compose.DynamicProxies";
+
 		private readonly AssemblyName _assemblyName;
 		private readonly AssemblyBuilder _assemblyBuilder;
 		private readonly ModuleBuilder _moduleBuilder;
@@ -26,7 +28,7 @@ namespace Compose
 		internal Type GetManagedDynamicProxy(TypeInfo serviceTypeInfo)
 		{
 			var serviceType = serviceTypeInfo.AsType();
-            ValidateProxyIsPossible(serviceTypeInfo);
+            ValidateProxyIsPossible(serviceTypeInfo, true);
 			/* C#: 
 			public sealed class WrapperName[<TService>] : TService, ITransition<TService>
 			{
@@ -54,32 +56,31 @@ namespace Compose
 			}
 			catch (Exception ex)
 			{
+				ValidateProxyIsPossible(serviceTypeInfo, false);
 				throw new UnsupportedTypeDefinitionException(serviceType, ex);
 			}
 		}
 
-		private void ValidateProxyIsPossible(TypeInfo serviceType)
+		private void ValidateProxyIsPossible(TypeInfo serviceType, bool acceptInternalsVisibleTo)
 		{
-			if (!serviceType.IsPublic && !serviceType.IsNestedPublic)
+			if (!serviceType.IsAccessible(acceptInternalsVisibleTo))
 				throw new InaccessibleTypeException(serviceType);
 			if (serviceType.IsGenericType)
-				ValidateGenericTypesAccessible(serviceType);
+				ValidateGenericTypesAccessible(serviceType, acceptInternalsVisibleTo);
 		}
 
-		private void ValidateGenericTypesAccessible(TypeInfo serviceType)
+		private void ValidateGenericTypesAccessible(TypeInfo serviceType, bool acceptInternalsVisibleTo)
 		{
 			var inaccessibleGeneric = serviceType.GenericTypeArguments
 				.Select(x => x.GetTypeInfo())
-				.FirstOrDefault(x => !x.IsPublic && !x.IsNestedPublic);
+				.FirstOrDefault(x => !x.IsAccessible(acceptInternalsVisibleTo));
 			if (inaccessibleGeneric != null)
 				throw new InaccessibleTypeException(serviceType, inaccessibleGeneric);
 		}
 
 		private AssemblyName CreateAssemblyName()
 		{
-			//var my = GetType();
-			//return new AssemblyName($"{my.Namespace}.{my.Name}_{Guid.NewGuid().ToString()}");
-			return new AssemblyName("Compose.DynamicProxies");
+			return new AssemblyName(AssemblyName);
 		}
 
 		private AssemblyBuilder CreateAssemblyBuilder()

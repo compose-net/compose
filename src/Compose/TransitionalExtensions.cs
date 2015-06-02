@@ -84,6 +84,7 @@ namespace Compose
 				)
 				.Distinct()
 				.Where(service => !blanketMarkerType.IsAssignableFrom(service.ServiceType))
+				.Where(service => service.ServiceType.GetTypeInfo().IsInterface)
 				.ToList();
 		}
 

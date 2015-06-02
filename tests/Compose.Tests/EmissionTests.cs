@@ -521,31 +521,31 @@ namespace Compose.Tests
 		}
 		#endregion
 
-		#region CanThrowInformativeExceptionWhenInterfaceIsInternal
-		internal interface IInformativeExceptionThrownForInternalInterface { }
-		internal class InformativeExceptionThrownForInternalInterface : IInformativeExceptionThrownForInternalInterface { }
+		#region CanThrowInformativeExceptionWhenInterfaceIsNotVisible
+		private interface IInformativeExceptionThrownForInvisibleInterface { }
+		internal class InformativeExceptionThrownForInvisibleInterface : IInformativeExceptionThrownForInvisibleInterface { }
 		[Fact]
-		public void CanThrowInformativeExceptionWhenInterfaceIsInternal()
+		public void CanThrowInformativeExceptionWhenInterfaceIsNotVisible()
 		{
 
 			Assert.IsType(
 				typeof(InaccessibleTypeException), 
-				Record.Exception(InvokeProxy<IInformativeExceptionThrownForInternalInterface, InformativeExceptionThrownForInternalInterface>())
+				Record.Exception(InvokeProxy<IInformativeExceptionThrownForInvisibleInterface, InformativeExceptionThrownForInvisibleInterface>())
 			);
 		}
 		#endregion
 
-		#region CanThrowInformativeExceptionWhenGenericTypeIsInternal
-		public interface IInformativeExceptionThrownForInternalGeneric<T> { }
-		internal class InformativeExceptionThrownForInternalInterfaceGeneric { }
-		internal class InformativeExceptionThrownForInternalGeneric 
-			: IInformativeExceptionThrownForInternalGeneric<InformativeExceptionThrownForInternalInterfaceGeneric> { }
+		#region CanThrowInformativeExceptionWhenGenericTypeIsNotVisible
+		public interface IInformativeExceptionThrownForInvisibleGeneric<T> { }
+		private class InformativeExceptionThrownForInvisibleInterfaceGeneric { }
+		private class InformativeExceptionThrownForInvisibleGeneric 
+			: IInformativeExceptionThrownForInvisibleGeneric<InformativeExceptionThrownForInvisibleInterfaceGeneric> { }
 		[Fact]
-		public void CanThrowInformativeExceptionWhenGenericTypeIsInternal()
+		public void CanThrowInformativeExceptionWhenGenericTypeIsNotVisible()
 		{
 			Assert.IsType(
 				typeof(InaccessibleTypeException), 
-				Record.Exception(InvokeProxy<IInformativeExceptionThrownForInternalGeneric<InformativeExceptionThrownForInternalInterfaceGeneric>, InformativeExceptionThrownForInternalGeneric>())
+				Record.Exception(InvokeProxy<IInformativeExceptionThrownForInvisibleGeneric<InformativeExceptionThrownForInvisibleInterfaceGeneric>, InformativeExceptionThrownForInvisibleGeneric>())
 			);
 		}
 		#endregion

@@ -126,6 +126,7 @@ namespace Compose
 		private static void AddPropertyGetImplementation(this TypeBuilder typeBuilder, PropertyBuilder propertyBuilder, PropertyInfo propertyInfo, FieldBuilder managerField, MethodInfo managerCurrent)
 		{
 			var propertyInfoGetMethod = propertyInfo.GetGetMethod();
+			if (propertyInfoGetMethod == null) return;
 			var propertyGetMethod = typeBuilder.DefineMethod(propertyInfoGetMethod.Name, MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig | MethodAttributes.Virtual, propertyInfo.PropertyType, Type.EmptyTypes);
 			var propertyGetEmitter = propertyGetMethod.GetILGenerator();
 			propertyGetEmitter.Emit(OpCodes.Ldarg_0);
@@ -140,6 +141,7 @@ namespace Compose
 		private static void AddPropertySetImplementation(this TypeBuilder typeBuilder, PropertyBuilder propertyBuilder, PropertyInfo propertyInfo, FieldBuilder managerField, MethodInfo managerCurrent)
 		{
 			var propertyInfoSetMethod = propertyInfo.GetSetMethod();
+			if (propertyInfoSetMethod == null) return;
 			var propertySetMethod = typeBuilder.DefineMethod(propertyInfoSetMethod.Name, MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig | MethodAttributes.Virtual, null, new[] { propertyInfo.PropertyType });
 			var propertySetEmitter = propertySetMethod.GetILGenerator();
 			propertySetEmitter.Emit(OpCodes.Ldarg_0);

@@ -114,7 +114,12 @@ namespace Compose.Tests
 		public void CanTransitionService()
 		{
 			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransitional<IDependency, Dependency>(); });
+			app.UseServices(services => 
+			{
+				services
+					.AddTransitional<IDependency, Dependency>()
+					.AddTransient<OtherDependency>();
+			});
 			app.OnExecute<IDependency>(dependency =>
 			{
 				Assert.Equal(Type.Dependency, dependency.Id);
@@ -130,7 +135,9 @@ namespace Compose.Tests
 			var app = new Fake.Application();
 			app.UseServices(services =>
 			{
-				services.AddTransient<IDependency, Dependency>()
+				services
+					.AddTransient<IDependency, Dependency>()
+					.AddTransient<OtherDependency>()
 					.WithTransitional<IDependency>();
 			});
 			app.OnExecute<IDependency>(dependency =>
@@ -148,7 +155,9 @@ namespace Compose.Tests
 			var app = new Fake.Application();
 			app.UseServices(services =>
 			{
-				services.AddTransient<IDependency, Dependency>()
+				services
+					.AddTransient<IDependency, Dependency>()
+					.AddTransient<OtherDependency>()
 					.AsTransitional();
 			});
 			app.OnExecute<IDependency>(dependency =>
@@ -164,7 +173,12 @@ namespace Compose.Tests
 		public void CanTransitionBackToOriginalService()
 		{
 			var app = new Fake.Application();
-			app.UseServices(services => { services.AddTransitional<IDependency, Dependency>(); });
+			app.UseServices(services =>
+			{
+				services
+					.AddTransitional<IDependency, Dependency>()
+					.AddTransient<OtherDependency>();
+			});
 			app.OnExecute<IDependency>(dependency =>
 			{
 				app.Transition<IDependency, OtherDependency>();

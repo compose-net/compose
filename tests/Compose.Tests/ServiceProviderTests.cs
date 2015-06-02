@@ -38,9 +38,9 @@ namespace Compose.Tests
 			{
 				services.AddInstance<IService1>(instance);
 			});
-			app.OnExecute<Parent>(parent =>
+			app.OnExecute<IService1>(parent =>
 			{
-				Assert.Equal(instance, parent.Service);
+				Assert.Equal(instance, parent);
 				Assert.Equal(instance, app.ApplicationServices.GetService<IService1>());
 			});
 			app.Execute();

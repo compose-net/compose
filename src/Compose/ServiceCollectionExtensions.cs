@@ -21,9 +21,6 @@ namespace Compose
 
 		public static IServiceCollection WithTransitional<TService>(this IServiceCollection services)
 			=> services.AddTransient<TransitionMarker<TService>>();
-		
-		internal static SingletonRegister BuildSingletonRegister(this IServiceCollection services)
-			=> new SingletonRegister(services);
 
 		internal static ServiceDescriptor BestSingletonMatchFor(this IServiceCollection services, Type serviceType)
 			=> services.Where(x => x.Lifetime == ServiceLifetime.Singleton && serviceType.IsAssignableFrom(x.ServiceType))

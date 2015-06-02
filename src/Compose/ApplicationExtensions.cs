@@ -70,12 +70,12 @@ namespace Compose
 
 		public static void Snapshot(this Application app)
 		{
-			app.ApplicationServices.GetService<ITransitionManagerContainer>()?.Snapshot();
+			app.ApplicationServices?.GetService<ITransitionManagerContainer>()?.Snapshot();
 		}
 
 		public static void Restore(this Application app)
 		{
-			app.ApplicationServices.GetService<ITransitionManagerContainer>()?.Restore();
+			app.ApplicationServices?.GetService<ITransitionManagerContainer>()?.Restore();
 		}
 
 		#endregion
