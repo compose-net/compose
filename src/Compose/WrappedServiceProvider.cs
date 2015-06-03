@@ -1,64 +1,34 @@
 ﻿using Microsoft.Framework.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Compose
 {
-	internal sealed class WrappedServiceProvider : ISingletonRepositoryServiceProvider
+	internal sealed class WrappedServiceProvider : IServiceProvider
 	{
-		private readonly IServiceCollection _services;
-		private Dictionary<Type, object> _singletons;
 		private IServiceProvider _fallback;
-		private IServiceProvider _snapshot;
 
 		public WrappedServiceProvider(IServiceCollection services)
 		{
-			_singletons = services.Where(x => x.Lifetime == ServiceLifetime.Singleton)
-				.ToDictionary(x => x.ServiceType, x => x.ImplementationInstance);
-			_fallback = CreateFallbackProvider(services);
-			_services = services;
+			_fallback = services.BuildServiceProvider();
         }
+
+		public WrappedServiceProvider(IServiceProvider fallback)
+		{
+			_fallback = fallback;
+		}
 
 		public object GetService(Type serviceType)
 		{
-			if (_singletons.ContainsKey(serviceType))
-				return ResolveSingleton(serviceType);
-			return _fallback.GetService(serviceType);
-		}
-
-		public void Extend(ServiceDescriptor service)
-		{
-			_services.Add(service);
-			_fallback = CreateFallbackProvider(_services);
-		}
-
-		public void AppendSingleton(Type serviceType)
-		{
-			if (!_singletons.ContainsKey(serviceType))
-				_singletons.Add(serviceType, null);
-		}
-
-		private IServiceProvider CreateFallbackProvider(IServiceCollection services)
-		{
-			return (IServiceProvider)Activator.CreateInstance(Constants.GetServiceProvider(), services);
-		}
-
-		private object ResolveSingleton(Type serviceType)
-		{
-			if (_singletons[serviceType] == null)
-				_singletons[serviceType] = _fallback.GetService(serviceType);
-			return _singletons[serviceType];
-		}
-
-		public void Snapshot()
-		{
-			_snapshot = CreateFallbackProvider(_services);
-		}
-
-		public void Restore()
-		{
-			_fallback = _snapshot ?? _fallback;
+			// exception logic - neccessary evil due to bug in beta 4 MS Provider
+			try
+			{
+				return _fallback.GetService(serviceType);
+			}
+			catch (ArgumentNullException anex)
+			{
+				if (anex.Message == "Object cannot be null.\r\nParameter name: source") return null;
+				throw;
+			}
 		}
 	}
 }

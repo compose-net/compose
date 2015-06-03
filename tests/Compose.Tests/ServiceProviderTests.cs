@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.Framework.DependencyInjection;
+﻿using Microsoft.Framework.DependencyInjection;
 using System;
 using Xunit;
 
@@ -13,7 +12,7 @@ namespace Compose.Tests
 			var app = new Fake.Application();
 			app.UseServices(services => services.AddInstance(typeof(string), "foo"));
 			Action act = app.Execute;
-			act.ShouldNotThrow<Exception>();
+			Assert.Null(Record.Exception(act));
 		}
 
 		[Fact]
@@ -22,39 +21,85 @@ namespace Compose.Tests
 			var app = new Fake.Application();
 			app.UseServices(services =>
 			{
-				var service = new Dependency();
+				var service = new Service();
 				services.AddInstance<IService1>(service);
 				services.AddInstance<IService2>(service);
 			});
 			Action act = app.Execute;
-			act.ShouldNotThrow<Exception>();
+			Assert.Null(Record.Exception(act));
 		}
 
 		[Fact]
 		public void CanTreatInstancesAsSingletons()
 		{
 			var app = new Fake.Application();
-			var instance = new Dependency();
+			var instance = new Service();
 			app.UseServices(services =>
 			{
 				services.AddInstance<IService1>(instance);
 			});
-			app.OnExecute<Parent>(parent =>
+			app.OnExecute<IService1>(parent =>
 			{
-				parent.Service.Should().Be(instance);
-				app.HostingServices.GetService<IService1>()
-					.Should().Be(instance);
+				Assert.Equal(instance, parent);
+				Assert.Equal(instance, app.ApplicationServices.GetService<IService1>());
 			});
 			app.Execute();
 		}
 
+		[Fact]
+		public void CanUseCustomServiceProvider()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => new CustomServiceProvider());
+			app.OnExecute<IService1>(service => { });
+			Action act = app.Execute;
+			Assert.IsType<NotImplementedException>(Record.Exception(act));
+		}
+
+		[Fact]
+		public void CanResolveSingletonsIndirectly()
+		{
+			var app = new Fake.Application();
+			app.UseServices(services => services
+				.AddTransient<IConsumer, Consumer>()
+				.AddSingleton<IDependency, Dependency>()
+			);
+			app.OnExecute<IConsumer>(consumer =>
+			{
+				var newConsumer = app.ApplicationServices.GetRequiredService<IConsumer>();
+				Assert.Equal(consumer.Id, newConsumer.Id);
+				Assert.NotEqual(consumer, newConsumer);
+			});
+		}
+
 		private interface IService1 { }
 		private interface IService2 { }
-		private class Dependency : IService1, IService2 { }
-		private class Parent
+		private class Service : IService1, IService2 { }
+
+		private interface IConsumer { Guid Id { get; } }
+		private class Consumer : IConsumer
 		{
-			public IService1 Service { get; private set; }
-			public Parent(IService1 service) { Service = service; }
+			private readonly IDependency _dependency;
+			public Consumer(IDependency dependency)
+			{
+				_dependency = dependency;
+			}
+
+			public Guid Id { get { return _dependency.Id; } }
+		}
+
+		private interface IDependency { Guid Id { get; } }
+		private class Dependency : IDependency
+		{
+			public Guid Id { get; } = Guid.NewGuid();
+		}
+
+		private class CustomServiceProvider : IServiceProvider
+		{
+			public object GetService(Type serviceType)
+			{
+				throw new NotImplementedException();
+			}
 		}
 	}
 }

@@ -183,3 +183,4 @@ UpgradeLog*.htm
 FakesAssemblies/
 
 artifacts/
+project.lock.json

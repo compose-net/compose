@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using Microsoft.Framework.DependencyInjection;
 using System;
 using Xunit;
 
@@ -12,7 +12,7 @@ namespace Compose.Tests
 			var app = new Fake.Application();
 			app.UseServices(services => services.AddTransitional<IDependency, Dependency1>());
 			Action act = app.Snapshot;
-			act.ShouldNotThrow<Exception>();
+			Assert.Null(Record.Exception(act));
 		}
 
 		[Fact]
@@ -20,7 +20,7 @@ namespace Compose.Tests
 		{
 			var app = new Fake.Application();
 			Action act = app.Snapshot;
-			act.ShouldNotThrow<Exception>();
+			Assert.Null(Record.Exception(act));
 		}
 
 		[Fact]
@@ -29,7 +29,7 @@ namespace Compose.Tests
 			var app = new Fake.Application();
 			app.UseServices(services => services.AddTransitional<IDependency, Dependency1>());
 			Action act = app.Restore;
-			act.ShouldNotThrow<Exception>();
+			Assert.Null(Record.Exception(act));
 		}
 
 		[Fact]
@@ -37,21 +37,25 @@ namespace Compose.Tests
 		{
 			var app = new Fake.Application();
 			Action act = app.Restore;
-			act.ShouldNotThrow<Exception>();
+			Assert.Null(Record.Exception(act));
 		}
 
 		[Fact]
 		public void CanRestoreExplicitlySnapshottedTransitionedServices()
 		{
 			var app = new Fake.Application();
-			app.UseServices(services => services.AddTransitional<IDependency, Dependency1>());
+			app.UseServices(services =>
+			{
+				services.AddTransitional<IDependency, Dependency1>();
+				services.AddTransient<Dependency2>();
+            });
 			app.OnExecute<IDependency>(dependency =>
 			{
 				app.Snapshot();
 				app.Transition<IDependency, Dependency2>();
-				dependency.Id.Should().Be(Type.Two);
+				Assert.Equal(Type.Two, dependency.Id);
 				app.Restore();
-				dependency.Id.Should().Be(Type.One);
+				Assert.Equal(Type.One, dependency.Id);
 			});
 			app.Execute();
 		}
@@ -60,13 +64,17 @@ namespace Compose.Tests
 		public void CanRestoreImplicitlySnapshottedTransitionedServices()
 		{
 			var app = new Fake.Application();
-			app.UseServices(services => services.AddTransitional<IDependency, Dependency1>());
+			app.UseServices(services =>
+			{
+				services.AddTransitional<IDependency, Dependency1>();
+				services.AddTransient<Dependency2>();
+			});
 			app.OnExecute<IDependency>(dependency =>
 			{
 				app.Transition<IDependency, Dependency2>();
-				dependency.Id.Should().Be(Type.Two);
+				Assert.Equal(Type.Two, dependency.Id);
 				app.Restore();
-				dependency.Id.Should().Be(Type.One);
+				Assert.Equal(Type.One, dependency.Id);
 			});
 			app.Execute();
 		}
@@ -75,7 +83,12 @@ namespace Compose.Tests
 		public void CanRestoreLatestSnapshot()
 		{
 			var app = new Fake.Application();
-			app.UseServices(services => services.AddTransitional<IDependency, Dependency1>());
+			app.UseServices(services =>
+			{
+				services.AddTransitional<IDependency, Dependency1>();
+				services.AddTransient<Dependency2>();
+				services.AddTransient<Dependency3>();
+			});
 			app.OnExecute<IDependency>(dependency =>
 			{
 				app.Snapshot();
@@ -83,7 +96,7 @@ namespace Compose.Tests
 				app.Snapshot();
 				app.Transition<IDependency, Dependency3>();
 				app.Restore();
-				dependency.Id.Should().Be(Type.Two);
+				Assert.Equal(Type.Two, dependency.Id);
 			});
 			app.Execute();
 		}
