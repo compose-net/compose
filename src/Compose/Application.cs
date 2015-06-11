@@ -9,6 +9,6 @@ namespace Compose
 
 		public IServiceProvider ApplicationServices { get; set; }
 
-        internal ServiceCollection Services { get; set; }
+        internal IServiceCollection Services { get; set; }
     }
 }
