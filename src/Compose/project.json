@@ -9,7 +9,7 @@
 	"iconUrl": "https://raw.githubusercontent.com/Smudge202/Compose/master/Compose-Icon.png",
 	"summary": "Assists with clean application composition allowing components to be isolated, reused, and interchanged.",
 	"dependencies": {
-		"Microsoft.Framework.DependencyInjection": "1.0.0-beta4"
+		"Microsoft.Framework.DependencyInjection": "1.0.0-beta6-11427"
 	},
 	"frameworks": {
 		"net45": { },
@@ -17,15 +17,16 @@
 		"dnxcore50": {
 			"compilationOptions": { "define": [ "DNXCORE" ] },
 			"dependencies": {
-				"Microsoft.CSharp": "4.0.0-beta-*",
-				"System.Collections": "4.0.10-beta-*",
-				"System.Linq": "4.0.0-beta-*",
-				"System.Reflection": "4.0.10-beta-*",
-				"System.Reflection.Emit": "4.0.0-beta-*",
-				"System.Reflection.Extensions": "4.0.0-beta-*",
-				"System.Reflection.TypeExtensions": "4.0.0-beta-*",
-				"System.Runtime": "4.0.20-beta-*",
-				"System.Threading": "4.0.10-beta-*"
+				"Microsoft.CSharp": "4.0.0-beta-22913",
+				"System.Collections": "4.0.10-beta-22913",
+				"System.Linq": "4.0.0-beta-22913",
+				"System.Reflection": "4.0.10-beta-22913",
+				"System.Reflection.Emit": "4.0.0-beta-22913",
+				"System.Reflection.Extensions": "4.0.0-beta-22913",
+				"System.Reflection.TypeExtensions": "4.0.0-beta-22913",
+				"System.Runtime": "4.0.20-beta-22911",
+				"System.Runtime.Extensions": "4.0.10-beta-22913",
+				"System.Threading": "4.0.10-beta-22913"
 			}
 		}
 	}
