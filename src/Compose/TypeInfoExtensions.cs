@@ -27,7 +27,7 @@ namespace Compose
 		private static bool HasInternalsVisibleToComposeProxies(this Assembly assembly)
 		{
 			return assembly
-				.GetCustomAttributes<System.Runtime.CompilerServices.InternalsVisibleToAttribute>()
+				.CustomAttributes.OfType<System.Runtime.CompilerServices.InternalsVisibleToAttribute>()
 				.Any(attribute => attribute.AssemblyName == DynamicEmitter.AssemblyName);
 		}
     }

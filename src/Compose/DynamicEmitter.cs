@@ -45,14 +45,7 @@ namespace Compose
 			{
 				var managerTypeInfo = typeof(IDynamicRegister<>).MakeGenericType(serviceType).GetTypeInfo();
                 typeBuilder.AddDirectImplementation(serviceTypeInfo, managerTypeInfo);
-
-#if DEBUG && !DNXCORE
-				var dynamicType = typeBuilder.CreateType();
-                //_assemblyBuilder.Save($"{_assemblyName.Name}.dll");
-				return dynamicType;
-#else
 				return typeBuilder.CreateTypeInfo().AsType();
-#endif
 			}
 			catch (Exception ex)
 			{
@@ -86,18 +79,13 @@ namespace Compose
 		private AssemblyBuilder CreateAssemblyBuilder()
 		{
 			var attributes = new List<CustomAttributeBuilder>(7);
-			attributes.Add(new CustomAttributeBuilder(typeof(AssemblyTitleAttribute).GetConstructors().Single(), new object[] { "Compose.DynamicProxies" }));
-			attributes.Add(new CustomAttributeBuilder(typeof(AssemblyCompanyAttribute).GetConstructors().Single(), new object[] { "Devbot.Net" }));
-			attributes.Add(new CustomAttributeBuilder(typeof(AssemblyProductAttribute).GetConstructors().Single(), new object[] { "Compose.DynamicProxies" }));
-			attributes.Add(new CustomAttributeBuilder(typeof(AssemblyCopyrightAttribute).GetConstructors().Single(), new object[] { $"Devbot.Net {DateTime.Now.Year}" }));
-			attributes.Add(new CustomAttributeBuilder(typeof(ComVisibleAttribute).GetConstructors().Single(), new object[] { false }));
-			attributes.Add(new CustomAttributeBuilder(typeof(TargetFrameworkAttribute).GetConstructors().Single(), new object[] { ".NETFramework,Version=v4.5" }));
-#if DEBUG && !DNXCORE
-			attributes.Add(new CustomAttributeBuilder(typeof(DebuggableAttribute).GetConstructor(new[] { typeof(DebuggableAttribute.DebuggingModes) }), new object[] { DebuggableAttribute.DebuggingModes.Default | DebuggableAttribute.DebuggingModes.DisableOptimizations | DebuggableAttribute.DebuggingModes.IgnoreSymbolStoreSequencePoints | DebuggableAttribute.DebuggingModes.EnableEditAndContinue }));
-            return AppDomain.CurrentDomain.DefineDynamicAssembly(_assemblyName, AssemblyBuilderAccess.RunAndSave, attributes, SecurityContextSource.CurrentAppDomain);
-#else
+			attributes.Add(new CustomAttributeBuilder(typeof(AssemblyTitleAttribute).GetTypeInfo().DeclaredConstructors.Single(), new object[] { "Compose.DynamicProxies" }));
+			attributes.Add(new CustomAttributeBuilder(typeof(AssemblyCompanyAttribute).GetTypeInfo().DeclaredConstructors.Single(), new object[] { "Devbot.Net" }));
+			attributes.Add(new CustomAttributeBuilder(typeof(AssemblyProductAttribute).GetTypeInfo().DeclaredConstructors.Single(), new object[] { "Compose.DynamicProxies" }));
+			attributes.Add(new CustomAttributeBuilder(typeof(AssemblyCopyrightAttribute).GetTypeInfo().DeclaredConstructors.Single(), new object[] { $"Devbot.Net {DateTime.Now.Year}" }));
+			attributes.Add(new CustomAttributeBuilder(typeof(ComVisibleAttribute).GetTypeInfo().DeclaredConstructors.Single(), new object[] { false }));
+			attributes.Add(new CustomAttributeBuilder(typeof(TargetFrameworkAttribute).GetTypeInfo().DeclaredConstructors.Single(), new object[] { ".NETFramework,Version=v4.5" }));
 			return AssemblyBuilder.DefineDynamicAssembly(_assemblyName, AssemblyBuilderAccess.Run, attributes);
-#endif
 		}
 
 		private ModuleBuilder CreateModuleBuilder()
