@@ -102,7 +102,7 @@ namespace Compose.Tests
 			}
 		}
 
-		internal interface IDependency { }
+		public interface IDependency { }
 
 		private class Dependency : IDependency { }
     }
