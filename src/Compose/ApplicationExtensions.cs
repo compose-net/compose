@@ -40,14 +40,14 @@ namespace Compose
 			transitional.Change(() => app.ApplicationServices.GetRequiredService<TImplementation>());
         }
 
-        internal static Type CreateProxy(this Application app, TypeInfo serviceTypeInfo)
+        public static Type CreateProxy(this Application app, TypeInfo serviceTypeInfo)
         {
             var emitter = app.ApplicationServices.GetService<DynamicEmitter>();
             if (emitter == null) emitter = app.GetRegisteredDynamicEmitter();
 			return emitter.GetManagedDynamicProxy(serviceTypeInfo);
         }
 
-        internal static TService CreateProxy<TService>(this Application app, TypeInfo injectionTypeInfo) where TService : class
+        public static TService CreateProxy<TService>(this Application app, TypeInfo injectionTypeInfo) where TService : class
         {
 			var serviceType = typeof(TService);
 			var serviceTypeInfo = serviceType.GetTypeInfo();
