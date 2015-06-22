@@ -3,7 +3,7 @@ using System;
 
 namespace Compose
 {
-	internal sealed class WrappedServiceProvider : IServiceProvider
+	public sealed class WrappedServiceProvider : IServiceProvider
 	{
 		private IServiceProvider _fallback;
 

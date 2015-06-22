@@ -23,7 +23,7 @@ namespace Compose
 			=> services.AddTransient<TransitionMarker<TService>>();
 
 		internal static ServiceDescriptor BestSingletonMatchFor(this IServiceCollection services, Type serviceType)
-			=> services.Where(x => x.Lifetime == ServiceLifetime.Singleton && serviceType.IsAssignableFrom(x.ServiceType))
+			=> services.Where(x => x.Lifetime == ServiceLifetime.Singleton && serviceType.GetTypeInfo().IsAssignableFrom(x.ServiceType.GetTypeInfo()))
 				.OrderByDescending(x => x.ServiceType == serviceType)
 				.LastOrDefault();
 	}

@@ -14,7 +14,7 @@ namespace Compose
 			var managerFieldName = GetRandomString();
 			var managerType = managerTypeInfo.AsType();
 			var managerField = typeBuilder.AddManagerField(managerFieldName, managerType);
-			var managerCurrent = managerTypeInfo.GetDeclaredProperty("CurrentService").GetGetMethod();
+			var managerCurrent = managerTypeInfo.GetDeclaredProperty("CurrentService").GetMethod;
 			var managerRegister = managerTypeInfo.GetDeclaredMethod("Register");
 			var implementedInterfaces = new[] { serviceTypeInfo }.Union(serviceTypeInfo.ImplementedInterfaces.Select(x => x.GetTypeInfo()).ToArray()).ToArray();
 			typeBuilder.AddServiceConstructor(managerField, managerType, managerRegister);
@@ -125,7 +125,7 @@ namespace Compose
 
 		private static void AddPropertyGetImplementation(this TypeBuilder typeBuilder, PropertyBuilder propertyBuilder, PropertyInfo propertyInfo, FieldBuilder managerField, MethodInfo managerCurrent)
 		{
-			var propertyInfoGetMethod = propertyInfo.GetGetMethod();
+			var propertyInfoGetMethod = propertyInfo.GetMethod;
 			if (propertyInfoGetMethod == null) return;
 			var propertyGetMethod = typeBuilder.DefineMethod(propertyInfoGetMethod.Name, MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig | MethodAttributes.Virtual, propertyInfo.PropertyType, Type.EmptyTypes);
 			var propertyGetEmitter = propertyGetMethod.GetILGenerator();
@@ -140,7 +140,7 @@ namespace Compose
 
 		private static void AddPropertySetImplementation(this TypeBuilder typeBuilder, PropertyBuilder propertyBuilder, PropertyInfo propertyInfo, FieldBuilder managerField, MethodInfo managerCurrent)
 		{
-			var propertyInfoSetMethod = propertyInfo.GetSetMethod();
+			var propertyInfoSetMethod = propertyInfo.SetMethod;
 			if (propertyInfoSetMethod == null) return;
 			var propertySetMethod = typeBuilder.DefineMethod(propertyInfoSetMethod.Name, MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig | MethodAttributes.Virtual, null, new[] { propertyInfo.PropertyType });
 			var propertySetEmitter = propertySetMethod.GetILGenerator();
