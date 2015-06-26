@@ -9,7 +9,7 @@ namespace Compose.Tests
 		[Fact]
 		public void WhenTransitioningAwayFromDirectlyImplementedDisposableThenDisposesCurrentService()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => services
 				.AddTransitional<IDependency, DirectlyDisposableDependency>()
 				.AddTransient<Dependency, Dependency>()
@@ -24,7 +24,7 @@ namespace Compose.Tests
 		[Fact]
 		public void WhenTransitioningAwayFromIndirectlyImplementedDisposableThenDisposesCurrentService()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => services
 				.AddTransitional<IDependency, IndirectlyDisposableDependency>()
 				.AddTransient<Dependency, Dependency>()
@@ -39,7 +39,7 @@ namespace Compose.Tests
 		[Fact]
 		public void WhenSnapshottingAwayFromDirectlyImplementedDisposableThenDisposesCurrentService()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => services
 				.AddTransitional<IDependency, DirectlyDisposableDependency>()
 				.AddTransient<Dependency, Dependency>()
@@ -54,7 +54,7 @@ namespace Compose.Tests
 		[Fact]
 		public void WhenSnapshottingAwayFromIndirectlyImplementedDisposableThenDisposesCurrentService()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => services
 				.AddTransitional<IDependency, IndirectlyDisposableDependency>()
 				.AddTransient<Dependency, Dependency>()
@@ -69,7 +69,7 @@ namespace Compose.Tests
 		[Fact]
 		public void WhenRestoringAwayFromDirectlyImplementedDisposableThenDisposesCurrentService()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => services
 				.AddTransitional<IDependency, DirectlyDisposableDependency>()
 				.AddTransient<Dependency, Dependency>()
@@ -84,7 +84,7 @@ namespace Compose.Tests
 		[Fact]
 		public void WhenRestoringAwayFromIndirectlyImplementedDisposableThenDisposesCurrentService()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => services
 				.AddTransitional<IDependency, IndirectlyDisposableDependency>()
 				.AddTransient<Dependency, Dependency>()

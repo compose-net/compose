@@ -9,7 +9,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanResolveServicesWhenAddedAsTransitional()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => services.AddTransitional<IDependency, Dependency>());
 			app.OnExecute<IDependency>(dependency =>
 			{
@@ -22,7 +22,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanResolveServicesWhenWithTransitional()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services =>
 			{
 				services
@@ -40,7 +40,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanResolveServicesWhenAsTransitional()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services =>
 			{
 				services
@@ -58,7 +58,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanResolveServicesIndirectlyWhenAddedAsTransitional()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services =>
 			{
 				services.AddTransient<IConsumer, Consumer>();
@@ -75,7 +75,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanResolveServicesIndirectlyWhenWithTransitional()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services =>
 			{
 				services
@@ -94,7 +94,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanResolveServicesIndirectlyWhenAsTransitional()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services =>
 			{
 				services
@@ -113,7 +113,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanTransitionService()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => 
 			{
 				services
@@ -132,7 +132,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanTransitionSpecificallyBoundService()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services =>
 			{
 				services
@@ -152,7 +152,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanTransitionAllBoundServices()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services =>
 			{
 				services
@@ -172,7 +172,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanTransitionBackToOriginalService()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services =>
 			{
 				services
@@ -191,7 +191,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanPassThroughGenericArgumentsForGenericProxies()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => { services.AddTransient(typeof(IGenericDependency<>), typeof(GenericDependency<>)); });
 			app.OnExecute<IGenericDependency<byte[]>>(dependency =>
 			{
@@ -203,7 +203,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanNotTransitionToUnresolvableService()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => services.AddTransient<IDependency, Dependency>().AsTransitional());
 			app.OnExecute<IDependency>(dependency =>
 			{
@@ -216,7 +216,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CannotTransitionServicesAddedAfterMarker()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services =>
 			{
 				services
@@ -234,7 +234,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanTransitionServicesAddedBeforeLastMarker()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services =>
 			{
 				services
@@ -251,7 +251,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanTransitionIndirectService()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => services
 				.AddTransitional<IDependency, Dependency>()
 				.AddTransient<IConsumer, Consumer>()

@@ -9,7 +9,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanSnapshot()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => services.AddTransitional<IDependency, Dependency1>());
 			Action act = app.Snapshot;
 			Assert.Null(Record.Exception(act));
@@ -18,7 +18,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanSnapshotWithoutServices()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			Action act = app.Snapshot;
 			Assert.Null(Record.Exception(act));
 		}
@@ -26,7 +26,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanRestore()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => services.AddTransitional<IDependency, Dependency1>());
 			Action act = app.Restore;
 			Assert.Null(Record.Exception(act));
@@ -35,7 +35,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanRestoreWithoutServices()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			Action act = app.Restore;
 			Assert.Null(Record.Exception(act));
 		}
@@ -43,7 +43,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanRestoreExplicitlySnapshottedTransitionedServices()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services =>
 			{
 				services.AddTransitional<IDependency, Dependency1>();
@@ -63,7 +63,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanRestoreImplicitlySnapshottedTransitionedServices()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services =>
 			{
 				services.AddTransitional<IDependency, Dependency1>();
@@ -82,7 +82,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanRestoreLatestSnapshot()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services =>
 			{
 				services.AddTransitional<IDependency, Dependency1>();

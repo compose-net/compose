@@ -130,7 +130,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanChangeImplementation()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => services.AddTransitional<IDependency, Dependency1>());
 			var service = app.ApplicationServices.GetRequiredService<IDependency>();
 			Dependency1.Id = Guid.NewGuid().ToString();
@@ -571,7 +571,7 @@ namespace Compose.Tests
 
 		private static Action CreateProxy(Type interfaceType, Type implementationType)
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => services.AddTransient(interfaceType, implementationType));
 			return () => app.CreateProxy(interfaceType.GetTypeInfo());
 		}
@@ -605,7 +605,7 @@ namespace Compose.Tests
 
 		private static Func<T> SetupProxy<T>(Type interfaceType, Type implementationType) where T : class
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => services.AddTransient(interfaceType, implementationType));
 			return () => app.CreateProxy<T>(implementationType.GetTypeInfo());
 		}

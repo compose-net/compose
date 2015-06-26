@@ -9,7 +9,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanHandleImplementationInstances()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => services.AddInstance(typeof(string), "foo"));
 			Action act = app.Execute;
 			Assert.Null(Record.Exception(act));
@@ -18,7 +18,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanHandleSameInstanceImplementingMultipleServices()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services =>
 			{
 				var service = new Service();
@@ -32,7 +32,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanTreatInstancesAsSingletons()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			var instance = new Service();
 			app.UseServices(services =>
 			{
@@ -49,7 +49,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanUseCustomServiceProvider()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => new CustomServiceProvider());
 			app.OnExecute<IService1>(service => { });
 			Action act = app.Execute;
@@ -59,7 +59,7 @@ namespace Compose.Tests
 		[Fact]
 		public void CanResolveSingletonsIndirectly()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => services
 				.AddTransient<IConsumer, Consumer>()
 				.AddSingleton<IDependency, Dependency>()
