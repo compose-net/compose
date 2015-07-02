@@ -1,6 +1,7 @@
 ﻿{
 	"commands": {
-		"test": "xunit.runner.dnx -trait \"Category=Unit Tests\""
+		"test": "xunit.runner.dnx -trait \"Category=Unit Tests\"",
+		"testall": "xunit.runner.dnx"
 	},
 	"compile": [
 		"../../src/**/*.cs"
