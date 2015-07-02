@@ -12,10 +12,13 @@ IF NOT EXIST %USERPROFILE%\.dnx md %USERPROFILE%\.dnx
 IF NOT EXIST %USERPROFILE%\.dnx\bin md %USERPROFILE%\.dnx\bin
 @powershell -NoProfile -ExecutionPolicy unrestricted -Command "&{$Branch='dev';iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/aspnet/Home/dev/dnvminstall.ps1'))}"
 
-%USERPROFILE%\.dnx\bin\dnvm install 1.0.0-beta6-12100 -arch x86 -r clr -unstable
+%USERPROFILE%\.dnx\bin\dnvm install latest -arch x86 -r clr
+%USERPROFILE%\.dnx\bin\dnvm install latest -arch x86 -r coreclr
 dnu restore --quiet
 IF EXIST src\Compose\bin\Release DEL src\Compose\bin\Release /Q
 dnu pack src\Compose --configuration Release --quiet
+dnx tests\Compose.Tests\ test
+dnvm use latest -r clr -p
 dnx tests\Compose.Tests\ test
 
 IF NOT EXIST artifacts md artifacts
