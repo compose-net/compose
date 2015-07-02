@@ -1,13 +1,14 @@
 ﻿using Microsoft.Framework.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using TestAttributes;
 using Xunit;
 
 namespace Compose.Tests
 {
 	public class ApplicationTests
 	{
-		[Fact]
+		[Unit]
 		public void WhenUsingInternalServiceProviderThenPreConfigureServicesReceivesEmptyServiceCollection()
 		{
 			var app = new Fake.Application();
@@ -17,7 +18,7 @@ namespace Compose.Tests
 			Assert.Equal(0, app.PreConfiguredServices.Count);
 		}
 
-		[Fact]
+		[Unit]
 		public void WhenUsingInternalServiceProviderThenPostConfigureServicesReceivesConfiguredServices()
 		{
 			var app = new Fake.Application();
@@ -27,7 +28,7 @@ namespace Compose.Tests
 			Assert.Contains(app.PostConfiguredServices, service => service.ServiceType == typeof(Fake.Service));
 		}
 
-		[Fact]
+		[Unit]
 		public void WhenUsingInternalServiceProviderThenPreConfiguredServicesArePresentInApplicationServices()
 		{
 			var app = new Fake.Application
@@ -45,7 +46,7 @@ namespace Compose.Tests
 			Assert.Contains(app.PostConfiguredServices, service => service.ServiceType == typeof(Fake.Service));
 		}
 
-		[Fact]
+		[Unit]
 		public void WhenUsingCustomServiceProviderThenPreConfigureServicesReceivesEmptyServiceCollection()
 		{
 			var app = new Fake.Application();
@@ -55,7 +56,7 @@ namespace Compose.Tests
 			Assert.Equal(0, app.PreConfiguredServices.Count);
 		}
 
-		[Fact]
+		[Unit]
 		public void WhenUsingCustomServiceProviderThenPostConfigureServicesReceivesConfiguredServices()
 		{
 			var app = new Fake.Application();
@@ -69,7 +70,7 @@ namespace Compose.Tests
 			Assert.Contains(app.PostConfiguredServices, service => service.ServiceType == typeof(Fake.Service));
 		}
 
-		[Fact]
+		[Unit]
 		public void WhenUsingCustomServiceProviderThenPreConfiguredServicesArePresentInApplicationServices()
 		{
 			var app = new Fake.Application

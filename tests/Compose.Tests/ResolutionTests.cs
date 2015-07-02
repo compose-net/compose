@@ -1,5 +1,6 @@
 ﻿using Microsoft.Framework.DependencyInjection;
 using System;
+using TestAttributes;
 using Xunit;
 
 namespace Compose.Tests
@@ -12,7 +13,7 @@ namespace Compose.Tests
 
 		private class Dependency : IDependency { }
 
-		[Fact]
+		[Unit]
 		public void WhenResolvingUnboundServiceThenThrowsDescriptiveException()
 		{
 			var app = new Application();
@@ -27,7 +28,7 @@ namespace Compose.Tests
 
 		private class Service<T> : IService<T> { }
 
-		[Fact]
+		[Unit]
 		public void WhenMultipleTransientImplementationsRegisteredForGenericSerivceThenCanResolve()
 		{
 			var app = new Application();
@@ -46,7 +47,7 @@ namespace Compose.Tests
 			Assert.NotNull(Record.Exception(act));
 		}
 
-		[Fact]
+		[Unit]
 		public void WhenMultipleSingletonImplementationsRegisteredForGenericSerivceThenCanResolve()
 		{
 			var app = new Application();
@@ -65,7 +66,7 @@ namespace Compose.Tests
 			Assert.NotNull(Record.Exception(act));
 		}
 
-		[Fact]
+		[Unit]
 		public void WhenAddingClosedAndOpenGenericTransientImplementationsForGenericServiceThenCanResolve()
 		{
 			var app = new Application();
@@ -82,7 +83,7 @@ namespace Compose.Tests
 			Assert.Null(Record.Exception(act));
 		}
 
-		[Fact]
+		[Unit]
 		public void WhenAddingClosedAndOpenGenericSingletonImplementationsForGenericServiceThenCanResolve()
 		{
 			var app = new Application();
@@ -99,7 +100,7 @@ namespace Compose.Tests
 			Assert.Null(Record.Exception(act));
 		}
 
-		[Fact]
+		[Unit]
 		public void WhenAddingSameServiceTypeMultipleTimesThenCanResolve()
 		{
 			var app = new Application();

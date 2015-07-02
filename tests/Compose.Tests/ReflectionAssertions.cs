@@ -1,18 +1,19 @@
 ﻿using Microsoft.Framework.DependencyInjection;
 using System;
+using TestAttributes;
 using Xunit;
 
 namespace Compose.Tests
 {
     public class ReflectionAssertions
     {
-		[Fact]
+		[Unit]
 		public void CanBuildMicrosoftFrameworkDependencyInjectionServiceProvider()
 		{
 			Assert.NotNull(new ServiceCollection().BuildServiceProvider());
 		}
 
-		[Fact]
+		[Unit]
 		public void CanActivateServiceProviderThroughWrappingFacade()
 		{
 			Action act = () => new WrappedServiceProvider(new ServiceCollection());
