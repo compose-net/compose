@@ -1,5 +1,6 @@
 ﻿using Microsoft.Framework.DependencyInjection;
 using System;
+using TestAttributes;
 using Xunit;
 
 namespace Compose.Tests
@@ -8,7 +9,7 @@ namespace Compose.Tests
     {
 		public class TypeBased
 		{
-			[Fact]
+			[Unit]
 			public void WhenResolvingTransientThenProviderReturnsMultipleInstances()
 			{
 				var app = new Fake.Executable();
@@ -16,7 +17,7 @@ namespace Compose.Tests
 				Assert.True(app.CanResolveMultipleInstances<IDependency>());
 			}
 
-			[Fact]
+			[Unit]
 			public void WhenResolvingTransientTransitionalThenProviderReturnsMultipleInstances()
 			{
 
@@ -25,7 +26,7 @@ namespace Compose.Tests
 				Assert.True(app.CanResolveMultipleInstances<IDependency>());
 			}
 
-			[Fact]
+			[Unit]
 			public void WhenResolvingSingletonThenProviderReturnsSingleInstance()
 			{
 				var app = new Fake.Executable();
@@ -33,7 +34,7 @@ namespace Compose.Tests
 				Assert.False(app.CanResolveMultipleInstances<IDependency>());
 			}
 
-			[Fact]
+			[Unit]
 			public void WhenResolvingSingletonTransitionalThenProviderReturnsSingleInstance()
 			{
 				var app = new Fake.Executable();
@@ -44,7 +45,7 @@ namespace Compose.Tests
 
 		public class InstanceBased
 		{
-			[Fact]
+			[Unit]
 			public void WhenResolvingInstanceThenProviderReturnsSingleInstance()
 			{
 				var app = new Fake.Executable();
@@ -53,7 +54,7 @@ namespace Compose.Tests
 				Assert.False(app.CanResolveMultipleInstances<IDependency>());
 			}
 
-			[Fact]
+			[Unit]
 			public void WhenResolvingTransitionalInstanceThenProviderReturnsSingleInstance()
 			{
 				var app = new Fake.Executable();
@@ -65,7 +66,7 @@ namespace Compose.Tests
 
 		public class FactoryBased
 		{
-			[Fact]
+			[Unit]
 			public void WhenTransientFactoryReturnsInstancesThenProviderReturnsInstances()
 			{
 				var app = new Fake.Executable();
@@ -74,7 +75,7 @@ namespace Compose.Tests
 				Assert.True(app.CanResolveMultipleInstances<IDependency>());
 			}
 
-			[Fact]
+			[Unit]
 			public void WhenTransientTransitionalFactoryReturnsInstancesThenProviderReturnsInstances()
 			{
 				var app = new Fake.Executable();
@@ -83,7 +84,7 @@ namespace Compose.Tests
 				Assert.True(app.CanResolveMultipleInstances<IDependency>());
 			}
 
-			[Fact]
+			[Unit]
 			public void WhenSingletonFactoryReturnsInstancesThenProviderReturnsSingleInstance()
 			{
 				var app = new Fake.Executable();
@@ -92,7 +93,7 @@ namespace Compose.Tests
 				Assert.False(app.CanResolveMultipleInstances<IDependency>());
 			}
 
-			[Fact]
+			[Unit]
 			public void WhenSingletonTransitionalFactoryReturnsInstancesThenProviderReturnsSingleInstance()
 			{
 				var app = new Fake.Executable();

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using TestAttributes;
 using Xunit;
 
 namespace Compose.Tests
@@ -11,7 +12,7 @@ namespace Compose.Tests
 		#region CanGenerateDynamicProxy
 		public interface IBlank { }
 		internal class Dependency : IBlank { }
-		[Fact]
+		[Unit]
 		public void CanGenerateDynamicProxy()
 		{
 			Assert.NotNull(SetupProxy<IBlank, Dependency>());
@@ -25,7 +26,7 @@ namespace Compose.Tests
 			internal static string Id { get; set; }
 			public string Property { get { return Id; } }
 		}
-		[Fact]
+		[Unit]
 		public void CanGetProperty()
 		{
 			Assert.Equal(GetProperty.Id, SetupProxy<IGetProperty, GetProperty>()().Property);
@@ -39,7 +40,7 @@ namespace Compose.Tests
 			internal static string Id { get; set; }
 			public string Property { set { Id = value; } }
 		}
-		[Fact]
+		[Unit]
 		public void CanSetProperty()
 		{
 			var service = SetupProxy<ISetProperty, SetProperty>()();
@@ -57,7 +58,7 @@ namespace Compose.Tests
 
 			public void Method() { Invoked = true; }
 		}
-		[Fact]
+		[Unit]
 		public void CanInvokeVoidWithoutArguments()
 		{
 			var service = SetupProxy<IInvokeWithoutArguments, InvokeWithoutArguments>()();
@@ -74,7 +75,7 @@ namespace Compose.Tests
 			internal static int Invoked { get; set; }
 			public void Method(int arg) { Invoked = arg; }
 		}
-		[Fact]
+		[Unit]
 		public void CanInvokeVoidWithArguments()
 		{
 			var service = SetupProxy<IInvokeWithArguments, InvokeWithArguments>()();
@@ -91,7 +92,7 @@ namespace Compose.Tests
 			internal static int Return { get; set; }
 			public int Method() { return Return; }
 		}
-		[Fact]
+		[Unit]
 		public void CanReturnInvocationResult()
 		{
 			var service = SetupProxy<IReturnFromInvoke, ReturnFromInvoke>()();
@@ -107,7 +108,7 @@ namespace Compose.Tests
 		{
 			public void Method() { throw new TestException(); }
 		}
-		[Fact]
+		[Unit]
 		public void CanPassThroughExceptions()
 		{
 			Action act = () => SetupProxy<IThrowException, ThrowException>()().Method();
@@ -127,7 +128,7 @@ namespace Compose.Tests
 			internal static string Id { get; set; }
 			public string GetId() { return Id; }
 		}
-		[Fact]
+		[Unit]
 		public void CanChangeImplementation()
 		{
 			var app = new Fake.Executable();
@@ -148,7 +149,7 @@ namespace Compose.Tests
 		{
 			public void Method<T1, T2, T3>(T1 a, T2 b, T3 c) { }
 		}
-		[Fact]
+		[Unit]
 		public void CanInvokeVoidWithGenericArguments()
 		{
 			var service = SetupProxy<IInvokeWithGenericArguments, InvokeWithGenericArguments>()();
@@ -163,7 +164,7 @@ namespace Compose.Tests
 		{
 			public T Method<T>(T arg) { return arg; }
 		}
-		[Fact]
+		[Unit]
 		public void CanReturnGenericInvocationResult()
 		{
 			var service = SetupProxy<IReturnGenericFromInvoke, ReturnGenericFromInvoke>()();
@@ -176,7 +177,7 @@ namespace Compose.Tests
 		public interface IInterfaceConstraint { }
 		public interface IInterfaceConstrainedGenericArgument<T> where T : IInterfaceConstraint { }
 		internal class InterfaceConstrainedGenericArgument<T> : IInterfaceConstrainedGenericArgument<T> where T : IInterfaceConstraint { }
-		[Fact]
+		[Unit]
 		public void CanGenerateProxyWithInterfaceConstrainedGenericArguments()
 		{
 			Assert.NotNull(Record.Exception(CreateProxy(typeof(IInterfaceConstrainedGenericArgument<>), typeof(InterfaceConstrainedGenericArgument<>))));
@@ -186,7 +187,7 @@ namespace Compose.Tests
 		#region CanGenerateProxyWithBaseClassConstrainedGenericArguments
 		public interface IInterfaceWithBaseClassConstrainedGenericArgument<T> where T : Base { }
 		internal class InterfaceWithBaseClassConstrainedGenericArgument<T> : IInterfaceWithBaseClassConstrainedGenericArgument<T> where T : Derivative { }
-		[Fact]
+		[Unit]
 		public void CanGenerateProxyWithBaseClassConstrainedGenericArguments()
 		{
 			Assert.NotNull(Record.Exception(CreateProxy(typeof(IInterfaceWithBaseClassConstrainedGenericArgument<>), typeof(InterfaceWithBaseClassConstrainedGenericArgument<>))));
@@ -196,7 +197,7 @@ namespace Compose.Tests
 		#region CanGenerateProxyWithDefaultConstructorConstrainedGenericArguments
 		public interface IInterfaceWithDefaultConstructorConstrainedGenericArgument<T> where T : new() { }
 		internal class InterfaceWithDefaultConstructorConstrainedGenericArgument<T> : IInterfaceWithDefaultConstructorConstrainedGenericArgument<T> where T : new() { }
-		[Fact]
+		[Unit]
 		public void CanGenerateProxyWithDefaultConstructorConstrainedGenericArguments()
 		{
 			Assert.NotNull(Record.Exception(CreateProxy(typeof(IInterfaceWithDefaultConstructorConstrainedGenericArgument<>), typeof(InterfaceWithDefaultConstructorConstrainedGenericArgument<>))));
@@ -206,7 +207,7 @@ namespace Compose.Tests
 		#region CanGenerateProxyWithClassConstrainedGenericArguments
 		public interface IInterfaceWithClassConstrainedGenericArgument<T> where T : class { }
 		internal class InterfaceWithClassConstrainedGenericArgument<T> : IInterfaceWithClassConstrainedGenericArgument<T> where T : class { }
-        [Fact]
+        [Unit]
 		public void CanGenerateProxyWithClassConstrainedGenericArguments()
 		{
 			Assert.NotNull(Record.Exception(CreateProxy(typeof(IInterfaceWithClassConstrainedGenericArgument<>), typeof(InterfaceWithClassConstrainedGenericArgument<>))));
@@ -216,7 +217,7 @@ namespace Compose.Tests
 		#region CanGenerateProxyWithStructConstrainedGenericArguments
 		public interface IInterfaceWithStructConstrainedGenericArgument<T> where T : struct { }
 		internal class InterfaceWithStructConstrainedGenericArgument<T> : IInterfaceWithStructConstrainedGenericArgument<T> where T : struct { }
-		[Fact]
+		[Unit]
 		public void CanGenerateProxyWithStructConstrainedGenericArguments()
 		{
 			Assert.NotNull(Record.Exception(CreateProxy(typeof(IInterfaceWithStructConstrainedGenericArgument<>), typeof(InterfaceWithStructConstrainedGenericArgument<>))));
@@ -226,7 +227,7 @@ namespace Compose.Tests
 		#region CanGenerateProxyWithCovariantConstrainedGenericsArguments
 		public interface IInterfaceWithCovariantConstrainedGenericArguments<in TIn, out TOut> { }
 		internal class InterfaceWithCovariantConstrainedGenericArguments<TIn, TOut> : IInterfaceWithCovariantConstrainedGenericArguments<TIn, TOut> { }
-		[Fact]
+		[Unit]
 		public void CanGenerateProxyWithCovariantConstrainedGenericsArguments()
 		{
 			Assert.NotNull(Record.Exception(CreateProxy(typeof(IInterfaceWithCovariantConstrainedGenericArguments<,>), typeof(InterfaceWithCovariantConstrainedGenericArguments<,>))));
@@ -240,7 +241,7 @@ namespace Compose.Tests
 		{
 			public void Method<T>(T arg) where T : IDependency { }
 		}
-		[Fact]
+		[Unit]
 		public void CanInvokeVoidWithInterfaceConstrainedGenericArguments()
 		{
 			var service = SetupProxy<IInvokeWithInterfaceConstrainedGenericArguments, InvokeWithInterfaceConstrainedGenericArguments>()();
@@ -254,7 +255,7 @@ namespace Compose.Tests
 		{
 			public void Method<T>(T arg) where T : Base { }
 		}
-		[Fact]
+		[Unit]
 		public void CanInvokeVoidWithBaseClassConstrainedGenericArguments()
 		{
 			var service = SetupProxy<IInvokeWithBaseClassConstrainedGenericArguments, InvokeWithBaseClassConstrainedGenericArguments>()();
@@ -268,7 +269,7 @@ namespace Compose.Tests
 		{
 			public void Method<T>(T arg) where T : new() { }
 		}
-		[Fact]
+		[Unit]
 		public void CanInvokeWithDefaultConstructorConstrainedGenericArgument()
 		{
 			var service = SetupProxy<IInvokeWithDefaultConstructorConstrainedGenericArguments, InvokeWithDefaultConstructorConstrainedGenericArguments>()();
@@ -282,7 +283,7 @@ namespace Compose.Tests
 		{
 			public void Method<T>(T arg) where T : class { }
 		}
-		[Fact]
+		[Unit]
 		public void CanInvokeWithClassConstrainedGenericArgument()
 		{
 			var service = SetupProxy<IInvokeWithClassConstrainedGenericArguments, InvokeWithClassConstrainedGenericArguments>()();
@@ -296,7 +297,7 @@ namespace Compose.Tests
 		{
 			public void Method<T>(T arg) where T : struct { }
 		}
-		[Fact]
+		[Unit]
 		public void CanInvokeWithStructConstrainedGenericArgument()
 		{
 			var service = SetupProxy<IInvokeWithStructConstrainedGenericArguments, InvokeWithStructConstrainedGenericArguments>()();
@@ -310,7 +311,7 @@ namespace Compose.Tests
 		{
 			public void Method<TDerivative>(TDerivative derivative) where TDerivative : TBase { }
 		}
-		[Fact]
+		[Unit]
 		public void CanInvokeWithClassGenericConstrainedGenericArguments()
 		{
 			var service = SetupProxy<IInvokeWithClassGenericConstrainedGenericArguments<Base>, InvokeWithClassGenericConstrainedGenericArguments<Base>>()();
@@ -324,7 +325,7 @@ namespace Compose.Tests
 		{
 			public void Method<TBase, TDerivative>(TBase arg1, TDerivative arg2) where TDerivative : TBase { }
 		}
-		[Fact]
+		[Unit]
 		public void CanInvokeWithMethodGenericConstrainedGenericArguments()
 		{
 			var service = SetupProxy<IInvokeWithMethodGenericConstrainedGenericArguments, InvokeWithMethodGenericConstrainedGenericArguments>()();
@@ -345,7 +346,7 @@ namespace Compose.Tests
 			{ arg2 = new TMethodDerivative(); }
 		}
 		internal class LowerDerivative : Derivative, IDisposable { public void Dispose() { } }
-		[Fact]
+		[Unit]
 		public void CanInvokeWithAllGenericConstraints()
 		{
 			var service = SetupProxy<IInvokeWithAllGenericConstraints<Base>, InvokeWithAllGenericConstraints<Base>>()();
@@ -366,7 +367,7 @@ namespace Compose.Tests
 			public void Method(int arg) { }
 			public void Method(string arg) { }
 		}
-		[Fact]
+		[Unit]
 		public void CanInvokeOverloadedMethods()
 		{
 			var service = SetupProxy<IInvokeOverloadedMethods, InvokeOverloadedMethods>()();
@@ -381,7 +382,7 @@ namespace Compose.Tests
 		{
 			public void Method<T>(List<List<T>> arg) { }
 		}
-		[Fact]
+		[Unit]
 		public void CanInvokeWithNestedGenericArgument()
 		{
 			var service = SetupProxy<IInvokeWithNestedGenericArgument, InvokeWithNestedGenericArgument>()();
@@ -395,7 +396,7 @@ namespace Compose.Tests
 		{
 			public void Method(T arg) { }
 		}
-		[Fact]
+		[Unit]
 		public void CanInvokeWithClassDefinedGenericArgument()
 		{
 			var service = SetupProxy<IInvokeWithClassDefinedGenericArgument<int>, InvokeWithClassDefinedGenericArgument<int>>()();
@@ -409,7 +410,7 @@ namespace Compose.Tests
 		{
 			public void Method(ref int arg) { }
 		}
-		[Fact]
+		[Unit]
 		public void CanInvokeWithByRefArguments()
 		{
 			var service = SetupProxy<IInvokeWithByRefArgument, InvokeWithByRefArgument>()();
@@ -424,7 +425,7 @@ namespace Compose.Tests
 		{
 			public void Method(out int arg) { arg = 4; }
 		}
-		[Fact]
+		[Unit]
 		public void CanInvokeWithOutArguments()
 		{
 			var service = SetupProxy<IInvokeWithOutArguments, InvokeWithOutArguments>()();
@@ -439,7 +440,7 @@ namespace Compose.Tests
 		{
 			public void Method<T>(params T[] arg) { }
 		}
-		[Fact]
+		[Unit]
 		public void CanInvokeWithParamsArguments()
 		{
 			var service = SetupProxy<IInvokeWithParamsArguments, InvokeWithParamsArguments>()();
@@ -456,7 +457,7 @@ namespace Compose.Tests
 
 			public void ParentMethod() { }
 		}
-		[Fact]
+		[Unit]
 		public void CanInvokeInheritedInterfaceMethods()
 		{
 			var service = SetupProxy<IParentInterface, InvokeInheritedInterfaceMethods>()();
@@ -474,7 +475,7 @@ namespace Compose.Tests
 			void IExplicitInterface1.Method() { }
 			void IExplicitInterface2.Method() { }
 		}
-		[Fact]
+		[Unit]
 		public void CanInvokeInheritedInterfaceExplcitlyImplementedMethods()
 		{
 			var service = SetupProxy<IInvokeInheritedInterfaceExplcitlyImplementedMethods, InvokeInheritedInterfaceExplcitlyImplementedMethods>()();
@@ -489,7 +490,7 @@ namespace Compose.Tests
 		{
 			public string Method() { return null; }
 		}
-		[Fact]
+		[Unit]
 		public void CanGenerateCovariantProxies()
 		{
             Assert.Null(Record.Exception(InvokeProxy<ICovariant<string>, Covariant>()));
@@ -501,7 +502,7 @@ namespace Compose.Tests
 		{
 			public void Dispose() { }
 		}
-		[Fact]
+		[Unit]
 		public void CanGenerateProxyForSystemInterfaces()
 		{
 			Assert.Null(Record.Exception(InvokeProxy<IDisposable, Disposable>()));
@@ -514,7 +515,7 @@ namespace Compose.Tests
 		{
 			public void Method() { }
 		}
-		[Fact]
+		[Unit]
 		public void CanGenerateProxyForUntypedGenerics()
 		{
 			Assert.Null(Record.Exception(InvokeProxy<IUntypedGeneric<string>>(typeof(IUntypedGeneric<>), typeof(UntypedGeneric<>))));
@@ -524,7 +525,7 @@ namespace Compose.Tests
 		#region CanThrowInformativeExceptionWhenInterfaceIsNotVisible
 		private interface IInformativeExceptionThrownForInvisibleInterface { }
 		internal class InformativeExceptionThrownForInvisibleInterface : IInformativeExceptionThrownForInvisibleInterface { }
-		[Fact]
+		[Unit]
 		public void CanThrowInformativeExceptionWhenInterfaceIsNotVisible()
 		{
 
@@ -540,7 +541,7 @@ namespace Compose.Tests
 		private class InformativeExceptionThrownForInvisibleInterfaceGeneric { }
 		private class InformativeExceptionThrownForInvisibleGeneric 
 			: IInformativeExceptionThrownForInvisibleGeneric<InformativeExceptionThrownForInvisibleInterfaceGeneric> { }
-		[Fact]
+		[Unit]
 		public void CanThrowInformativeExceptionWhenGenericTypeIsNotVisible()
 		{
 			Assert.IsType(
@@ -553,7 +554,7 @@ namespace Compose.Tests
 		#region CanGenerateGenericProxy
 		public interface IGeneric<T> { }
 		internal class Generic<T> : IGeneric<T> { }
-		[Fact]
+		[Unit]
 		public void CanGenerateGenericProxy()
 		{
 			Assert.NotNull(Record.Exception(CreateProxy(typeof(IGeneric<>), typeof(Generic<>))));
@@ -561,7 +562,7 @@ namespace Compose.Tests
 		#endregion
 
 		#region CanResolveGenericProxy
-		[Fact]
+		[Unit]
 		public void CanResolveGenericProxy()
 		{
 			Assert.Null(Record.Exception(InvokeProxy<IGeneric<object>>(typeof(IGeneric<>), typeof(Generic<>))));

@@ -1,12 +1,13 @@
 ﻿using Microsoft.Framework.DependencyInjection;
 using System;
+using TestAttributes;
 using Xunit;
 
 namespace Compose.Tests
 {
 	public class ServiceProviderTests
 	{
-		[Fact]
+		[Unit]
 		public void CanHandleImplementationInstances()
 		{
 			var app = new Fake.Executable();
@@ -15,7 +16,7 @@ namespace Compose.Tests
 			Assert.Null(Record.Exception(act));
 		}
 
-		[Fact]
+		[Unit]
 		public void CanHandleSameInstanceImplementingMultipleServices()
 		{
 			var app = new Fake.Executable();
@@ -29,7 +30,7 @@ namespace Compose.Tests
 			Assert.Null(Record.Exception(act));
 		}
 
-		[Fact]
+		[Unit]
 		public void CanTreatInstancesAsSingletons()
 		{
 			var app = new Fake.Executable();
@@ -46,7 +47,7 @@ namespace Compose.Tests
 			app.Execute();
 		}
 
-		[Fact]
+		[Unit]
 		public void CanUseCustomServiceProvider()
 		{
 			var app = new Fake.Executable();
@@ -56,7 +57,7 @@ namespace Compose.Tests
 			Assert.IsType<NotImplementedException>(Record.Exception(act));
 		}
 
-		[Fact]
+		[Unit]
 		public void CanResolveSingletonsIndirectly()
 		{
 			var app = new Fake.Executable();
