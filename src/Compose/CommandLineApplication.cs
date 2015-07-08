@@ -1,8 +1,6 @@
-﻿using System.Threading;
-
-namespace Compose
+﻿namespace Compose
 {
 	public class CommandLineApplication : CommandLineApplication<int> { }
 	public class CommandLineApplication<TResult> : Executable<TResult> { }
-	public class CancellableCommandLineApplication : Executable<CancellationToken, int> { }
+	public class CommandLineApplication<TContext, TResult> : Executable<TContext, TResult> { }
 }
