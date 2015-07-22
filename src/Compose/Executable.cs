@@ -48,29 +48,29 @@ namespace Compose
 		}
 	}
 
-	public abstract class Executable<TResult> : Application
+	public abstract class Executable<T> : Application
 	{
-		protected Func<TResult> Execution { get; private set; }
-		protected Func<CancellationToken, Task<TResult>> ExecutionAsync { get; private set; }
+		protected Func<T> Execution { get; private set; }
+		protected Func<CancellationToken, Task<T>> ExecutionAsync { get; private set; }
 
-		public void OnExecute(Func<TResult> invoke)
+		public void OnExecute(Func<T> invoke)
 		{
 			Execution = invoke;
 		}
 
-		public void OnExecute(Func<CancellationToken, Task<TResult>> asyncInvoke)
+		public void OnExecute(Func<CancellationToken, Task<T>> asyncInvoke)
 		{
 			ExecutionAsync = asyncInvoke;
 		}
 
-		public void OnExecute<TService>(Func<TService, TResult> invoke) where TService : class
+		public void OnExecute<TService>(Func<TService, T> invoke) where TService : class
 		{
 			if (ApplicationServices == null) throw new InvalidOperationException($"{nameof(ApplicationServices)} was not registered; cannot execute action.");
 
 			OnExecute(() => invoke(ApplicationServices.GetRequiredService<TService>()));
 		}
 
-		public virtual TResult Execute()
+		public virtual T Execute()
 		{
 			if (Execution != null)
 				return Execution();
@@ -80,7 +80,7 @@ namespace Compose
 				throw new InvalidOperationException("Cannot execute without invokable action");
 		}
 
-		public virtual async Task<TResult> ExecuteAsync(CancellationToken cancellationToken)
+		public virtual async Task<T> ExecuteAsync(CancellationToken cancellationToken)
 		{
 			if (ExecutionAsync != null)
 				return await ExecutionAsync(cancellationToken);
@@ -88,6 +88,49 @@ namespace Compose
 				return await Task.Run(Execution, cancellationToken);
 			else
 				throw new InvalidOperationException("Cannot execute without invokable action");
+		}
+
+		public abstract class ContextOnly : Application
+		{
+			protected Action<T> Execution { get; private set; }
+			protected Func<CancellationToken, T, Task> ExecutionAsync { get; private set; }
+
+			public void OnExecute(Action<T> invoke)
+			{
+				Execution = invoke;
+			}
+
+			public void OnExecute(Func<CancellationToken, Task> asyncInvoke)
+			{
+				ExecutionAsync = asyncInvoke;
+			}
+
+			public void OnExecute<TService>(Action<TService, T> invoke)
+			{
+				if (ApplicationServices == null) throw new InvalidOperationException($"{nameof(ApplicationServices)} was not registered; cannot execute action.");
+
+				OnExecute(context => invoke(ApplicationServices.GetRequiredService<TService>(), context));
+			}
+
+			public virtual void Execute(T context)
+			{
+				if (Execution != null)
+					Execution(context);
+				else if (ExecutionAsync != null)
+					return ExecutionAsync(CancellationToken.None).Result;
+				else
+					throw new InvalidOperationException("Cannot execute without invokable action");
+			}
+
+			public virtual async Task ExecuteAsync(CancellationToken cancellationToken, T context)
+			{
+				if (ExecutionAsync != null)
+					await ExecutionAsync(cancellationToken, context);
+				else if (Execution != null)
+					await Task.Run(() => Execution(context), cancellationToken);
+				else
+					throw new InvalidOperationException("Cannot execute without invokable action");
+			}
 		}
 	}
 
