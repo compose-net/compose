@@ -11,7 +11,7 @@
 	"frameworks": {
 		"dotnet": {
 			"dependencies": {
-				"Microsoft.Framework.DependencyInjection": "1.0.0-beta5",
+				"Microsoft.Framework.DependencyInjection": "1.0.0-beta6",
 				"System.Reflection.Emit": "4.0.0-beta-23019"
 			}
 		}

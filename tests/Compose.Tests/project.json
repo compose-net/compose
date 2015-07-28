@@ -7,13 +7,12 @@
 		"../../src/**/*.cs"
 	],
 	"dependencies": {
-		"Microsoft.Framework.DependencyInjection": "1.0.0-beta5",
+		"Microsoft.Framework.DependencyInjection": "1.0.0-beta6",
 		"System.Reflection.Emit": "4.0.0-beta-23019",
-		"Moq": "4.2.1502.911",
+		"Moq": "4.2.1507.118",
 		"TestAttributes": "1.2.3-beta"
 	},
 	"frameworks": {
-		"dnx451": { },
-		"dnxcore50": { }
+		"dnx451": { }
 	}
 }
