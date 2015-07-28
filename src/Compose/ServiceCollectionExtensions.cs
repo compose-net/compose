@@ -10,7 +10,7 @@ namespace Compose
 		public static IServiceCollection AddTransitional(this IServiceCollection services, Type serviceType, Type implementationType)
 			=> services.AddTransient(serviceType, implementationType).WithTransitional(serviceType);
 
-		public static IServiceCollection AddTransitional<TService, TImplementation>(this IServiceCollection services) where TImplementation : TService
+		public static IServiceCollection AddTransitional<TService, TImplementation>(this IServiceCollection services) where TImplementation : class, TService where TService : class
 			=> services.AddTransient<TService, TImplementation>().WithTransitional<TService>();
 
 		public static IServiceCollection AsTransitional(this IServiceCollection services)

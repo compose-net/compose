@@ -100,7 +100,7 @@ namespace Compose
 				Execution = invoke;
 			}
 
-			public void OnExecute(Func<CancellationToken, Task> asyncInvoke)
+			public void OnExecute(Func<CancellationToken, T, Task> asyncInvoke)
 			{
 				ExecutionAsync = asyncInvoke;
 			}
@@ -117,7 +117,7 @@ namespace Compose
 				if (Execution != null)
 					Execution(context);
 				else if (ExecutionAsync != null)
-					return ExecutionAsync(CancellationToken.None).Result;
+					ExecutionAsync(CancellationToken.None, context).Wait();
 				else
 					throw new InvalidOperationException("Cannot execute without invokable action");
 			}
