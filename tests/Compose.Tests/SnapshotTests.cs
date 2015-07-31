@@ -1,49 +1,50 @@
 ﻿using Microsoft.Framework.DependencyInjection;
 using System;
+using TestAttributes;
 using Xunit;
 
 namespace Compose.Tests
 {
 	public class SnapshotTests
 	{
-		[Fact]
+		[Unit]
 		public void CanSnapshot()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => services.AddTransitional<IDependency, Dependency1>());
 			Action act = app.Snapshot;
 			Assert.Null(Record.Exception(act));
 		}
 
-		[Fact]
+		[Unit]
 		public void CanSnapshotWithoutServices()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			Action act = app.Snapshot;
 			Assert.Null(Record.Exception(act));
 		}
 
-		[Fact]
+		[Unit]
 		public void CanRestore()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => services.AddTransitional<IDependency, Dependency1>());
 			Action act = app.Restore;
 			Assert.Null(Record.Exception(act));
 		}
 
-		[Fact]
+		[Unit]
 		public void CanRestoreWithoutServices()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			Action act = app.Restore;
 			Assert.Null(Record.Exception(act));
 		}
 
-		[Fact]
+		[Unit]
 		public void CanRestoreExplicitlySnapshottedTransitionedServices()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services =>
 			{
 				services.AddTransitional<IDependency, Dependency1>();
@@ -60,10 +61,10 @@ namespace Compose.Tests
 			app.Execute();
 		}
 
-		[Fact]
+		[Unit]
 		public void CanRestoreImplicitlySnapshottedTransitionedServices()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services =>
 			{
 				services.AddTransitional<IDependency, Dependency1>();
@@ -79,10 +80,10 @@ namespace Compose.Tests
 			app.Execute();
 		}
 
-		[Fact]
+		[Unit]
 		public void CanRestoreLatestSnapshot()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services =>
 			{
 				services.AddTransitional<IDependency, Dependency1>();

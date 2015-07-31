@@ -1,15 +1,16 @@
 ﻿using Microsoft.Framework.DependencyInjection;
 using System;
+using TestAttributes;
 using Xunit;
 
 namespace Compose.Tests
 {
     public class DisposableTests
 	{
-		[Fact]
+		[Unit]
 		public void WhenTransitioningAwayFromDirectlyImplementedDisposableThenDisposesCurrentService()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => services
 				.AddTransitional<IDependency, DirectlyDisposableDependency>()
 				.AddTransient<Dependency, Dependency>()
@@ -21,10 +22,10 @@ namespace Compose.Tests
 			});
 		}
 
-		[Fact]
+		[Unit]
 		public void WhenTransitioningAwayFromIndirectlyImplementedDisposableThenDisposesCurrentService()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => services
 				.AddTransitional<IDependency, IndirectlyDisposableDependency>()
 				.AddTransient<Dependency, Dependency>()
@@ -36,10 +37,10 @@ namespace Compose.Tests
 			});
 		}
 
-		[Fact]
+		[Unit]
 		public void WhenSnapshottingAwayFromDirectlyImplementedDisposableThenDisposesCurrentService()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => services
 				.AddTransitional<IDependency, DirectlyDisposableDependency>()
 				.AddTransient<Dependency, Dependency>()
@@ -51,10 +52,10 @@ namespace Compose.Tests
 			});
 		}
 
-		[Fact]
+		[Unit]
 		public void WhenSnapshottingAwayFromIndirectlyImplementedDisposableThenDisposesCurrentService()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => services
 				.AddTransitional<IDependency, IndirectlyDisposableDependency>()
 				.AddTransient<Dependency, Dependency>()
@@ -66,10 +67,10 @@ namespace Compose.Tests
 			});
 		}
 
-		[Fact]
+		[Unit]
 		public void WhenRestoringAwayFromDirectlyImplementedDisposableThenDisposesCurrentService()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => services
 				.AddTransitional<IDependency, DirectlyDisposableDependency>()
 				.AddTransient<Dependency, Dependency>()
@@ -81,10 +82,10 @@ namespace Compose.Tests
 			});
 		}
 
-		[Fact]
+		[Unit]
 		public void WhenRestoringAwayFromIndirectlyImplementedDisposableThenDisposesCurrentService()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => services
 				.AddTransitional<IDependency, IndirectlyDisposableDependency>()
 				.AddTransient<Dependency, Dependency>()
@@ -96,7 +97,7 @@ namespace Compose.Tests
 			});
 		}
 
-		internal interface IDependency { }
+		public interface IDependency { }
 
 		private class Dependency : IDependency { }
 

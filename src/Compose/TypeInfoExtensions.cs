@@ -1,13 +1,18 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace Compose
 {
-    internal static class TypeInfoExtensions
-    {
+	internal static class TypeInfoExtensions
+	{
 		public static TypeInfo[] GetGenericArguments(this TypeInfo typeInfo)
 		{
-			return typeInfo.GenericTypeArguments.Select(x => x.GetTypeInfo()).ToArray();
+			IEnumerable<Type> arguments = typeInfo.IsGenericTypeDefinition
+								? typeInfo.GenericTypeParameters
+								: typeInfo.GenericTypeArguments;
+			return arguments.Select(x => x.GetTypeInfo()).ToArray();
 		}
 
 		public static TypeInfo[] GetInterfaces(this TypeInfo typeInfo)
@@ -27,8 +32,8 @@ namespace Compose
 		private static bool HasInternalsVisibleToComposeProxies(this Assembly assembly)
 		{
 			return assembly
-				.GetCustomAttributes<System.Runtime.CompilerServices.InternalsVisibleToAttribute>()
+				.CustomAttributes.OfType<System.Runtime.CompilerServices.InternalsVisibleToAttribute>()
 				.Any(attribute => attribute.AssemblyName == DynamicEmitter.AssemblyName);
 		}
-    }
+	}
 }

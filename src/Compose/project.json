@@ -1,5 +1,4 @@
 ﻿{
-	"version": "0.1.4-beta",
 	"description": "The easy wasy to compose well formed application components in .Net",
 	"authors": [ "Tommy Long" ],
 	"owners": [ "Tommy Long" ],
@@ -8,24 +7,15 @@
 	"licenseUrl": "https://raw.githubusercontent.com/Smudge202/Compose/master/LICENSE",
 	"iconUrl": "https://raw.githubusercontent.com/Smudge202/Compose/master/Compose-Icon.png",
 	"summary": "Assists with clean application composition allowing components to be isolated, reused, and interchanged.",
-	"dependencies": {
-		"Microsoft.Framework.DependencyInjection": "1.0.0-beta4"
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/smudge202/compose"
 	},
 	"frameworks": {
-		"net45": { },
-		"dnx451": { },
-		"dnxcore50": {
-			"compilationOptions": { "define": [ "DNXCORE" ] },
+		"dotnet": {
 			"dependencies": {
-				"Microsoft.CSharp": "4.0.0-beta-*",
-				"System.Collections": "4.0.10-beta-*",
-				"System.Linq": "4.0.0-beta-*",
-				"System.Reflection": "4.0.10-beta-*",
-				"System.Reflection.Emit": "4.0.0-beta-*",
-				"System.Reflection.Extensions": "4.0.0-beta-*",
-				"System.Reflection.TypeExtensions": "4.0.0-beta-*",
-				"System.Runtime": "4.0.20-beta-*",
-				"System.Threading": "4.0.10-beta-*"
+				"Microsoft.Framework.DependencyInjection": "1.0.0-beta6",
+				"System.Reflection.Emit": "4.0.0-beta-23019"
 			}
 		}
 	}

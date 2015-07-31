@@ -1,5 +1,6 @@
 ﻿using Microsoft.Framework.DependencyInjection;
 using System;
+using System.Linq;
 using System.Reflection;
 
 namespace Compose
@@ -11,22 +12,26 @@ namespace Compose
 		public static void UseServices(this Application app, Action<IServiceCollection> configureServices)
 		{
 			app.Services = new ServiceCollection();
+			app.PreServiceConfiguration(app.Services);
 			configureServices(app.Services);
 			app.Services.TryAdd(ServiceDescriptor.Singleton<DynamicEmitter, DynamicEmitter>());
-			app.ApplicationServices = new WrappedServiceProvider(app.Services);
+			app.ApplicationServices = app.Services.BuildServiceProvider();
 			if (app.ContainsTransitionMarkers())
 				app.ApplyTransitions();
-			app.ApplicationServices = new WrappedServiceProvider(app.Services);
+			app.ApplicationServices = app.Services.BuildServiceProvider();
+			app.PostServiceConfiguration(app.Services.ToList().AsReadOnly());
 		}
 
 		public static void UseServices(this Application app, Func<IServiceCollection, IServiceProvider> configureServices)
 		{
 			app.Services = new ServiceCollection();
+			app.PreServiceConfiguration(app.Services);
 			app.ApplicationServices = configureServices(app.Services);
 			app.Services.TryAdd(ServiceDescriptor.Singleton<DynamicEmitter, DynamicEmitter>());
 			if (app.ContainsTransitionMarkers())
 				app.ApplyTransitions();
-			app.ApplicationServices = new WrappedServiceProvider(app.ApplicationServices);
+			app.ApplicationServices = configureServices(app.Services);
+			app.PostServiceConfiguration(app.Services.ToList().AsReadOnly());
 		}
 
 		#endregion

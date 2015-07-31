@@ -1,24 +1,25 @@
 ﻿using Microsoft.Framework.DependencyInjection;
 using System;
+using TestAttributes;
 using Xunit;
 
 namespace Compose.Tests
 {
 	public class ServiceProviderTests
 	{
-		[Fact]
+		[Unit]
 		public void CanHandleImplementationInstances()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => services.AddInstance(typeof(string), "foo"));
 			Action act = app.Execute;
 			Assert.Null(Record.Exception(act));
 		}
 
-		[Fact]
+		[Unit]
 		public void CanHandleSameInstanceImplementingMultipleServices()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services =>
 			{
 				var service = new Service();
@@ -29,10 +30,10 @@ namespace Compose.Tests
 			Assert.Null(Record.Exception(act));
 		}
 
-		[Fact]
+		[Unit]
 		public void CanTreatInstancesAsSingletons()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			var instance = new Service();
 			app.UseServices(services =>
 			{
@@ -46,20 +47,20 @@ namespace Compose.Tests
 			app.Execute();
 		}
 
-		[Fact]
+		[Unit]
 		public void CanUseCustomServiceProvider()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => new CustomServiceProvider());
 			app.OnExecute<IService1>(service => { });
 			Action act = app.Execute;
 			Assert.IsType<NotImplementedException>(Record.Exception(act));
 		}
 
-		[Fact]
+		[Unit]
 		public void CanResolveSingletonsIndirectly()
 		{
-			var app = new Fake.Application();
+			var app = new Fake.Executable();
 			app.UseServices(services => services
 				.AddTransient<IConsumer, Consumer>()
 				.AddSingleton<IDependency, Dependency>()

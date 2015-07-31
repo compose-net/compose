@@ -15,7 +15,8 @@ namespace Compose
 
 		internal static bool IsTransitionMarker(this ServiceDescriptor descriptor)
 		{
-			return typeof(TransitionMarker).IsAssignableFrom(descriptor.ImplementationType);
+			if (descriptor.ImplementationType == null) return false;
+			return typeof(TransitionMarker).GetTypeInfo().IsAssignableFrom(descriptor.ImplementationType.GetTypeInfo());
 		}
 
 		internal static void ApplyTransitions(this Application app)
@@ -106,7 +107,7 @@ namespace Compose
 					services.GetBlanketTransitionalServices(blanketMarkerType)
 				)
 				.Distinct()
-				.Where(service => !blanketMarkerType.IsAssignableFrom(service.ServiceType))
+				.Where(service => !blanketMarkerType.GetTypeInfo().IsAssignableFrom(service.ServiceType.GetTypeInfo()))
 				.Where(service => service.ServiceType.GetTypeInfo().IsInterface)
 				.ToList();
 		}
@@ -116,8 +117,8 @@ namespace Compose
 			var targettedMarkerTypeInfo = typeof(TransitionMarker<>).GetTypeInfo(); // depicts a single service to be transitional
 			var targettedTransitionalMarkers = services
 				.Where(marker => targettedMarkerTypeInfo.IsAssignableFromGeneric(marker.ServiceType.GetTypeInfo()))
-				.Select(marker => marker.ServiceType.GetGenericArguments().Single());
-			return services.Where(service => targettedTransitionalMarkers.Contains(service.ServiceType));
+				.Select(marker => marker.ServiceType.GetTypeInfo().GetGenericArguments().Single());
+			return services.Where(service => targettedTransitionalMarkers.Contains(service.ServiceType.GetTypeInfo()));
 		}
 
 		private static IEnumerable<ServiceDescriptor> GetBlanketTransitionalServices(this IServiceCollection services, Type blanketMarkerType)
