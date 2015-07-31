@@ -1,4 +1,5 @@
 ﻿{
+﻿	"version": "0.1.5-beta",
 	"description": "The easy wasy to compose well formed application components in .Net",
 	"authors": [ "Tommy Long" ],
 	"owners": [ "Tommy Long" ],
