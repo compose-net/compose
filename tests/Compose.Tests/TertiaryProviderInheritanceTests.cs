@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Compose.Tests
 {
-    public class TertiaryProviderTests
+    public class TertiaryProviderInheritanceTests
     {
 		[Fact]
 		public void WhenAddingTertiaryProviderThenProviderContainingTertiaryServicesIsReturned()
