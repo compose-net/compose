@@ -1,23 +1,30 @@
 ﻿{
-	"version": "1.0.0-rc1",
-	"description": "The easy wasy to compose well formed application components in .Net",
+	"version": "1.0.0-*",
 	"authors": [ "Tommy Long" ],
 	"owners": [ "Tommy Long" ],
 	"tags": [ "composition", "compose" ],
 	"projectUrl": "http://github.com/smudge202/compose",
 	"licenseUrl": "https://raw.githubusercontent.com/Smudge202/Compose/master/LICENSE",
 	"iconUrl": "https://raw.githubusercontent.com/Smudge202/Compose/master/Compose-Icon.png",
-	"summary": "Assists with clean application composition allowing components to be isolated, reused, and interchanged.",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/smudge202/compose"
 	},
+	"commands": {
+		"test": "xunit.runner.dnx"
+	},
 	"dependencies": {
-		"Microsoft.Extensions.DependencyInjection": "1.0.0-rc1-final",
-		"System.Reflection.Emit": "4.0.1-beta-23516"
+		"Compose": "",
+		"FluentAssertions": "4.1.0",
+		"Moq": "4.2.1510.2205",
+		"xunit": "2.1.0",
+		"xunit.runner.dnx": "2.1.0-rc1-build204"
 	},
 	"frameworks": {
-		"net451": { },
-		"dotnet5.4": { }
+		"dnx46": {
+			"frameworkAssemblies": {
+				"System.ComponentModel": ""
+			}
+		}
 	}
 }
