@@ -1,13 +1,7 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace Compose
+﻿namespace Compose
 {
-    public class Application
+    public class Application : ServiceProvider
     {
-		public IServiceProvider ApplicationServices { get; internal set; }
-			= new ServiceCollection().BuildServiceProvider();
 
-		internal ServiceCollection Services { get; set; }
 	}
 }
