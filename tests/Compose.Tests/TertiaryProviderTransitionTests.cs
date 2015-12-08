@@ -4,10 +4,10 @@ using Xunit;
 
 namespace Compose.Tests
 {
-    public class TertiaryProviderTransitionTests
-    {
+	public class TertiaryProviderTransitionTests
+	{
 		[Fact]
-		public void WhenApplicationTransitionedThenResolvesTertiaryService()
+		public static void WhenApplicationTransitionedThenResolvesTertiaryService()
 		{
 			var application = new Application();
 			application.UseServices(services => services.AddTransient<Fake.Service, Fake.Implementation>());
@@ -18,5 +18,5 @@ namespace Compose.Tests
 			application.ApplicationServices.GetRequiredService<Fake.Service>()
 				.Should().BeOfType<Fake.AlternativeImplementation>();
 		}
-    }
+	}
 }

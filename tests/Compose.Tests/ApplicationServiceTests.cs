@@ -6,17 +6,17 @@ using Xunit;
 
 namespace Compose.Tests
 {
-    public class ApplicationServiceTests
-    {
+	public class ApplicationServiceTests
+	{
 		[Fact]
-		public void GivenApplicationHasNoServicesWhenGettingApplicationServicesThenReturnsBaseProvider()
+		public static void GivenApplicationHasNoServicesWhenGettingApplicationServicesThenReturnsBaseProvider()
 		{
 			new Application().ApplicationServices
 				.Should().NotBeNull();
 		}
 
 		[Fact]
-		public void WhenConfiguringApplicationServicesToUseInternalProviderThenReturnsProviderContainingService()
+		public static void WhenConfiguringApplicationServicesToUseInternalProviderThenReturnsProviderContainingService()
 		{
 			var application = new Application();
 			application.UseServices(services => services.AddTransient<Fake.Implementation>());
@@ -25,7 +25,7 @@ namespace Compose.Tests
 		}
 
 		[Fact]
-		public void WhenConfiguringApplicationServicesToUseCustomProviderThenApplicationServicesMatchesCustomProvider()
+		public static void WhenConfiguringApplicationServicesToUseCustomProviderThenApplicationServicesMatchesCustomProvider()
 		{
 			var provider = new Mock<IServiceProvider>().Object;
 			var application = new Application();
@@ -33,5 +33,5 @@ namespace Compose.Tests
 			application.ApplicationServices
 				.Should().Be(provider);
 		}
-    }
+	}
 }

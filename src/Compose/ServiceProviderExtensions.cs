@@ -3,8 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Compose
 {
-    public static class ServiceProviderExtensions
-    {
+	public static class ServiceProviderExtensions
+	{
 		public static void UseServices(this Application app, Action<IServiceCollection> configureServices)
 		{
 			configureServices(app.Services ?? (app.Services = new ServiceCollection()));
@@ -15,5 +15,5 @@ namespace Compose
 		{
 			app.ApplicationServices = configureServices(app.Services ?? (app.Services = new ServiceCollection()));
 		}
-    }
+	}
 }
