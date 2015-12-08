@@ -12,11 +12,12 @@ namespace Compose.Tests
 			var application = new Application();
 			application.UseServices(services => services.AddTransient<Fake.Service, Fake.Implementation>());
 			var provider = application.UseProvider<Fake.Service>(services => services.AddTransient<Fake.Service, Fake.AlternativeImplementation>());
+			var service = application.ApplicationServices.GetRequiredService<Fake.Service>();
 
+			service.ServiceType.Should().Be(typeof(Fake.Implementation));
 			application.Transition(provider);
 
-			application.ApplicationServices.GetRequiredService<Fake.Service>().ServiceType
-				.Should().Be(typeof(Fake.AlternativeImplementation));
+			service.ServiceType.Should().Be(typeof(Fake.AlternativeImplementation));
 		}
 	}
 }
