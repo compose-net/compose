@@ -20,8 +20,8 @@ namespace Compose.Tests
 		public static void WhenAddingProviderForClassThenThrowsException()
 		{
 			var application = new Application();
-			application.UseServices(services => services.AddTransient<Fake.Consumer>());
-			Action act = () => application.UseProvider<Fake.Consumer>(services => services.AddTransient<Fake.Consumer>());
+			application.UseServices(services => services.AddTransient<Fake.Implementation>());
+			Action act = () => application.UseProvider<Fake.Implementation>(services => services.AddTransient<Fake.Implementation>());
 			act.ShouldThrow<InvalidOperationException>();
 		}
 
@@ -78,11 +78,11 @@ namespace Compose.Tests
 			var application = new Application();
 			application.UseServices(services =>
 			{
-				services.AddTransient<Fake.Consumer>();
+				services.AddTransient<Fake.Consumer, Fake.ConsumerImplementation>();
 				services.AddTransient<Fake.Service, Fake.Implementation>();
 			});
 			application
-				.UseProvider<Fake.Consumer>(services => services.AddTransient<Fake.Consumer>())
+				.UseProvider<Fake.Consumer>(services => services.AddTransient<Fake.Consumer, Fake.ConsumerImplementation>())
 				.ApplicationServices.GetService<Fake.Consumer>()
 				.Should().NotBeNull();
 		}
@@ -93,11 +93,12 @@ namespace Compose.Tests
 			var application = new Application();
 			application.UseServices(services =>
 			{
+				services.AddTransient<Fake.Consumer, Fake.ConsumerImplementation>();
 				services.AddTransient<Fake.Implementation>();
 				services.AddTransient<Fake.Service>(provider => provider.GetRequiredService<Fake.Implementation>());
 			});
 			application
-				.UseProvider<Fake.Consumer>(services => services.AddTransient<Fake.Consumer>())
+				.UseProvider<Fake.Consumer>(services => services.AddTransient<Fake.Consumer, Fake.ConsumerImplementation>())
 				.ApplicationServices.GetService<Fake.Consumer>().Service
 				.Should().NotBeNull();
 		}
@@ -108,11 +109,12 @@ namespace Compose.Tests
 			var application = new Application();
 			application.UseServices(services =>
 			{
+				services.AddTransient<Fake.Consumer, Fake.ConsumerImplementation>();
 				services.AddTransient<Fake.Implementation>();
 				services.AddScoped<Fake.Service>(provider => provider.GetRequiredService<Fake.Implementation>());
 			});
 			application
-				.UseProvider<Fake.Consumer>(services => services.AddTransient<Fake.Consumer>())
+				.UseProvider<Fake.Consumer>(services => services.AddTransient<Fake.Consumer, Fake.ConsumerImplementation>())
 				.ApplicationServices.GetService<Fake.Consumer>().Service
 				.Should().NotBeNull();
 		}
@@ -123,11 +125,12 @@ namespace Compose.Tests
 			var application = new Application();
 			application.UseServices(services =>
 			{
+				services.AddTransient<Fake.Consumer, Fake.ConsumerImplementation>();
 				services.AddTransient<Fake.Implementation>();
 				services.AddSingleton<Fake.Service>(provider => provider.GetRequiredService<Fake.Implementation>());
 			});
 			application
-				.UseProvider<Fake.Consumer>(services => services.AddTransient<Fake.Consumer>())
+				.UseProvider<Fake.Consumer>(services => services.AddTransient<Fake.Consumer, Fake.ConsumerImplementation>())
 				.ApplicationServices.GetRequiredService<Fake.Consumer>().Service
 				.Should().Be(application.ApplicationServices.GetRequiredService<Fake.Service>());
 		}
@@ -136,9 +139,13 @@ namespace Compose.Tests
 		public static void WhenTertiaryProviderInheritsSingletonTypedThenSingletonIsHonouredAcrossProviders()
 		{
 			var application = new Application();
-			application.UseServices(services => services.AddSingleton<Fake.Service, Fake.Implementation>());
+			application.UseServices(services =>
+			{
+				services.AddTransient<Fake.Consumer, Fake.ConsumerImplementation>();
+				services.AddSingleton<Fake.Service, Fake.Implementation>();
+			});
 			application
-				.UseProvider<Fake.Consumer>(services => services.AddTransient<Fake.Consumer>())
+				.UseProvider<Fake.Consumer>(services => services.AddTransient<Fake.Consumer, Fake.ConsumerImplementation>())
 				.ApplicationServices.GetRequiredService<Fake.Consumer>().Service
 				.Should().Be(application.ApplicationServices.GetRequiredService<Fake.Service>());
 		}

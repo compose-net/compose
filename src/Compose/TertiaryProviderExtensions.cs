@@ -32,7 +32,7 @@ namespace Compose
 			if (!serviceType.GetTypeInfo().IsInterface)
 				throw new InvalidOperationException($"Only interfaces can be added as tertiary providers.");
 			if (serviceDescriptor == null)
-				throw new InvalidOperationException($"No service has been registered for {serviceType.FullName}.");
+				throw new InvalidOperationException($"No service has been registered for {serviceType.FullName} so it cannot be transitioned.");
 			var provider = new TertiaryProvider<Service> { Services = app.Services.ForTertiaryProvider(app.ApplicationServices) };
 			provider.Services.TryAdd(ServiceDescriptor.Singleton<DynamicEmitter, IlGeneratingDynamicEmitter>());
 			provider.Services.TryAdd(ServiceDescriptor.Singleton(typeof(DynamicManagerContainer<,>), typeof(SyncLockDynamicManagerContainer<,>)));
