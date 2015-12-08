@@ -68,7 +68,9 @@ namespace Compose.Tests
 			application.UseServices(services => services.AddTransient<Fake.Service, Fake.Implementation>());
 			application.UseProvider<Fake.Service>(services => services.AddTransient<Fake.Service, Fake.AlternativeImplementation>());
 
-			application.ApplicationServices.GetRequiredService<Fake.Service>()
+			var x = application.ApplicationServices.GetRequiredService<Fake.Service>();
+
+			application.ApplicationServices.GetRequiredService<Fake.Service>().ServiceType
 				.Should().BeOfType<Fake.Implementation>();
 		}
 

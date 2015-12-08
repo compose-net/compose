@@ -1,6 +1,9 @@
-﻿namespace Compose.Tests.Fake
+﻿using System;
+
+namespace Compose.Tests.Fake
 {
-    public interface Service
-    {
-    }
+	public interface Service
+	{
+		Type ServiceType { get; }
+	}
 }

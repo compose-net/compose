@@ -32,7 +32,7 @@ namespace Compose
 			if (serviceDescriptor == null)
 				throw new InvalidOperationException($"No service has been registered for {serviceType.FullName} so it cannot be transitioned.");
 			if (!serviceType.GetTypeInfo().IsInterface)
-				throw new InvalidOperationException($"Only interfaces can be added as tertiary providers.");
+				throw new InvalidOperationException("Only interfaces can be added as tertiary providers.");
 			var provider = new TertiaryProvider<Service> { Services = app.Services.ForTertiaryProvider(() => app.ApplicationServices) };
 			return provider;
 		}
@@ -104,17 +104,31 @@ namespace Compose
 				);
 			app.Services.Add(new ServiceDescriptor(dynamicManagerInterface, dynamicManagerFactory, original.Lifetime));
 			app.Services.Add(new ServiceDescriptor(TransitionManager.MakeGenericType(original.ServiceType), dynamicManagerFactory, original.Lifetime));
-			app.Services.Add(new ServiceDescriptor(DynamicRegister.MakeGenericType(original.ServiceType), dynamicManagerFactory, original.Lifetime));
-			// TODO : Defer proxy binding!?
-			app.Services.Replace(new ServiceDescriptor(original.ServiceType, provider => provider.GetService(app.CreateProxy(original.ServiceType.GetTypeInfo())), original.Lifetime));
+			var dynamicRegister = DynamicRegister.MakeGenericType(original.ServiceType);
+			app.Services.Add(new ServiceDescriptor(dynamicRegister, dynamicManagerFactory, original.Lifetime));
+			app.Services.Replace(new ServiceDescriptor(
+				original.ServiceType,
+				provider => new DynamicActivator(
+					() => app.CreateProxy(original.ServiceType.GetTypeInfo()),
+					() => provider.GetService(dynamicRegister)
+				).Create(),
+				original.Lifetime)
+			);
 		}
 
 		private static void ApplyTransition(this Application app, ServiceDescriptor original, Type dynamicManagerType)
 		{
 			app.Services.Add(new ServiceDescriptor(TransitionManager.MakeGenericType(original.ServiceType), dynamicManagerType, original.Lifetime));
-			app.Services.Add(new ServiceDescriptor(DynamicRegister.MakeGenericType(original.ServiceType), dynamicManagerType, original.Lifetime));
-			// TODO : Defer proxy binding!?
-			app.Services.Replace(new ServiceDescriptor(original.ServiceType, provider => provider.GetService(app.CreateProxy(original.ServiceType.GetTypeInfo())), original.Lifetime));
+			var dynamicRegister = DynamicRegister.MakeGenericType(original.ServiceType);
+			app.Services.Add(new ServiceDescriptor(dynamicRegister, dynamicManagerType, original.Lifetime));
+			app.Services.Replace(new ServiceDescriptor(
+				original.ServiceType, 
+				provider => new DynamicActivator(
+					() => app.CreateProxy(original.ServiceType.GetTypeInfo()), 
+					() => provider.GetService(dynamicRegister)
+				).Create(), 
+				original.Lifetime)
+			);
 		}
 	}
 }

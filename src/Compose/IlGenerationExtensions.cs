@@ -7,7 +7,7 @@ namespace Compose
 {
 	internal static class IlGenerationExtensions
 	{
-		private static Random random = new Random();
+		private static readonly Random Random = new Random();
 
 		internal static void AddDirectImplementation(this TypeBuilder typeBuilder, TypeInfo serviceTypeInfo, TypeInfo managerTypeInfo)
 		{
@@ -24,8 +24,8 @@ namespace Compose
 
 		private static string GetRandomString()
 		{
-			const string Characters = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm";
-			return new string(Enumerable.Repeat(Characters, 16).Select(x => x[random.Next(x.Length)]).ToArray());
+			const string characters = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm";
+			return new string(Enumerable.Repeat(characters, 16).Select(x => x[Random.Next(x.Length)]).ToArray());
 		}
 
 		internal static void AddGenericsFrom(this TypeBuilder typeBuilder, TypeInfo serviceType)
