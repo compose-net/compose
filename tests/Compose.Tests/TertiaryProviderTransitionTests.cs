@@ -16,7 +16,7 @@ namespace Compose.Tests
 			application.Transition(provider);
 
 			application.ApplicationServices.GetRequiredService<Fake.Service>().ServiceType
-				.Should().BeOfType<Fake.AlternativeImplementation>();
+				.Should().Be(typeof(Fake.AlternativeImplementation));
 		}
 	}
 }
