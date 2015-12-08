@@ -1,6 +1,4 @@
 ﻿namespace Compose
 {
-	public sealed class TertiaryProvider<Service> : Application
-	{
-	}
+	public sealed class TertiaryProvider<Service> : Application { }
 }

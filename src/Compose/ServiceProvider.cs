@@ -4,9 +4,16 @@ using System;
 namespace Compose
 {
     public class ServiceProvider
-	{
-		public IServiceProvider ApplicationServices { get; internal set; }
-		= new ServiceCollection().BuildServiceProvider();
+    {
+	    internal Func<IServiceProvider> ApplicationServiceFactory 
+			= () => new ServiceCollection().BuildServiceProvider();
+
+		private IServiceProvider _applicationServices;
+		public IServiceProvider ApplicationServices
+		{
+			get { return _applicationServices ?? (_applicationServices = ApplicationServiceFactory()); }
+			internal set { _applicationServices = value; }
+		}
 
 		internal IServiceCollection Services { get; set; }
 	}

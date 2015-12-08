@@ -7,25 +7,25 @@ namespace Compose
 {
 	internal sealed class TertiaryServiceCollection : ServiceCollection
 	{
-		public TertiaryServiceCollection(IServiceProvider provider, IServiceCollection services)
+		public TertiaryServiceCollection(Func<IServiceProvider> providerFactory, IServiceCollection services)
 		{
-			foreach (var serviceDescriptor in services ?? Enumerable.Empty<ServiceDescriptor>())
-				this.Add(Describe(serviceDescriptor, provider));
+			foreach (var serviceDescriptor in services.Except(ServiceProviderExtensions.DynamicEmissionDescriptors) ?? Enumerable.Empty<ServiceDescriptor>())
+				this.Add(Describe(serviceDescriptor, providerFactory));
 		}
 
-		private ServiceDescriptor Describe(ServiceDescriptor serviceDescriptor, IServiceProvider provider)
+		private ServiceDescriptor Describe(ServiceDescriptor serviceDescriptor, Func<IServiceProvider> providerFactory)
 		{
 			if (serviceDescriptor.Lifetime == ServiceLifetime.Singleton)
-				return ServiceDescriptor.Singleton(serviceDescriptor.ServiceType, _ => provider.GetRequiredService(serviceDescriptor.ServiceType));
+				return ServiceDescriptor.Singleton(serviceDescriptor.ServiceType, _ => providerFactory().GetRequiredService(serviceDescriptor.ServiceType));
 			if (serviceDescriptor.ImplementationFactory != null)
 				switch (serviceDescriptor.Lifetime)
 				{
 					case ServiceLifetime.Scoped:
-						return ServiceDescriptor.Scoped(serviceDescriptor.ServiceType, _ => provider.GetRequiredService(serviceDescriptor.ServiceType));
+						return ServiceDescriptor.Scoped(serviceDescriptor.ServiceType, _ => providerFactory().GetRequiredService(serviceDescriptor.ServiceType));
 					case ServiceLifetime.Singleton:
-						return ServiceDescriptor.Singleton(serviceDescriptor.ServiceType, _ => provider.GetRequiredService(serviceDescriptor.ServiceType));
+						return ServiceDescriptor.Singleton(serviceDescriptor.ServiceType, _ => providerFactory().GetRequiredService(serviceDescriptor.ServiceType));
 					case ServiceLifetime.Transient:
-						return ServiceDescriptor.Transient(serviceDescriptor.ServiceType, _ => provider.GetRequiredService(serviceDescriptor.ServiceType));
+						return ServiceDescriptor.Transient(serviceDescriptor.ServiceType, _ => providerFactory().GetRequiredService(serviceDescriptor.ServiceType));
 				}
 			return serviceDescriptor;
 		}

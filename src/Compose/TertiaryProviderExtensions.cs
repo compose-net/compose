@@ -13,7 +13,7 @@ namespace Compose
 			var serviceDescriptor = app.Services?.SingleOrDefault(x => x.ServiceType == typeof(Service));
 			var provider = app.BuildProvider<Service>(serviceDescriptor);
 			provider.UseServices(configureServices);
-			provider.ApplyTransition(serviceDescriptor);
+			app.ApplyTransition(serviceDescriptor);
 			return provider;
 		}
 
@@ -22,21 +22,18 @@ namespace Compose
 			var serviceDescriptor = app.Services?.SingleOrDefault(x => x.ServiceType == typeof(Service));
 			var provider = app.BuildProvider<Service>(serviceDescriptor);
 			provider.UseServices(configureServices);
-			provider.ApplyTransition(serviceDescriptor);
+			app.ApplyTransition(serviceDescriptor);
 			return provider;
 		}
 
 		private static TertiaryProvider<Service> BuildProvider<Service>(this Application app, ServiceDescriptor serviceDescriptor)
 		{
 			var serviceType = typeof(Service);
-			if (!serviceType.GetTypeInfo().IsInterface)
-				throw new InvalidOperationException($"Only interfaces can be added as tertiary providers.");
 			if (serviceDescriptor == null)
 				throw new InvalidOperationException($"No service has been registered for {serviceType.FullName} so it cannot be transitioned.");
-			var provider = new TertiaryProvider<Service> { Services = app.Services.ForTertiaryProvider(app.ApplicationServices) };
-			provider.Services.TryAdd(ServiceDescriptor.Singleton<DynamicEmitter, IlGeneratingDynamicEmitter>());
-			provider.Services.TryAdd(ServiceDescriptor.Singleton(typeof(DynamicManagerContainer<,>), typeof(SyncLockDynamicManagerContainer<,>)));
-			provider.Services.TryAdd(ServiceDescriptor.Singleton<TransitionManagerContainer, ConcurrentTransitionManagerContainer>());
+			if (!serviceType.GetTypeInfo().IsInterface)
+				throw new InvalidOperationException($"Only interfaces can be added as tertiary providers.");
+			var provider = new TertiaryProvider<Service> { Services = app.Services.ForTertiaryProvider(() => app.ApplicationServices) };
 			return provider;
 		}
 
@@ -48,8 +45,8 @@ namespace Compose
 			transitional.Change(() => provider.ApplicationServices.GetRequiredService<Service>());
 		}
 
-		private static IServiceCollection ForTertiaryProvider(this IServiceCollection services, IServiceProvider provider)
-			=> new TertiaryServiceCollection(provider, services);
+		private static IServiceCollection ForTertiaryProvider(this IServiceCollection services, Func<IServiceProvider> providerFactory)
+			=> new TertiaryServiceCollection(providerFactory, services);
 
 		private static void ApplyTransition(this Application app, ServiceDescriptor original)
 		{
@@ -108,16 +105,16 @@ namespace Compose
 			app.Services.Add(new ServiceDescriptor(dynamicManagerInterface, dynamicManagerFactory, original.Lifetime));
 			app.Services.Add(new ServiceDescriptor(TransitionManager.MakeGenericType(original.ServiceType), dynamicManagerFactory, original.Lifetime));
 			app.Services.Add(new ServiceDescriptor(DynamicRegister.MakeGenericType(original.ServiceType), dynamicManagerFactory, original.Lifetime));
-			var dynamicProxyType = app.CreateProxy(original.ServiceType.GetTypeInfo());
-			app.Services.Replace(new ServiceDescriptor(original.ServiceType, dynamicProxyType, original.Lifetime));
+			// TODO : Defer proxy binding!?
+			app.Services.Replace(new ServiceDescriptor(original.ServiceType, provider => provider.GetService(app.CreateProxy(original.ServiceType.GetTypeInfo())), original.Lifetime));
 		}
 
 		private static void ApplyTransition(this Application app, ServiceDescriptor original, Type dynamicManagerType)
 		{
 			app.Services.Add(new ServiceDescriptor(TransitionManager.MakeGenericType(original.ServiceType), dynamicManagerType, original.Lifetime));
 			app.Services.Add(new ServiceDescriptor(DynamicRegister.MakeGenericType(original.ServiceType), dynamicManagerType, original.Lifetime));
-			var dynamicProxyType = app.CreateProxy(original.ServiceType.GetTypeInfo());
-			app.Services.Replace(new ServiceDescriptor(original.ServiceType, dynamicProxyType, original.Lifetime));
+			// TODO : Defer proxy binding!?
+			app.Services.Replace(new ServiceDescriptor(original.ServiceType, provider => provider.GetService(app.CreateProxy(original.ServiceType.GetTypeInfo())), original.Lifetime));
 		}
 	}
 }
