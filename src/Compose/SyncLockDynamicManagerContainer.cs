@@ -11,8 +11,6 @@ namespace Compose
 			= new List<WeakReferencingDynamicManager<Interface, OriginalService>>();
 		private readonly object _sync = new object();
 
-		private static readonly TypeInfo Disposable = typeof(IDisposable).GetTypeInfo();
-
 		public void Add(WeakReferencingDynamicManager<Interface, OriginalService> manager)
 		{
 			lock (_sync)
@@ -46,7 +44,7 @@ namespace Compose
 
 		private void Change(WeakReferencingDynamicManager<Interface, OriginalService> manager, Interface service)
 		{
-			if (manager.CurrentService != null && Disposable.IsAssignableFrom(manager.CurrentService.GetType().GetTypeInfo()))
+			if (manager.CurrentService != null && KnownTypes.Disposable.IsAssignableFrom(manager.CurrentService.GetType().GetTypeInfo()))
 				((IDisposable)manager.CurrentService).Dispose();
 			manager.CurrentService = service;
 		}

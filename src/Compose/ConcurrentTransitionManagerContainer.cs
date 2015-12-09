@@ -7,13 +7,14 @@ namespace Compose
 {
 	internal sealed class ConcurrentTransitionManagerContainer : TransitionManagerContainer
 	{
-		private readonly ConcurrentDictionary<Type, ConcurrentBag<object>> Managers
+		private readonly ConcurrentDictionary<Type, ConcurrentBag<object>> _managers
 			= new ConcurrentDictionary<Type, ConcurrentBag<object>>();
+
 		private static readonly Type Helper = typeof(GenericHelper<>);
+		private static readonly TypeInfo Disposable = typeof(IDisposable).GetTypeInfo();
 
 		private static class GenericHelper<T>
 		{
-			private static readonly TypeInfo Disposable = typeof(IDisposable).GetTypeInfo();
 			public static void Restore(object untypedManager)
 			{
 				var manager = untypedManager as DynamicRegister<T>;
@@ -33,13 +34,13 @@ namespace Compose
 
 		public void Add<T>(DynamicRegister<T> register)
 		{
-			var managers = Managers.GetOrAdd(typeof(T), new ConcurrentBag<object>());
+			var managers = _managers.GetOrAdd(typeof(T), new ConcurrentBag<object>());
 			managers.Add(register);
 		}
 
 		public void Restore()
 		{
-			foreach (var kvp in Managers)
+			foreach (var kvp in _managers)
 				Restore(kvp.Key, kvp.Value);
 		}
 
@@ -63,7 +64,7 @@ namespace Compose
 
 		public void Snapshot()
 		{
-			foreach (var kvp in Managers)
+			foreach (var kvp in _managers)
 				Snapshot(kvp.Key, kvp.Value);
 		}
 

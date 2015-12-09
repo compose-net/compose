@@ -39,7 +39,7 @@ namespace Compose
 			= new List<ServiceDescriptor>
 			{
 				ServiceDescriptor.Singleton<DynamicEmitter, IlGeneratingDynamicEmitter>(),
-				ServiceDescriptor.Singleton(typeof(DynamicManagerContainer<,>), typeof(SyncLockDynamicManagerContainer<,>)),
+				ServiceDescriptor.Singleton(KnownTypes.OpenDynamicManagerContainer, KnownTypes.OpenDynamicManagerContainerImplementation),
 				ServiceDescriptor.Singleton<TransitionManagerContainer, ConcurrentTransitionManagerContainer>()
 			};
 	}
