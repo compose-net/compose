@@ -1,4 +1,9 @@
-﻿namespace Compose
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace Compose
 {
-	public class Application : ServiceProvider { }
+	public class Application : ServiceProvider
+	{
+		protected internal virtual void PreServiceConfiguration(IServiceCollection services) { }
+	}
 }

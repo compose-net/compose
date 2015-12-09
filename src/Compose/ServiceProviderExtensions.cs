@@ -8,25 +8,46 @@ namespace Compose
 	public static class ServiceProviderExtensions
 	{
 		public static void UseServices(this Application app, Action<IServiceCollection> configureServices)
-			=> app.ConfigureDynamicEmission().UseBuiltInProvider(configureServices);
+			=> app
+			.ConfigureDynamicEmission()
+			.RunPreConfiguration()
+			.UseBuiltInProvider(configureServices)
+			.RunPostConfiguration();
+
+		private static Application RunPreConfiguration(this Application app)
+		{
+			app.PreServiceConfiguration(app.Services ?? (app.Services = new ServiceCollection()));
+			return app;
+		}
+
+		private static Application RunPostConfiguration(this Application app)
+			=> null;
 
 		internal static void UseServices<Service>(this TertiaryProvider<Service> app, Action<IServiceCollection> configureServices)
 			=> app.UseBuiltInProvider(configureServices);
 
-		private static void UseBuiltInProvider(this ServiceProvider app, Action<IServiceCollection> configureServices)
+		private static Application UseBuiltInProvider(this Application app, Action<IServiceCollection> configureServices)
 		{
 			configureServices(app.Services ?? (app.Services = new ServiceCollection()));
 			app.ApplicationServiceFactory = () => app.Services.BuildServiceProvider();
+			return app;
 		}
 
 		public static void UseServices(this Application app, Func<IServiceCollection, IServiceProvider> configureServices)
-			=> app.ConfigureDynamicEmission().UseCustomProvider(configureServices);
+			=> app
+			.ConfigureDynamicEmission()
+			.RunPreConfiguration()
+			.UseCustomProvider(configureServices)
+			.RunPostConfiguration();
 
 		internal static void UseServices<Service>(this TertiaryProvider<Service> app, Func<IServiceCollection, IServiceProvider> configureServices)
 			=> app.UseCustomProvider(configureServices);
 
-		private static void UseCustomProvider(this ServiceProvider app, Func<IServiceCollection, IServiceProvider> configureServices)
-			=> app.ApplicationServiceFactory = () => configureServices(app.Services ?? (app.Services = new ServiceCollection()));
+		private static Application UseCustomProvider(this Application app, Func<IServiceCollection, IServiceProvider> configureServices)
+		{
+			app.ApplicationServiceFactory = () => configureServices(app.Services ?? (app.Services = new ServiceCollection()));
+			return app;
+		}
 
 		private static Application ConfigureDynamicEmission(this Application app)
 		{
