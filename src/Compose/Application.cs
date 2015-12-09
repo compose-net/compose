@@ -1,7 +1,4 @@
 ﻿namespace Compose
 {
-    public class Application : ServiceProvider
-    {
-
-	}
+	public class Application : ServiceProvider { }
 }
