@@ -8,30 +8,107 @@ namespace Compose.Tests
 {
 	public class ApplicationInheritanceTests
 	{
-		[Fact]
-		public static void GivenBuiltInProviderWhenServicesAddedToPreServiceConfigurationThenServicesCanBeResolved()
+		public class GivenUsingBuiltInProvider
 		{
-			var app = new Fake.Application();
-			app.PreConfiguredServices.AddTransient<Fake.Service, Fake.Implementation>();
-			app.UseServices(services =>
+			[Fact]
+			public static void WhenServicesAddedToPreServiceConfigurationThenServicesCanBeResolved()
 			{
-				services.Should().Contain(app.PreConfiguredServices);
-			});
-			app.ApplicationServices.Should().NotBeNull();
+				var app = new Fake.Application();
+				app.PreConfiguredServices.AddTransient<Fake.Service, Fake.Implementation>();
+				var useServicesCalled = false;
+				app.UseServices(services =>
+				{
+					services.Should().Contain(app.PreConfiguredServices);
+					useServicesCalled = true;
+				});
+
+				app.ApplicationServices.Should().NotBeNull();
+
+				useServicesCalled.Should().BeTrue();
+			}
+
+			[Fact]
+			public static void WhenServicesAddedToPreServiceConfigurationThenServicesArePresentInPostConfiguration()
+			{
+				var app = new Fake.Application();
+				app.PreConfiguredServices.AddTransient<Fake.Service, Fake.Implementation>();
+				app.PostConfigurationCallback = services => services.Should().Contain(app.PreConfiguredServices);
+
+				app.PostConfigurationCalled.Should().BeFalse();
+				app.ApplicationServices.Should().NotBeNull();
+
+				app.PostConfigurationCalled.Should().BeTrue();
+			}
+
+			[Fact]
+			public static void WhenServicesAddedThenServicesArePresentInPostConfiguration()
+			{
+				var app = new Fake.Application();
+				var serviceDescriptor = ServiceDescriptor.Transient<Fake.Service, Fake.Implementation>();
+				app.PostConfigurationCallback = services => services.Should().Contain(serviceDescriptor);
+				app.UseServices(services => services.Add(serviceDescriptor));
+
+				app.PostConfigurationCalled.Should().BeFalse();
+				app.ApplicationServices.Should().NotBeNull();
+
+				app.PostConfigurationCalled.Should().BeTrue();
+			}
 		}
 
-		[Fact]
-		public static void GivenCustomProviderWhenServicesAddedToPreServiceConfigurationThenServicesCanBeResolved()
+		public class GivenUsingCustomProvider
 		{
-			var provider = new Mock<IServiceProvider>().Object;
-			var app = new Fake.Application();
-			app.PreConfiguredServices.AddTransient<Fake.Service, Fake.Implementation>();
-			app.UseServices(services =>
+			[Fact]
+			public static void WhenServicesAddedToPreServiceConfigurationThenServicesCanBeResolved()
 			{
-				services.Should().Contain(app.PreConfiguredServices);
-				return provider;
-			});
-			app.ApplicationServices.Should().NotBeNull();
+				var provider = new Mock<IServiceProvider>().Object;
+				var app = new Fake.Application();
+				app.PreConfiguredServices.AddTransient<Fake.Service, Fake.Implementation>();
+				var useServicesCalled = false;
+				app.UseServices(services =>
+				{
+					services.Should().Contain(app.PreConfiguredServices);
+					useServicesCalled = true;
+					return provider;
+				});
+
+				app.ApplicationServices.Should().NotBeNull();
+
+				useServicesCalled.Should().BeTrue();
+			}
+
+			[Fact]
+			public static void WhenServicesAddedToPreServiceConfigurationThenServicesArePresentInPostConfiguration()
+			{
+				var provider = new Mock<IServiceProvider>().Object;
+				var app = new Fake.Application();
+				app.PreConfiguredServices.AddTransient<Fake.Service, Fake.Implementation>();
+				app.PostConfigurationCallback = services => services.Should().Contain(app.PreConfiguredServices);
+				app.UseServices(_ => provider);
+
+				app.PostConfigurationCalled.Should().BeFalse();
+				app.ApplicationServices.Should().NotBeNull();
+
+				app.PostConfigurationCalled.Should().BeTrue();
+			}
+
+			[Fact]
+			public static void WhenServicesAddedThenServicesArePresentInPostConfiguration()
+			{
+				var provider = new Mock<IServiceProvider>().Object;
+				var app = new Fake.Application();
+				var serviceDescriptor = ServiceDescriptor.Transient<Fake.Service, Fake.Implementation>();
+				app.PostConfigurationCallback = services => services.Should().Contain(serviceDescriptor);
+				app.UseServices(services =>
+				{
+					services.Add(serviceDescriptor);
+					return provider;
+				});
+
+				app.PostConfigurationCalled.Should().BeFalse();
+				app.ApplicationServices.Should().NotBeNull();
+
+				app.PostConfigurationCalled.Should().BeTrue();
+			}
 		}
 	}
 }

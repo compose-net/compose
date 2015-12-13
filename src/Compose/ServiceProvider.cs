@@ -3,10 +3,9 @@ using System;
 
 namespace Compose
 {
-    public class ServiceProvider
-    {
-	    internal Func<IServiceProvider> ApplicationServiceFactory 
-			= () => new ServiceCollection().BuildServiceProvider();
+	public abstract class ServiceProvider
+	{
+		protected internal abstract Func<IServiceProvider> ApplicationServiceFactory { get; set; }
 
 		private IServiceProvider _applicationServices;
 		public IServiceProvider ApplicationServices
