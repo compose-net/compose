@@ -1,5 +1,7 @@
 # Compose
 
+Shutta your mouth
+
 [![Build status](https://ci.appveyor.com/api/projects/status/2a52f9nlucas0jsn?svg=true)](https://ci.appveyor.com/project/Smudge202/compose) [![Stories in Backlog](https://badge.waffle.io/smudge202/compose.png?label=backlog&title=Backlog)](http://waffle.io/smudge202/compose) [![Stories in Ready](https://badge.waffle.io/smudge202/compose.png?label=ready&title=Ready)](http://waffle.io/smudge202/compose) [![Stories in Progress](https://badge.waffle.io/smudge202/compose.png?label=in%20progress&title=In%20Progress)](http://waffle.io/smudge202/compose)
 [![NuGet](https://img.shields.io/nuget/dt/Compose.svg)]()
 
