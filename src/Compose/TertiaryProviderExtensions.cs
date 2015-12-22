@@ -50,6 +50,7 @@ namespace Compose
 
 		private static void ApplyTransition(this Application app, ServiceDescriptor original)
 		{
+			if (original is DynamicServiceDescriptor) return;
 			if (original.ImplementationType != null)
 				app.ApplyTypeTransition(original);
 			else if (original.ImplementationInstance != null)
@@ -60,20 +61,20 @@ namespace Compose
 
 		private static void ApplyTypeTransition(this Application app, ServiceDescriptor original)
 		{
-			app.Services.Add(new ServiceDescriptor(original.ImplementationType, original.ImplementationType, original.Lifetime));
+			app.Services.Add(new ServiceDescriptor(original.ImplementationType, original.ImplementationType, original.Lifetime).WithDynamicMarker());
 			var dynamicManagerInterface = KnownTypes.OpenDynamicManager.MakeGenericType(original.ServiceType, original.ImplementationType);
 			var dynamicManagerImplemenation = KnownTypes.OpenDynamicManagerImplementation.MakeGenericType(original.ServiceType, original.ImplementationType);
-			app.Services.Add(new ServiceDescriptor(dynamicManagerInterface, dynamicManagerImplemenation, original.Lifetime));
+			app.Services.Add(new ServiceDescriptor(dynamicManagerInterface, dynamicManagerImplemenation, original.Lifetime).WithDynamicMarker());
 			app.ApplyTransition(original, dynamicManagerImplemenation);
 		}
 
 		private static void ApplyInstanceTransition(this Application app, ServiceDescriptor original)
 		{
 			var implementationType = original.ImplementationInstance.GetType();
-			app.Services.Add(new ServiceDescriptor(implementationType, original.ImplementationInstance));
+			app.Services.Add(new ServiceDescriptor(implementationType, original.ImplementationInstance).WithDynamicMarker());
 			var dynamicManagerInterface = KnownTypes.OpenDynamicManager.MakeGenericType(original.ServiceType, implementationType);
 			var dynamicManagerImplemenation = KnownTypes.OpenDynamicManagerImplementation.MakeGenericType(original.ServiceType, implementationType);
-			app.Services.Add(new ServiceDescriptor(dynamicManagerInterface, dynamicManagerImplemenation, original.Lifetime));
+			app.Services.Add(new ServiceDescriptor(dynamicManagerInterface, dynamicManagerImplemenation, original.Lifetime).WithDynamicMarker());
 			app.ApplyTransition(original, dynamicManagerImplemenation);
 		}
 
@@ -85,7 +86,7 @@ namespace Compose
 				provider => Activator.CreateInstance(implementationFactoryImplementationType,
 					(Func<object>)(() => original.ImplementationFactory(provider))
 				);
-			app.Services.Add(new ServiceDescriptor(implementationFactoryInterfaceType, implementationFactory, original.Lifetime));
+			app.Services.Add(new ServiceDescriptor(implementationFactoryInterfaceType, implementationFactory, original.Lifetime).WithDynamicMarker());
 			var dynamicManagerInterface = KnownTypes.OpenDynamicManager.MakeGenericType(original.ServiceType, original.ServiceType);
 			Func<IServiceProvider, object> dynamicManagerFactory =
 				provider => DynamicManagerFactory.ForFactory(dynamicManagerInterface.GetTypeInfo(),
@@ -93,32 +94,34 @@ namespace Compose
 					provider.GetRequiredService<TransitionManagerContainer>(),
 					provider.GetRequiredService(implementationFactoryInterfaceType)
 				);
-			app.Services.Add(new ServiceDescriptor(dynamicManagerInterface, dynamicManagerFactory, original.Lifetime));
-			app.Services.Add(new ServiceDescriptor(KnownTypes.OpenTransitionManager.MakeGenericType(original.ServiceType), dynamicManagerFactory, original.Lifetime));
+			app.Services.Add(new ServiceDescriptor(dynamicManagerInterface, dynamicManagerFactory, original.Lifetime).WithDynamicMarker());
+			app.Services.Add(new ServiceDescriptor(KnownTypes.OpenTransitionManager.MakeGenericType(original.ServiceType), dynamicManagerFactory, original.Lifetime).WithDynamicMarker());
 			var dynamicRegister = KnownTypes.OpenDynamicRegister.MakeGenericType(original.ServiceType);
-			app.Services.Add(new ServiceDescriptor(dynamicRegister, dynamicManagerFactory, original.Lifetime));
+			app.Services.Add(new ServiceDescriptor(dynamicRegister, dynamicManagerFactory, original.Lifetime).WithDynamicMarker());
 			app.Services.Replace(new ServiceDescriptor(
 				original.ServiceType,
 				provider => new DynamicActivator(
-					() => app.CreateProxy(original.ServiceType.GetTypeInfo()),
+					() => app.GetProxy(original.ServiceType.GetTypeInfo()),
 					() => provider.GetService(dynamicRegister)
 				).Create(),
 				original.Lifetime)
+				.WithDynamicMarker()
 			);
 		}
 
 		private static void ApplyTransition(this Application app, ServiceDescriptor original, Type dynamicManagerType)
 		{
-			app.Services.Add(new ServiceDescriptor(KnownTypes.OpenTransitionManager.MakeGenericType(original.ServiceType), dynamicManagerType, original.Lifetime));
+			app.Services.Add(new ServiceDescriptor(KnownTypes.OpenTransitionManager.MakeGenericType(original.ServiceType), dynamicManagerType, original.Lifetime).WithDynamicMarker());
 			var dynamicRegister = KnownTypes.OpenDynamicRegister.MakeGenericType(original.ServiceType);
-			app.Services.Add(new ServiceDescriptor(dynamicRegister, dynamicManagerType, original.Lifetime));
+			app.Services.Add(new ServiceDescriptor(dynamicRegister, dynamicManagerType, original.Lifetime).WithDynamicMarker());
 			app.Services.Replace(new ServiceDescriptor(
 				original.ServiceType, 
 				provider => new DynamicActivator(
-					() => app.CreateProxy(original.ServiceType.GetTypeInfo()), 
+					() => app.GetProxy(original.ServiceType.GetTypeInfo()), 
 					() => provider.GetService(dynamicRegister)
 				).Create(), 
 				original.Lifetime)
+				.WithDynamicMarker()
 			);
 		}
 	}

@@ -6,14 +6,10 @@ namespace Compose
 {
 	public static class DynamicExtensions
 	{
-		internal static Type CreateProxy(this Application app, TypeInfo serviceTypeInfo)
+		internal static Type GetProxy(this Application app, TypeInfo serviceTypeInfo)
 		{
-			var emitter = app.ApplicationServices.GetService<DynamicEmitter>();
-			if (emitter == null) emitter = app.GetRegisteredDynamicEmitter();
-			return emitter.GetManagedDynamicProxy(serviceTypeInfo);
+			var emitter = app.ApplicationServices.GetRequiredService<DynamicFactory>();
+			return emitter.GetDynamicProxy(serviceTypeInfo);
 		}
-
-		private static DynamicEmitter GetRegisteredDynamicEmitter(this Application app)
-			=> app.ApplicationServices.GetRequiredService<DynamicEmitter>();
 	}
 }

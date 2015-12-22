@@ -44,7 +44,7 @@ namespace Compose
 
 		private void Change(WeakReferencingDynamicManager<Interface, OriginalService> manager, Interface service)
 		{
-			if (manager.CurrentService != null && KnownTypes.Disposable.IsAssignableFrom(manager.CurrentService.GetType().GetTypeInfo()))
+			if (manager.CurrentService != null && KnownTypes.DisposableInfo.IsAssignableFrom(manager.CurrentService.GetType().GetTypeInfo()))
 				((IDisposable)manager.CurrentService).Dispose();
 			manager.CurrentService = service;
 		}

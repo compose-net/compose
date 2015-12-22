@@ -2,6 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Xunit;
 
@@ -151,6 +153,37 @@ namespace Compose.Tests
 				.UseProvider<Fake.Consumer>(services => services.AddTransient<Fake.Consumer, Fake.ConsumerImplementation>())
 				.ApplicationServices.GetRequiredService<Fake.Consumer>().Service
 				.Should().Be(application.ApplicationServices.GetRequiredService<Fake.Service>());
+		}
+
+		public class GivenTertiaryProviderAdded
+		{
+
+			[Fact]
+			public static void WhenRequestingIEnumerableOfServiceOnPrimaryProviderThenReturnsPrimaryServiceOnly()
+			{
+				var application = new Application();
+				application.UseServices(services => services.AddTransient<Fake.Service, Fake.Implementation>());
+				application.UseProvider<Fake.Service>(services => services.AddTransient<Fake.Service, Fake.AlternativeImplementation>());
+
+				var results = application.ApplicationServices.GetRequiredService<IEnumerable<Fake.Service>>();
+
+				results.Should().HaveCount(1);
+				results.Single().ServiceType.Should().Be(typeof(Fake.Implementation));
+			}
+
+			[Fact]
+			public static void WhenRequestingIEnumerableOfServiceOnTertiaryProviderThenReturnsTertiaryServiceOnly()
+			{
+				var application = new Application();
+				application.UseServices(services => services.AddTransient<Fake.Service, Fake.Implementation>());
+				var tertiaryProvider = application.UseProvider<Fake.Service>(services => services.AddTransient<Fake.Service, Fake.AlternativeImplementation>());
+
+				var results = tertiaryProvider.ApplicationServices.GetRequiredService<IEnumerable<Fake.Service>>();
+
+				results.Should().HaveCount(2);
+				results.Should().ContainSingle(x => x.ServiceType == typeof(Fake.Implementation));
+				results.Should().ContainSingle(x => x.ServiceType == typeof(Fake.AlternativeImplementation));
+			}
 		}
 	}
 }

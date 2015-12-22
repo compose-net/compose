@@ -6,6 +6,9 @@ namespace Compose
 	{
 		private readonly Func<Service> _delegateFactory;
 
+		public DelegateAbstractFactory(Func<object> delegateFactory)
+			: this(() => (Service) delegateFactory()) { }
+
 		public DelegateAbstractFactory(Func<Service> delegateFactory)
 		{
 			_delegateFactory = delegateFactory;

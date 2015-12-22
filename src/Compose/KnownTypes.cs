@@ -14,7 +14,11 @@ namespace Compose
 		internal static readonly Type OpenAbstractFactoryImplementation = typeof(DelegateAbstractFactory<>);
 		internal static readonly Type OpenDynamicManager = typeof(DynamicManager<,>);
 		internal static readonly Type OpenDynamicManagerImplementation = typeof(WeakReferencingDynamicManager<,>);
+		internal static readonly Type OpenFunc = typeof(Func<>);
 
-		internal static readonly TypeInfo Disposable = typeof(IDisposable).GetTypeInfo();
+		internal static readonly TypeInfo DisposableInfo = typeof(IDisposable).GetTypeInfo();
+		internal static readonly TypeInfo OpenDynamicRegisterInfo = typeof(DynamicRegister<>).GetTypeInfo();
+		internal static readonly TypeInfo OpenDynamicManagerInfo = typeof(DynamicManager<,>).GetTypeInfo();
+		internal static readonly TypeInfo OpenTransitionManagerInfo = typeof(TransitionManager<>).GetTypeInfo();
 	}
 }

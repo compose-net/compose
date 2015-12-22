@@ -7,7 +7,7 @@ namespace Compose
 {
 	internal static class TypeInfoExtensions
 	{
-		public static TypeInfo[] GetGenericArguments(this TypeInfo typeInfo)
+		internal static TypeInfo[] GetGenericArguments(this TypeInfo typeInfo)
 		{
 			IEnumerable<Type> arguments = typeInfo.IsGenericTypeDefinition
 								? typeInfo.GenericTypeParameters

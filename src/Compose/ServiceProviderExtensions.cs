@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -58,12 +59,22 @@ namespace Compose
 			return app;
 		}
 
-		internal static readonly List<ServiceDescriptor> DynamicEmissionDescriptors
+		private static readonly List<ServiceDescriptor> DynamicEmissionDescriptors
 			= new List<ServiceDescriptor>
 			{
-				ServiceDescriptor.Singleton<DynamicEmitter, IlGeneratingDynamicEmitter>(),
-				ServiceDescriptor.Singleton(KnownTypes.OpenDynamicManagerContainer, KnownTypes.OpenDynamicManagerContainerImplementation),
-				ServiceDescriptor.Singleton<TransitionManagerContainer, ConcurrentTransitionManagerContainer>()
+				ServiceDescriptor.Singleton<DynamicFactory, ConcurrentCachingDynamicFactory>().WithDynamicMarker(),
+				ServiceDescriptor.Singleton<DynamicEmitter, IlGeneratingDynamicEmitter>().WithDynamicMarker(),
+				ServiceDescriptor.Singleton(KnownTypes.OpenDynamicManagerContainer, KnownTypes.OpenDynamicManagerContainerImplementation).WithDynamicMarker(),
+				ServiceDescriptor.Singleton<TransitionManagerContainer, ConcurrentTransitionManagerContainer>().WithDynamicMarker()
 			};
+
+		internal static IEnumerable<ServiceDescriptor> ExcludingDynamicServices(this IServiceCollection services)
+			=> services.Where(x => !x.IsDynamicService());
+
+		internal static ServiceDescriptor WithDynamicMarker(this ServiceDescriptor serviceDescriptor)
+			=> DynamicServiceDescriptor.For(serviceDescriptor);
+
+		private static bool IsDynamicService(this ServiceDescriptor serviceDescriptor)
+			=> serviceDescriptor is DynamicServiceDescriptor;
 	}
 }
