@@ -40,7 +40,7 @@ namespace Compose
                 _constructors = type.DeclaredConstructors.Select(x => new Ctor(x)).ToArray();
 
                 var fastCtor = _constructors.FirstOrDefault(x => x.ArgumentCount == 0).ConstructorInfo;
-                if(fastCtor != null)
+                if (fastCtor != null)
                     _fastCreator = Expression.Lambda<Func<object>>(Expression.New(fastCtor)).Compile();
             }
 
@@ -49,7 +49,7 @@ namespace Compose
                 if (args.Length == 0 && HasParameterlessCtor)
                     return _fastCreator();
 
-                for(var i = 0; i < _constructors.Length; i++)
+                for (var i = 0; i < _constructors.Length; i++)
                 {
                     var ctor = _constructors[i];
                     if (ctor.IsMatch(ref args))
@@ -75,7 +75,7 @@ namespace Compose
 
                 var array = Expression.Parameter(typeof(object[]));
                 var parameters = new List<Expression>();
-                for(var i = 0; i < ArgumentCount; i++)
+                for (var i = 0; i < ArgumentCount; i++)
                 {
                     parameters.Add(Expression.ConvertChecked(Expression.ArrayIndex(array, Expression.Constant(i)), _typeArguments[i].AsType()));
                 }
@@ -88,13 +88,13 @@ namespace Compose
                 if (args.Length != ArgumentCount)
                     return false;
 
-                for(var i = 0; i < ArgumentCount; i++)
-                    if(!args[i].GetType().GetTypeInfo().IsAssignableFrom(_typeArguments[i]))
+                for (var i = 0; i < ArgumentCount; i++)
+                    if (!_typeArguments[i].IsAssignableFrom(args[i].GetType().GetTypeInfo()))
                         return false;
 
                 return true;
             }
-            internal object Invoke(ref object[] args) => _creator(args);            
+            internal object Invoke(ref object[] args) => _creator(args);
         }
     }
 }
