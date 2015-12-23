@@ -1,8 +1,6 @@
 ﻿using FluentAssertions;
-using System;
-using System.Diagnostics;
 using System.Reflection;
-using Xunit;
+using TestAttributes;
 
 namespace Compose.Tests
 {
@@ -32,7 +30,7 @@ namespace Compose.Tests
 
             public class WithPublicConstructors
             {
-                [Fact]
+                [Unit]
                 public void WithNoConstructorArgumentsReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(PublicClassWithPublicConstructors).GetTypeInfo());
@@ -41,7 +39,7 @@ namespace Compose.Tests
                     result.Should().BeAssignableTo<PublicClassWithPublicConstructors>();
                 }
 
-                [Fact]
+                [Unit]
                 public void WhenPassedArgumentsThenReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(PublicClassWithPublicConstructors).GetTypeInfo(), 1);
@@ -50,7 +48,7 @@ namespace Compose.Tests
                     result.Should().BeAssignableTo<PublicClassWithPublicConstructors>();
                 }
 
-                [Fact]
+                [Unit]
                 public void WhenPassedArgumentsForAlternativeConstructorThenReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(PublicClassWithPublicConstructors).GetTypeInfo(), "123");
@@ -61,7 +59,7 @@ namespace Compose.Tests
             }
             public class WithInternalConstructors
             {
-                [Fact]
+                [Unit]
                 public void WithNoConstructorArgumentsReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(PublicClassWithInternalConstructors).GetTypeInfo());
@@ -70,7 +68,7 @@ namespace Compose.Tests
                     result.Should().BeAssignableTo<PublicClassWithInternalConstructors>();
                 }
 
-                [Fact]
+                [Unit]
                 public void WhenPassedArgumentsThenReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(PublicClassWithInternalConstructors).GetTypeInfo(), 1);
@@ -79,7 +77,7 @@ namespace Compose.Tests
                     result.Should().BeAssignableTo<PublicClassWithInternalConstructors>();
                 }
 
-                [Fact]
+                [Unit]
                 public void WhenPassedArgumentsForAlternativeConstructorThenReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(PublicClassWithInternalConstructors).GetTypeInfo(), "123");
@@ -90,7 +88,7 @@ namespace Compose.Tests
             }
             public class WithPrivateConstructors
             {
-                [Fact]
+                [Unit]
                 public void WithNoConstructorArgumentsReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(PublicClassWithInternalConstructors).GetTypeInfo());
@@ -99,7 +97,7 @@ namespace Compose.Tests
                     result.Should().BeAssignableTo<PublicClassWithInternalConstructors>();
                 }
 
-                [Fact]
+                [Unit]
                 public void WhenPassedArgumentsThenReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(PublicClassWithInternalConstructors).GetTypeInfo(), 1);
@@ -108,7 +106,7 @@ namespace Compose.Tests
                     result.Should().BeAssignableTo<PublicClassWithInternalConstructors>();
                 }
 
-                [Fact]
+                [Unit]
                 public void WhenPassedArgumentsForAlternativeConstructorThenReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(PublicClassWithInternalConstructors).GetTypeInfo(), "123");
@@ -143,7 +141,7 @@ namespace Compose.Tests
 
             public class WithPublicConstructors
             {
-                [Fact]
+                [Unit]
                 public void WithNoConstructorArgumentsReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(InternalClassWithPublicConstructors).GetTypeInfo());
@@ -152,7 +150,7 @@ namespace Compose.Tests
                     result.Should().BeAssignableTo<InternalClassWithPublicConstructors>();
                 }
 
-                [Fact]
+                [Unit]
                 public void WhenPassedArgumentsThenReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(InternalClassWithPublicConstructors).GetTypeInfo(), 1);
@@ -161,7 +159,7 @@ namespace Compose.Tests
                     result.Should().BeAssignableTo<InternalClassWithPublicConstructors>();
                 }
 
-                [Fact]
+                [Unit]
                 public void WhenPassedArgumentsForAlternativeConstructorThenReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(InternalClassWithPublicConstructors).GetTypeInfo(), "123");
@@ -172,7 +170,7 @@ namespace Compose.Tests
             }
             public class WithInternalConstructors
             {
-                [Fact]
+                [Unit]
                 public void WithNoConstructorArgumentsReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(InternalClassWithInternalConstructors).GetTypeInfo());
@@ -181,7 +179,7 @@ namespace Compose.Tests
                     result.Should().BeAssignableTo<InternalClassWithInternalConstructors>();
                 }
 
-                [Fact]
+                [Unit]
                 public void WhenPassedArgumentsThenReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(InternalClassWithInternalConstructors).GetTypeInfo(), 1);
@@ -190,7 +188,7 @@ namespace Compose.Tests
                     result.Should().BeAssignableTo<InternalClassWithInternalConstructors>();
                 }
 
-                [Fact]
+                [Unit]
                 public void WhenPassedArgumentsForAlternativeConstructorThenReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(InternalClassWithInternalConstructors).GetTypeInfo(), "123");
@@ -201,7 +199,7 @@ namespace Compose.Tests
             }
             public class WithPrivateConstructors
             {
-                [Fact]
+                [Unit]
                 public void WithNoConstructorArgumentsReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(InternalClassWithInternalConstructors).GetTypeInfo());
@@ -210,7 +208,7 @@ namespace Compose.Tests
                     result.Should().BeAssignableTo<InternalClassWithInternalConstructors>();
                 }
 
-                [Fact]
+                [Unit]
                 public void WhenPassedArgumentsThenReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(InternalClassWithInternalConstructors).GetTypeInfo(), 1);
@@ -219,7 +217,7 @@ namespace Compose.Tests
                     result.Should().BeAssignableTo<InternalClassWithInternalConstructors>();
                 }
 
-                [Fact]
+                [Unit]
                 public void WhenPassedArgumentsForAlternativeConstructorThenReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(InternalClassWithInternalConstructors).GetTypeInfo(), "123");
@@ -254,7 +252,7 @@ namespace Compose.Tests
 
             public class WithPublicConstructors
             {
-                [Fact]
+                [Unit]
                 public void WithNoConstructorArgumentsReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(PrivateClassWithPublicConstructors).GetTypeInfo());
@@ -263,7 +261,7 @@ namespace Compose.Tests
                     result.Should().BeAssignableTo<PrivateClassWithPublicConstructors>();
                 }
 
-                [Fact]
+                [Unit]
                 public void WhenPassedArgumentsThenReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(PrivateClassWithPublicConstructors).GetTypeInfo(), 1);
@@ -272,7 +270,7 @@ namespace Compose.Tests
                     result.Should().BeAssignableTo<PrivateClassWithPublicConstructors>();
                 }
 
-                [Fact]
+                [Unit]
                 public void WhenPassedArgumentsForAlternativeConstructorThenReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(PrivateClassWithPublicConstructors).GetTypeInfo(), "123");
@@ -283,7 +281,7 @@ namespace Compose.Tests
             }
             public class WithInternalConstructors
             {
-                [Fact]
+                [Unit]
                 public void WithNoConstructorArgumentsReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(PrivateClassWithInternalConstructors).GetTypeInfo());
@@ -292,7 +290,7 @@ namespace Compose.Tests
                     result.Should().BeAssignableTo<PrivateClassWithInternalConstructors>();
                 }
 
-                [Fact]
+                [Unit]
                 public void WhenPassedArgumentsThenReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(PrivateClassWithInternalConstructors).GetTypeInfo(), 1);
@@ -301,7 +299,7 @@ namespace Compose.Tests
                     result.Should().BeAssignableTo<PrivateClassWithInternalConstructors>();
                 }
 
-                [Fact]
+                [Unit]
                 public void WhenPassedArgumentsForAlternativeConstructorThenReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(PrivateClassWithInternalConstructors).GetTypeInfo(), "123");
@@ -312,7 +310,7 @@ namespace Compose.Tests
             }
             public class WithPrivateConstructors
             {
-                [Fact]
+                [Unit]
                 public void WithNoConstructorArgumentsReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(PrivateClassWithInternalConstructors).GetTypeInfo());
@@ -321,7 +319,7 @@ namespace Compose.Tests
                     result.Should().BeAssignableTo<PrivateClassWithInternalConstructors>();
                 }
 
-                [Fact]
+                [Unit]
                 public void WhenPassedArgumentsThenReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(PrivateClassWithInternalConstructors).GetTypeInfo(), 1);
@@ -330,7 +328,7 @@ namespace Compose.Tests
                     result.Should().BeAssignableTo<PrivateClassWithInternalConstructors>();
                 }
 
-                [Fact]
+                [Unit]
                 public void WhenPassedArgumentsForAlternativeConstructorThenReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(PrivateClassWithInternalConstructors).GetTypeInfo(), "123");
@@ -365,7 +363,7 @@ namespace Compose.Tests
 
             public class WithPublicConstructors
             {
-                [Fact]
+                [Unit]
                 public void WithNoConstructorArgumentsReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(GenericClassWithPublicConstructors<string>).GetTypeInfo());
@@ -374,7 +372,7 @@ namespace Compose.Tests
                     result.Should().BeAssignableTo<GenericClassWithPublicConstructors<string>>();
                 }
 
-                [Fact]
+                [Unit]
                 public void WhenPassedArgumentsThenReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(GenericClassWithPublicConstructors<string>).GetTypeInfo(), 1);
@@ -383,7 +381,7 @@ namespace Compose.Tests
                     result.Should().BeAssignableTo<GenericClassWithPublicConstructors<string>>();
                 }
 
-                [Fact]
+                [Unit]
                 public void WhenPassedArgumentsForAlternativeConstructorThenReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(GenericClassWithPublicConstructors<string>).GetTypeInfo(), "123");
@@ -394,7 +392,7 @@ namespace Compose.Tests
             }
             public class WithInternalConstructors
             {
-                [Fact]
+                [Unit]
                 public void WithNoConstructorArgumentsReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(GenericClassWithInternalConstructors<string>).GetTypeInfo());
@@ -403,7 +401,7 @@ namespace Compose.Tests
                     result.Should().BeAssignableTo<GenericClassWithInternalConstructors<string>>();
                 }
 
-                [Fact]
+                [Unit]
                 public void WhenPassedArgumentsThenReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(GenericClassWithInternalConstructors<string>).GetTypeInfo(), 1);
@@ -412,7 +410,7 @@ namespace Compose.Tests
                     result.Should().BeAssignableTo<GenericClassWithInternalConstructors<string>>();
                 }
 
-                [Fact]
+                [Unit]
                 public void WhenPassedArgumentsForAlternativeConstructorThenReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(GenericClassWithInternalConstructors<string>).GetTypeInfo(), "123");
@@ -423,7 +421,7 @@ namespace Compose.Tests
             }
             public class WithPrivateConstructors
             {
-                [Fact]
+                [Unit]
                 public void WithNoConstructorArgumentsReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(GenericClassWithInternalConstructors<string>).GetTypeInfo());
@@ -432,7 +430,7 @@ namespace Compose.Tests
                     result.Should().BeAssignableTo<GenericClassWithInternalConstructors<string>>();
                 }
 
-                [Fact]
+                [Unit]
                 public void WhenPassedArgumentsThenReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(GenericClassWithInternalConstructors<string>).GetTypeInfo(), 1);
@@ -441,7 +439,7 @@ namespace Compose.Tests
                     result.Should().BeAssignableTo<GenericClassWithInternalConstructors<string>>();
                 }
 
-                [Fact]
+                [Unit]
                 public void WhenPassedArgumentsForAlternativeConstructorThenReturnsObjectOfType()
                 {
                     var result = Activate.Type(typeof(GenericClassWithInternalConstructors<string>).GetTypeInfo(), "123");

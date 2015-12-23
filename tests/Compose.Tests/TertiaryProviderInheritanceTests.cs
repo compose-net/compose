@@ -5,20 +5,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Xunit;
+using TestAttributes;
 
 namespace Compose.Tests
 {
 	public class TertiaryProviderInheritanceTests
 	{
-		[Fact]
+		[Unit]
 		public static void WhenAddingProviderForUnRegisteredServiceThenThrowsException()
 		{
 			Action act = () => new Application().UseProvider<Fake.Service>(services => services.AddTransient<Fake.Service, Fake.Implementation>());
 			act.ShouldThrow<InvalidOperationException>();
 		}
 
-		[Fact]
+		[Unit]
 		public static void WhenAddingProviderForClassThenThrowsException()
 		{
 			var application = new Application();
@@ -30,7 +30,7 @@ namespace Compose.Tests
 		private static readonly Action<IServiceCollection> AddFakeTransientService
 			= services => services.AddTransient<Fake.Service, Fake.Implementation>();
 
-		[Fact]
+		[Unit]
 		public static void WhenAddingTertiaryProviderThenProviderContainingTertiaryServicesIsReturned()
 		{
 			var application = new Application();
@@ -39,7 +39,7 @@ namespace Compose.Tests
 				.Should().NotBeNull();
 		}
 
-		[Fact]
+		[Unit]
 		public static void WhenTertiaryProviderConfiguredToUseInternalProviderThenReturnsProviderContainingService()
 		{
 			var application = new Application();
@@ -50,7 +50,7 @@ namespace Compose.Tests
 				.Should().NotBeNull();
 		}
 
-		[Fact]
+		[Unit]
 		public static void WhenTertiaryProviderConfiguredToUseCustomProviderThenApplicationServicesMatchesCustomProvider()
 		{
 			var provider = new Mock<IServiceProvider>();
@@ -63,7 +63,7 @@ namespace Compose.Tests
 				.Should().Be(provider.Object);
 		}
 
-		[Fact]
+		[Unit]
 		public static void WhenTertiaryProviderAddedThenDoesNotConflictWithPrimaryServices()
 		{
 			var application = new Application();
@@ -77,7 +77,7 @@ namespace Compose.Tests
 			//.Should().BeOfType<Fake.Implementation>();
 		}
 
-		[Fact]
+		[Unit]
 		public static void WhenTertiaryProviderServiceDependsOnPrimaryServiceThenTertiaryServiceCanBeResolved()
 		{
 			var application = new Application();
@@ -92,7 +92,7 @@ namespace Compose.Tests
 				.Should().NotBeNull();
 		}
 
-		[Fact]
+		[Unit]
 		public static void WhenTertiaryProviderInheritsTransientFactoryThenConsumerCanBeResolved()
 		{
 			var application = new Application();
@@ -108,7 +108,7 @@ namespace Compose.Tests
 				.Should().NotBeNull();
 		}
 
-		[Fact]
+		[Unit]
 		public static void WhenTertiaryProviderInheritsScopedFactoryThenConsumerCanBeResolved()
 		{
 			var application = new Application();
@@ -124,7 +124,7 @@ namespace Compose.Tests
 				.Should().NotBeNull();
 		}
 
-		[Fact]
+		[Unit]
 		public static void WhenTertiaryProviderInheritsSingletonFactoryThenSingletonIsHonouredAcrossProviders()
 		{
 			var application = new Application();
@@ -140,7 +140,7 @@ namespace Compose.Tests
 				.Should().Be(application.ApplicationServices.GetRequiredService<Fake.Service>());
 		}
 
-		[Fact]
+		[Unit]
 		public static void WhenTertiaryProviderInheritsSingletonTypedThenSingletonIsHonouredAcrossProviders()
 		{
 			var application = new Application();
@@ -158,7 +158,7 @@ namespace Compose.Tests
 		public class GivenTertiaryProviderAdded
 		{
 
-			[Fact]
+			[Unit]
 			public static void WhenRequestingIEnumerableOfServiceOnPrimaryProviderThenReturnsPrimaryServiceOnly()
 			{
 				var application = new Application();
@@ -171,7 +171,7 @@ namespace Compose.Tests
 				results.Single().ServiceType.Should().Be(typeof(Fake.Implementation));
 			}
 
-			[Fact]
+			[Unit]
 			public static void WhenRequestingIEnumerableOfServiceOnTertiaryProviderThenReturnsTertiaryServiceOnly()
 			{
 				var application = new Application();

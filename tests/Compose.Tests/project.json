@@ -17,7 +17,7 @@
 		"Compose": "",
 		"FluentAssertions": "4.1.0",
 		"Moq": "4.2.1510.2205",
-		"xunit": "2.1.0",
+		"TestAttributes": "2.0.0-rc1",
 		"xunit.runner.dnx": "2.1.0-rc1-build204"
 	},
 	"frameworks": {
