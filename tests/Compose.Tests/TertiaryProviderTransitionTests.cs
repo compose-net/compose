@@ -1,12 +1,12 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using Xunit;
+using TestAttributes;
 
 namespace Compose.Tests
 {
 	public class TertiaryProviderTransitionTests
 	{
-		[Fact]
+		[Unit]
 		public static void WhenApplicationTransitionedThenResolvesTertiaryService()
 		{
 			var application = new Application();

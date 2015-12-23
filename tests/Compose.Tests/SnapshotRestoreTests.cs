@@ -1,14 +1,12 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using System.Collections.Generic;
-using System.Linq;
-using Xunit;
+using TestAttributes;
 
 namespace Compose.Tests
 {
 	public class SnapshotRestoreTests
 	{
-		[Fact]
+		[Unit]
 		public static void WhenRestoringImplicitlySnapshottedServiceThenServiceCanBeResolved()
 		{
 			var application = new Application();
@@ -24,7 +22,7 @@ namespace Compose.Tests
 			service.ServiceType.Should().Be(typeof(Fake.Implementation));
 		}
 
-		[Fact]
+		[Unit]
 		public static void WhenRestoringExplcitlySnapshottedServiceThenServiceCanBeResolved()
 		{
 			var application = new Application();

@@ -2,7 +2,7 @@
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Xunit;
+using TestAttributes;
 
 namespace Compose.Tests
 {
@@ -10,7 +10,7 @@ namespace Compose.Tests
 	{
 		public class GivenUsingBuiltInProvider
 		{
-			[Fact]
+			[Unit]
 			public static void WhenServicesAddedToPreServiceConfigurationThenServicesCanBeResolved()
 			{
 				var app = new Fake.Application();
@@ -27,7 +27,7 @@ namespace Compose.Tests
 				useServicesCalled.Should().BeTrue();
 			}
 
-			[Fact]
+			[Unit]
 			public static void WhenServicesAddedToPreServiceConfigurationThenServicesArePresentInPostConfiguration()
 			{
 				var app = new Fake.Application();
@@ -40,7 +40,7 @@ namespace Compose.Tests
 				app.PostConfigurationCalled.Should().BeTrue();
 			}
 
-			[Fact]
+			[Unit]
 			public static void WhenServicesAddedThenServicesArePresentInPostConfiguration()
 			{
 				var app = new Fake.Application();
@@ -57,7 +57,7 @@ namespace Compose.Tests
 
 		public class GivenUsingCustomProvider
 		{
-			[Fact]
+			[Unit]
 			public static void WhenServicesAddedToPreServiceConfigurationThenServicesCanBeResolved()
 			{
 				var provider = new Mock<IServiceProvider>().Object;
@@ -76,7 +76,7 @@ namespace Compose.Tests
 				useServicesCalled.Should().BeTrue();
 			}
 
-			[Fact]
+			[Unit]
 			public static void WhenServicesAddedToPreServiceConfigurationThenServicesArePresentInPostConfiguration()
 			{
 				var provider = new Mock<IServiceProvider>().Object;
@@ -91,7 +91,7 @@ namespace Compose.Tests
 				app.PostConfigurationCalled.Should().BeTrue();
 			}
 
-			[Fact]
+			[Unit]
 			public static void WhenServicesAddedThenServicesArePresentInPostConfiguration()
 			{
 				var provider = new Mock<IServiceProvider>().Object;

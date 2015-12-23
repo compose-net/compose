@@ -2,20 +2,20 @@
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Xunit;
+using TestAttributes;
 
 namespace Compose.Tests
 {
 	public class ApplicationServiceTests
 	{
-		[Fact]
+		[Unit]
 		public static void GivenApplicationHasNoServicesWhenGettingApplicationServicesThenReturnsBaseProvider()
 		{
 			new Application().ApplicationServices
 				.Should().NotBeNull();
 		}
 
-		[Fact]
+		[Unit]
 		public static void WhenConfiguringApplicationServicesToUseInternalProviderThenReturnsProviderContainingService()
 		{
 			var application = new Application();
@@ -24,7 +24,7 @@ namespace Compose.Tests
 				.Should().NotBeNull();
 		}
 
-		[Fact]
+		[Unit]
 		public static void WhenConfiguringApplicationServicesToUseCustomProviderThenApplicationServicesMatchesCustomProvider()
 		{
 			var provider = new Mock<IServiceProvider>().Object;
