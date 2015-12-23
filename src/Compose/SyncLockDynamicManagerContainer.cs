@@ -9,21 +9,18 @@ namespace Compose
 	{
 		private readonly List<WeakReferencingDynamicManager<Interface, OriginalService>> _managers
 			= new List<WeakReferencingDynamicManager<Interface, OriginalService>>();
-		private readonly object _sync = new object();
 
 		public void Add(WeakReferencingDynamicManager<Interface, OriginalService> manager)
 		{
-			lock (_sync)
-			{
+			lock (_managers)
 				_managers.Add(manager);
-			}
 		}
 
 		private IEnumerable<WeakReferencingDynamicManager<Interface, OriginalService>> GetActiveManagers()
 		{
 			var deadReferences = new List<WeakReferencingDynamicManager<Interface, OriginalService>>(_managers.Count);
 
-			lock (_sync)
+			lock (_managers)
 			{
 				foreach (var manager in _managers)
 					if (manager.IsActive)
