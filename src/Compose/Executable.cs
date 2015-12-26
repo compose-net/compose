@@ -20,11 +20,11 @@ namespace Compose
             ExecutionAsync = asyncInvoke;
         }
 
-        public void OnExecute<TService>(Action<TService> invoke) where TService : class
+        public void OnExecute<Service>(Action<Service> invoke) where Service : class
         {
             if (ApplicationServices == null) throw new InvalidOperationException($"{nameof(ApplicationServices)} was not registered; cannot execute action.");
 
-            OnExecute(() => invoke(ApplicationServices.GetRequiredService<TService>()));
+            OnExecute(() => invoke(ApplicationServices.GetRequiredService<Service>()));
         }
 
         public virtual void Execute()
