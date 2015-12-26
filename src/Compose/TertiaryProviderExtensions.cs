@@ -83,7 +83,7 @@ namespace Compose
 			var implementationFactoryInterfaceType = KnownTypes.OpenAbstractFactory.MakeGenericType(original.ServiceType);
 			var implementationFactoryImplementationType = KnownTypes.OpenAbstractFactoryImplementation.MakeGenericType(original.ServiceType);
 			Func<IServiceProvider, object> implementationFactory =
-				provider => Activator.CreateInstance(implementationFactoryImplementationType,
+				provider => Activate.Type(implementationFactoryImplementationType.GetTypeInfo(),
 					(Func<object>)(() => original.ImplementationFactory(provider))
 				);
 			app.Services.Add(new ServiceDescriptor(implementationFactoryInterfaceType, implementationFactory, original.Lifetime).WithDynamicMarker());

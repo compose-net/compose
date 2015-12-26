@@ -2,9 +2,9 @@
 using System.Reflection;
 
 namespace Compose
-{
+{                                               
 	public interface DynamicFactory
 	{
-		Type GetDynamicProxy(TypeInfo serviceTypeInfo);
+        TypeInfo GetDynamicProxy(TypeInfo serviceTypeInfo);
 	}
 }

@@ -23,7 +23,7 @@ namespace Compose
 			_moduleBuilder = CreateModuleBuilder();
 		}
 
-		public Type GetManagedDynamicProxy(TypeInfo serviceTypeInfo)
+		public TypeInfo GetManagedDynamicProxy(TypeInfo serviceTypeInfo)
 		{
 			var serviceType = serviceTypeInfo.AsType();
 			ValidateProxyIsPossible(serviceTypeInfo, true);
@@ -43,7 +43,7 @@ namespace Compose
 			{
 				var managerTypeInfo = KnownTypes.OpenDynamicRegister.MakeGenericType(serviceType).GetTypeInfo();
 				typeBuilder.AddDirectImplementation(serviceTypeInfo, managerTypeInfo);
-				return typeBuilder.CreateTypeInfo().AsType();
+				return typeBuilder.CreateTypeInfo();
 			}
 			catch (Exception ex)
 			{
