@@ -39,7 +39,7 @@ namespace Compose
             {
                 _constructors = type.DeclaredConstructors.Select(x => new Ctor(x)).ToArray();
 
-                var fastCtor = _constructors.FirstOrDefault(x => x.ArgumentCount == 0).ConstructorInfo;
+                var fastCtor = _constructors.FirstOrDefault(x => x.ArgumentCount == 0)?.ConstructorInfo;
                 if (fastCtor != null)
                     _fastCreator = Expression.Lambda<Func<object>>(Expression.New(fastCtor)).Compile();
             }

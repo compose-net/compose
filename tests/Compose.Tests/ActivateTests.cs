@@ -79,6 +79,10 @@ namespace Compose.Tests
             private GenericClassWithPrivateConstructors(int a) { }
             private GenericClassWithPrivateConstructors(string a) { }
         }
+        public class PublicClassWithNoParameterlessConstructor
+        {
+            public PublicClassWithNoParameterlessConstructor(int a, string b) { }
+        }
         #endregion
 
         [Unit]
@@ -403,6 +407,15 @@ namespace Compose.Tests
 
             result.Should().NotBeNull();
             result.Should().BeAssignableTo<GenericClassWithInternalConstructors<string>>();
+        }
+
+        [Unit]
+        public void GivenAPublicClassWithNoParameterlessConstructorThenReturnObjectOfType()
+        {
+            var result = Activate.Type(typeof(PublicClassWithNoParameterlessConstructor).GetTypeInfo(), 2, "abc");
+
+            result.Should().NotBeNull();
+            result.Should().BeAssignableTo<PublicClassWithNoParameterlessConstructor>();
         }
     }
 }
