@@ -105,7 +105,7 @@ namespace Compose
                 ExecutionAsync = asyncInvoke;
             }
 
-            public void OnExecute<Service>(Action<Service, Result> invoke)
+            public void OnExecute<Service>(Action<Service, Result> invoke) where Service : class
             {
                 if (ApplicationServices == null) throw new InvalidOperationException($"{nameof(ApplicationServices)} was not registered; cannot execute action.");
 
