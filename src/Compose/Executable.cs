@@ -63,11 +63,11 @@ namespace Compose
             ExecutionAsync = asyncInvoke;
         }
 
-        public void OnExecute<TService>(Func<TService, Result> invoke) where TService : class
+        public void OnExecute<Service>(Func<Service, Result> invoke) where Service : class
         {
             if (ApplicationServices == null) throw new InvalidOperationException($"{nameof(ApplicationServices)} was not registered; cannot execute action.");
 
-            OnExecute(() => invoke(ApplicationServices.GetRequiredService<TService>()));
+            OnExecute(() => invoke(ApplicationServices.GetRequiredService<Service>()));
         }
 
         public virtual Result Execute()
@@ -105,11 +105,11 @@ namespace Compose
                 ExecutionAsync = asyncInvoke;
             }
 
-            public void OnExecute<TService>(Action<TService, Result> invoke)
+            public void OnExecute<Service>(Action<Service, Result> invoke)
             {
                 if (ApplicationServices == null) throw new InvalidOperationException($"{nameof(ApplicationServices)} was not registered; cannot execute action.");
 
-                OnExecute(context => invoke(ApplicationServices.GetRequiredService<TService>(), context));
+                OnExecute(context => invoke(ApplicationServices.GetRequiredService<Service>(), context));
             }
 
             public virtual void Execute(Result context)
@@ -149,11 +149,11 @@ namespace Compose
             ExecutionAsync = asyncInvoke;
         }
 
-        public void OnExecute<TService>(Func<TService, Context, Result> invoke) where TService : class
+        public void OnExecute<Service>(Func<Service, Context, Result> invoke) where Service : class
         {
             if (ApplicationServices == null) throw new InvalidOperationException($"{nameof(ApplicationServices)} was not registered; cannot execute action.");
 
-            OnExecute(context => invoke(ApplicationServices.GetRequiredService<TService>(), context));
+            OnExecute(context => invoke(ApplicationServices.GetRequiredService<Service>(), context));
         }
 
         public virtual Result Execute(Context context)
