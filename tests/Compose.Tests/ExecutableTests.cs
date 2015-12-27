@@ -110,16 +110,6 @@ namespace Compose.Tests
         }
 
         [Unit]
-        public void GivenAnExecutableWhenOnExecuteIsInvokedAndNoServicesRegisteredThenThrowsException()
-        {
-            var app = new Executable();
-
-            Action act = () => app.OnExecute<string>((service) => { });
-
-            act.ShouldThrow<InvalidOperationException>();
-        }
-
-        [Unit]
         public void GivenAnExecutableOfResultWhenExecuteIsInvokedAndOnExecuteIsNotInvokedThenThrowsException()
         {
             var app = new Fake.FakeExecutable();
@@ -221,16 +211,6 @@ namespace Compose.Tests
         }
 
         [Unit]
-        public void GivenAnExecutableOfResultWhenOnExecuteIsInvokedAndNoServicesRegisteredThenThrowsException()
-        {
-            var app = new Fake.FakeExecutable();
-
-            Action act = () => app.OnExecute<string>((service) => true);
-
-            act.ShouldThrow<InvalidOperationException>();
-        }
-
-        [Unit]
         public void GivenAnExecutableOfContextAndResultWhenExecuteIsInvokedAndOnExecuteIsNotInvokedThenThrowsException()
         {
             var app = new Fake.FakeContextExecutable();
@@ -329,16 +309,6 @@ namespace Compose.Tests
             await app.ExecuteAsync(true, cts.Token);
 
             executed.Should().Be(1);
-        }
-
-        [Unit]
-        public void GivenAnExecutableOfContextAndResultWhenOnExecuteIsInvokedAndNoServicesRegisteredThenThrowsException()
-        {
-            var app = new Fake.FakeContextExecutable();
-
-            Action act = () => app.OnExecute<string>((service, b) => { return true; });
-
-            act.ShouldThrow<InvalidOperationException>();
         }
     }
 }
