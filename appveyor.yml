@@ -32,17 +32,3 @@ test_script:
 - cmd: dnx -p tests\Compose.Tests\ test
 artifacts:
 - path: artifacts/packages/**.nupkg
-deploy:
-- provider: NuGet
-  name: development
-  server: https://ci.appveyor.com/nuget/smudge202-46am3soaut15
-  api_key:
-    secure: fi5rlfPkAQ9yKX5ffuRSykvWTQbUqTp95PjfD00So1M=
-  on:
-    branch: dev
-- provider: NuGet
-  name: production
-  api_key:
-    secure: GauHc7DbZGcD8A4z+x6hToRqjurh0yQe/ky8TSjzBbRYug9ixYIsVnV/VDB8FT4H
-  on:
-    branch: master
