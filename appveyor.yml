@@ -23,7 +23,6 @@ before_build:
 - cmd: >-
     dnu restore
 
-    SET DNX_BUILD_VERSION=%APPVEYOR_BUILD_VERSION%
 build:
   publish_nuget: true
   publish_nuget_symbols: true
