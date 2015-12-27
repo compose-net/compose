@@ -1,5 +1,7 @@
 # Compose
 
+[![Join the chat at https://gitter.im/compose-net/compose](https://badges.gitter.im/compose-net/compose.svg)](https://gitter.im/compose-net/compose?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Latest Release](https://img.shields.io/nuget/vpre/compose.svg?style=plastic)](https://www.nuget.org/packages/compose)
 [![NuGet](https://img.shields.io/nuget/dt/Compose.svg?style=plastic)](https://www.nuget.org/packages/compose)
 
