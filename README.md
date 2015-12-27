@@ -1,7 +1,12 @@
 # Compose
 
-[![Build status](https://ci.appveyor.com/api/projects/status/2a52f9nlucas0jsn?svg=true)](https://ci.appveyor.com/project/Smudge202/compose) [![Stories in Backlog](https://badge.waffle.io/smudge202/compose.png?label=backlog&title=Backlog)](http://waffle.io/smudge202/compose) [![Stories in Ready](https://badge.waffle.io/smudge202/compose.png?label=ready&title=Ready)](http://waffle.io/smudge202/compose) [![Stories in Progress](https://badge.waffle.io/smudge202/compose.png?label=in%20progress&title=In%20Progress)](http://waffle.io/smudge202/compose)
-[![NuGet](https://img.shields.io/nuget/dt/Compose.svg)]()
+[![Join the chat at https://gitter.im/compose-net/compose](https://badges.gitter.im/compose-net/compose.svg)](https://gitter.im/compose-net/compose?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+[![Latest Release](https://img.shields.io/nuget/vpre/compose.svg?style=plastic)](https://www.nuget.org/packages/compose)
+[![NuGet](https://img.shields.io/nuget/dt/Compose.svg?style=plastic)](https://www.nuget.org/packages/compose)
+
+
+[![Build status](https://img.shields.io/appveyor/ci/smudge202/compose-v3nsp.svg?style=plastic)](https://ci.appveyor.com/project/Smudge202/compose) [![Stories in Backlog](https://img.shields.io/github/issues-raw/compose-net/compose.svg?style=plastic)](http://waffle.io/compose-net/compose) [![Stories in Ready](https://badge.waffle.io/smudge202/compose.png?label=ready&title=Ready)](http://waffle.io/compose-net/compose) [![Stories in Progress](https://badge.waffle.io/smudge202/compose.png?label=in%20progress&title=In%20Progress)](http://waffle.io/compose-net/compose)
 
 ## <a name="description"></a>Description
 
