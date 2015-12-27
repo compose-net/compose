@@ -10,7 +10,7 @@
 	"summary": "Assists with clean application composition allowing components to be isolated, reused, and interchanged.",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/smudge202/compose"
+		"url": "https://github.com/compose-net/compose"
 	},
 	"dependencies": {
 		"Microsoft.Extensions.DependencyInjection": "1.0.0-rc1-final",
