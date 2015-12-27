@@ -2,7 +2,7 @@
 
 namespace Compose.Tests.Fake
 {
-	public interface Service
+	public interface OpenGenericService<Service>
 	{
 		Type ServiceType { get; }
 	}

@@ -1,7 +1,6 @@
 ﻿namespace Compose.Tests.Fake
 {
-	internal class FakeExecutable : Executable<bool>
-	{
-
-	}
+    internal sealed class FakeExecutable : Executable<bool>
+    {
+    }
 }

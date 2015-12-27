@@ -4,28 +4,23 @@ using System.Reflection;
 
 namespace Compose
 {
-	internal sealed class SyncLockDynamicManagerContainer<TInterface, TOriginal> : IDynamicManagerContainer<TInterface, TOriginal>
-		where TInterface : class where TOriginal : TInterface
+	internal sealed class SyncLockDynamicManagerContainer<Interface, OriginalService> : DynamicManagerContainer<Interface, OriginalService>
+		where Interface : class where OriginalService : Interface
 	{
-		private readonly List<DynamicManager<TInterface, TOriginal>> _managers
-			= new List<DynamicManager<TInterface, TOriginal>>();
-		private readonly object _sync = new object();
+		private readonly List<WeakReferencingDynamicManager<Interface, OriginalService>> _managers
+			= new List<WeakReferencingDynamicManager<Interface, OriginalService>>();
 
-		private static TypeInfo Disposable = typeof(IDisposable).GetTypeInfo();
-
-		public void Add(DynamicManager<TInterface, TOriginal> manager)
+		public void Add(WeakReferencingDynamicManager<Interface, OriginalService> manager)
 		{
-			lock (_sync)
-			{
+			lock (_managers)
 				_managers.Add(manager);
-			}
 		}
 
-		private IEnumerable<DynamicManager<TInterface, TOriginal>> GetActiveManagers()
+		private IEnumerable<WeakReferencingDynamicManager<Interface, OriginalService>> GetActiveManagers()
 		{
-			var deadReferences = new List<DynamicManager<TInterface, TOriginal>>(_managers.Count);
+			var deadReferences = new List<WeakReferencingDynamicManager<Interface, OriginalService>>(_managers.Count);
 
-			lock (_sync)
+			lock (_managers)
 			{
 				foreach (var manager in _managers)
 					if (manager.IsActive)
@@ -38,15 +33,15 @@ namespace Compose
 			}
 		}
 
-		public void Change(Func<TInterface> service)
+		public void Change(Func<Interface> service)
 		{
 			foreach (var instance in GetActiveManagers())
 				Change(instance, service());
 		}
 
-		private void Change(DynamicManager<TInterface, TOriginal> manager, TInterface service)
+		private void Change(WeakReferencingDynamicManager<Interface, OriginalService> manager, Interface service)
 		{
-			if (manager.CurrentService != null && Disposable.IsAssignableFrom(manager.CurrentService.GetType().GetTypeInfo()))
+			if (manager.CurrentService != null && KnownTypes.DisposableInfo.IsAssignableFrom(manager.CurrentService.GetType().GetTypeInfo()))
 				((IDisposable)manager.CurrentService).Dispose();
 			manager.CurrentService = service;
 		}

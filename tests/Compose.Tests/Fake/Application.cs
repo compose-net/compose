@@ -1,27 +1,23 @@
-﻿using Microsoft.Framework.DependencyInjection;
+﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Compose.Tests.Fake
 {
-    internal sealed class Application : Compose.Application
-    {
-		public ReadOnlyCollection<ServiceDescriptor> PreConfiguredServices { get; private set; }
-		public IEnumerable<ServiceDescriptor> ServicesToAppendPreConfiguration;
-		protected internal override void PreServiceConfiguration(IServiceCollection services)
-		{
-			PreConfiguredServices = new List<ServiceDescriptor>(services).AsReadOnly();
-			if ((ServicesToAppendPreConfiguration?.Count() ?? 0) > 0)
-				services.TryAdd(ServicesToAppendPreConfiguration);
-			base.PreServiceConfiguration(services);
-		}
+	internal sealed class Application : Compose.Application
+	{
+		public IServiceCollection PreConfiguredServices { get; } = new ServiceCollection();
+		public Action<IReadOnlyCollection<ServiceDescriptor>>  PostConfigurationCallback { private get; set; }
+		public bool PostConfigurationCalled { get; private set; }
 
-		public ReadOnlyCollection<ServiceDescriptor> PostConfiguredServices { get; private set; }
-		protected internal override void PostServiceConfiguration(IReadOnlyCollection<ServiceDescriptor> services)
+		protected override void PreServiceConfiguration(IServiceCollection services)
+			=> services.Add(PreConfiguredServices);
+
+		protected override void PostServiceConfiguration(IReadOnlyCollection<ServiceDescriptor> services)
 		{
-			PostConfiguredServices = new List<ServiceDescriptor>(services).AsReadOnly();
-			base.PostServiceConfiguration(services);
+			PostConfigurationCallback?.Invoke(services);
+			PostConfigurationCalled = true;
 		}
 	}
 }

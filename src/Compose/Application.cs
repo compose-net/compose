@@ -1,19 +1,35 @@
-﻿using Microsoft.Framework.DependencyInjection;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Compose
 {
-    public class Application
-    {
-		public string Name { get; set; }
-
-		public IServiceProvider ApplicationServices { get; set; }
-
+	public class Application : ServiceProvider
+	{
 		protected internal virtual void PreServiceConfiguration(IServiceCollection services) { }
 
-        internal IServiceCollection Services { get; set; }
-
 		protected internal virtual void PostServiceConfiguration(IReadOnlyCollection<ServiceDescriptor> services) { }
-    }
+
+		protected internal override Func<IServiceProvider> ApplicationServiceFactory { get; set; }
+
+		public Application()
+		{
+			ApplicationServiceFactory = UseBuiltInProviderHonouringServiceConfigurations;
+		}
+
+		private IServiceProvider UseBuiltInProviderHonouringServiceConfigurations()
+		{
+			Services = new ServiceCollection();
+			PreServiceConfiguration(Services);
+			try
+			{
+				return Services.BuildServiceProvider();
+			}
+			finally
+			{
+				PostServiceConfiguration(Services.ToList().AsReadOnly());
+			}
+		}
+	}
 }

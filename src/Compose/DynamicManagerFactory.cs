@@ -3,23 +3,21 @@ using System.Reflection;
 
 namespace Compose
 {
-    internal static class DynamicManagerFactory
-    {
-		private static Type Exposer = typeof(DynamicManagerExposer<,>);
+	internal static class DynamicManagerFactory
+	{
+		private static readonly Type Exposer = typeof(DynamicManagerExposer<,>);
 
 		internal static object ForFactory(TypeInfo dynamicManagerTypeInfo, object dynamicContainer, object transitionManager, object abstractFactory)
-		{
-			return Activator.CreateInstance(Exposer.MakeGenericType(dynamicManagerTypeInfo.GenericTypeArguments),
+			=> Activator.CreateInstance(Exposer.MakeGenericType(dynamicManagerTypeInfo.GenericTypeArguments), 
 				dynamicContainer, transitionManager, abstractFactory
 			);
-		}
 
-		private class DynamicManagerExposer<TInterface, TOriginal> : DynamicManager<TInterface, TOriginal>
-			where TInterface : class where TOriginal : TInterface
+		private class DynamicManagerExposer<Interface, OriginalService> : WeakReferencingDynamicManager<Interface, OriginalService>
+			where Interface : class where OriginalService : Interface
 		{
-			public DynamicManagerExposer(IDynamicManagerContainer<TInterface, TOriginal> dynamicContainer, ITransitionManagerContainer transitionContainer, IAbstractFactory<TOriginal> factory)
-				: base(dynamicContainer, transitionContainer, (TOriginal)factory.Create())
+			public DynamicManagerExposer(DynamicManagerContainer<Interface, OriginalService> dynamicContainer, TransitionManagerContainer transitionContainer, AbstractFactory<OriginalService> factory)
+				: base(dynamicContainer, transitionContainer, factory.Create())
 			{ }
-        }
-    }
+		}
+	}
 }

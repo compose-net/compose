@@ -1,345 +1,314 @@
-﻿using Compose.Tests.Fake;
+﻿using FluentAssertions;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using TestAttributes;
-using Xunit;
 
 namespace Compose.Tests
 {
-	public class ExecutableTests
-	{
-		[Unit]
-		public void GivenOnExecuteNotInvokedWhenExecuteIsInvokedThenThrowsException()
-		{
-			var app = new Executable();
-
-			Action act = () => app.Execute();
+    public class ExecutableTests
+    {
+        [Unit]
+        public void GivenAnExecutableWhenExecuteIsInvokedAndOnExecuteIsNotInvokedThenThrowsException()
+        {
+            var app = new Executable();
+
+            Action act = () => app.Execute();
 
-			Assert.IsType(typeof(InvalidOperationException), Record.Exception(act));
-		}
-
-		[Unit]
-		public void GivenApplicationServicesIsNullWhenActionTServiceIsRegisteredThenThrowsException()
-		{
-			var app = new Executable();
-
-			Action act = () => app.OnExecute<string>((service) => { });
-
-			Assert.IsType(typeof(InvalidOperationException), Record.Exception(act));
-		}
-
-		[Unit]
-		public void WhenExecuteIsInvokedThenActionIsInvoked()
-		{
-			var executed = false;
-			var app = new Executable();
-			app.OnExecute(() => { executed = true; });
-
-			app.Execute();
-
-			Assert.True(executed);
-		}
-
-		[Unit]
-		public void GivenFunctionIsRegisteredWhenExecuteIsInvokedThenFunctionIsInvoked()
-		{
-			var executed = false;
-			var app = new Executable();
-			var cts = new CancellationTokenSource();
-			app.OnExecute((ct) => { executed = true; return Task.FromResult(false); });
-
-			app.Execute();
+            act.ShouldThrow<InvalidOperationException>();
+        }
 
-			Assert.True(executed);
-		}
+        [Unit]
+        public void GivenAnExecutableWhenExecuteIsInvokedThenActionIsInvoked()
+        {
+            var executed = false;
+            var app = new Executable();
+            app.OnExecute(() => { executed = true; });
+
+            app.Execute();
 
-		[Unit]
-		public void GivenBothActionAndFunctionAreRegisteredWhenExecuteIsInvokedThenActionIsInvoked()
-		{
-			var executed = 0;
-			var app = new Executable();
-
-			app.OnExecute((ct) => { executed = 1; return Task.FromResult(false); });
-			app.OnExecute(() => { executed = 2; });
-
-			app.Execute();
-
-			Assert.Equal(2, executed);
-		}
+            executed.Should().BeTrue();
+        }
 
-		[Unit]
-		public void GivenOnExecuteNotInvokedWhenExecuteAsyncIsInvokedThenThrowsException()
-		{
-			var app = new Executable();
-			var ct = new CancellationToken();
-
-			Assert.IsType<InvalidOperationException>(Record.ExceptionAsync(async () => await app.ExecuteAsync(ct)).Result);
-		}
-
-		[Unit]
-		public async void WhenExecuteAsyncIsInvokedThenActionIsInvoked()
-		{
-			var executed = false;
-			var app = new Executable();
-			var cts = new CancellationTokenSource();
-			app.OnExecute(() => { executed = true; });
-
-			await app.ExecuteAsync(cts.Token);
+        [Unit]
+        public void GivenAnExecutableWhenExecuteIsInvokedThenRegisteredFunctionIsInvoked()
+        {
+            var executed = false;
+            var app = new Executable();
+            var cts = new CancellationTokenSource();
+            app.OnExecute((ct) => { executed = true; return Task.FromResult(false); });
+
+            app.Execute();
+
+            executed.Should().BeTrue();
+        }
 
-			Assert.True(executed);
-		}
+        [Unit]
+        public void GivenAnExecutableWhenExecuteIsInvokedAndBothActionAndFunctionAreRegisteredThenActionIsInvoked()
+        {
+            var executed = 0;
+            var app = new Executable();
+
+            app.OnExecute((ct) => { executed = 1; return Task.FromResult(false); });
+            app.OnExecute(() => { executed = 2; });
+
+            app.Execute();
 
-		[Unit]
-		public async void GivenFunctionIsRegisteredWhenExecuteAsyncIsInvokedThenFunctionIsInvoked()
-		{
-			var executed = false;
-			var app = new Executable();
-			var cts = new CancellationTokenSource();
-			app.OnExecute((ct) => { executed = true; return Task.FromResult(false); });
-
-			await app.ExecuteAsync(cts.Token);
+            executed.Should().Be(2);
+        }
 
-			Assert.True(executed);
-		}
+        [Unit]
+        public void GivenAnExecutableWhenExecuteAsyncIsInvokedAndOnExecuteIsNotInvokedThenThrowsException()
+        {
+            var app = new Executable();
+            var ct = new CancellationToken();
 
-		[Unit]
-		public async void GivenBothActionAndFunctionAreRegisteredWhenExecuteAsyncIsInvokedThenFuncIsInvoked()
-		{
-			var executed = 0;
-			var app = new Executable();
-			var cts = new CancellationTokenSource();
-
-			app.OnExecute((ct) => { executed = 1; return Task.FromResult(false); });
-			app.OnExecute(() => { executed = 2; });
+            Action act = () => app.ExecuteAsync(ct).Wait();
 
-			await app.ExecuteAsync(cts.Token);
+            act.ShouldThrow<InvalidOperationException>();
+        }
 
-			Assert.Equal(1, executed);
-		}
-	}
+        [Unit]
+        public async void GivenAnExecutableWhenExecuteAsyncIsInvokedThenActionIsInvoked()
+        {
+            var executed = false;
+            var app = new Executable();
+            var cts = new CancellationTokenSource();
+            app.OnExecute(() => { executed = true; });
+
+            await app.ExecuteAsync(cts.Token);
 
-	public class ExecutableTResult
-	{
-		[Unit]
-		public void GivenOnExecuteNotInvokedWhenExecuteIsInvokedThenThrowsException()
-		{
-			var app = new FakeExecutable();
+            executed.Should().BeTrue();
+        }
 
-			Action act = () => app.Execute();
+        [Unit]
+        public async void GivenAnExecutableWhenExecuteAsyncIsInvokedThenRegisteredFunctionIsInvoked()
+        {
+            var executed = false;
+            var app = new Executable();
+            var cts = new CancellationTokenSource();
+            app.OnExecute((ct) => { executed = true; return Task.FromResult(false); });
+
+            await app.ExecuteAsync(cts.Token);
 
-			Assert.IsType(typeof(InvalidOperationException), Record.Exception(act));
-		}
+            executed.Should().BeTrue();
+        }
 
-		[Unit]
-		public void GivenApplicationServicesIsNullWhenActionTServiceIsRegisteredThenThrowsException()
-		{
-			var app = new FakeExecutable();
+        [Unit]
+        public async void GivenAnExecutableWhenExecuteAsyncIsInvokedAndBothActionAndFunctionAreRegisteredThenFunctionIsInvoked()
+        {
+            var executed = 0;
+            var app = new Executable();
+            var cts = new CancellationTokenSource();
+
+            app.OnExecute((ct) => { executed = 1; return Task.FromResult(false); });
+            app.OnExecute(() => { executed = 2; });
+
+            await app.ExecuteAsync(cts.Token);
 
-			Action act = () => app.OnExecute<string>((service) => { return false; });
-
-			Assert.IsType(typeof(InvalidOperationException), Record.Exception(act));
-		}
+            executed.Should().Be(1);
+        }
 
-		[Unit]
-		public void WhenExecuteIsInvokedThenActionIsInvoked()
-		{
-			var executed = false;
-			var app = new FakeExecutable();
-			app.OnExecute(() => { return true; });
+        [Unit]
+        public void GivenAnExecutableOfResultWhenExecuteIsInvokedAndOnExecuteIsNotInvokedThenThrowsException()
+        {
+            var app = new Fake.FakeExecutable();
 
-			executed = app.Execute();
+            Action act = () => app.Execute();
 
-			Assert.True(executed);
-		}
+            act.ShouldThrow<InvalidOperationException>();
+        }
 
-		[Unit]
-		public void GivenFunctionIsRegisteredWhenExecuteIsInvokedThenFunctionIsInvoked()
-		{
-			var executed = false;
-			var app = new FakeExecutable();
-			var cts = new CancellationTokenSource();
-			app.OnExecute((ct) => { executed = true; return Task.FromResult(false); });
+        [Unit]
+        public void GivenAnExecutableOfResultWhenExecuteIsInvokedThenActionIsInvoked()
+        {
+            var executed = false;
+            var app = new Fake.FakeExecutable();
+            app.OnExecute(() => { executed = true; return true; });
 
-			app.Execute();
+            app.Execute();
 
-			Assert.True(executed);
-		}
+            executed.Should().BeTrue();
+        }
 
-		[Unit]
-		public void GivenBothActionAndFunctionAreRegisteredWhenExecuteIsInvokedThenActionIsInvoked()
-		{
-			var executed = 0;
-			var app = new FakeExecutable();
+        [Unit]
+        public void GivenAnExecutableOfResultWhenExecuteIsInvokedThenRegisteredFunctionIsInvoked()
+        {
+            var executed = false;
+            var app = new Fake.FakeExecutable();
+            var cts = new CancellationTokenSource();
+            app.OnExecute((ct) => { executed = true; return Task.FromResult(false); });
 
-			app.OnExecute((ct) => { executed = 1; return Task.FromResult(false); });
-			app.OnExecute(() => { executed = 2; return false; });
+            app.Execute();
 
-			app.Execute();
+            executed.Should().BeTrue();
+        }
 
-			Assert.Equal(2, executed);
-		}
+        [Unit]
+        public void GivenAnExecutableOfResultWhenExecuteIsInvokedAndBothActionAndFunctionAreRegisteredThenActionIsInvoked()
+        {
+            var executed = 0;
+            var app = new Fake.FakeExecutable();
 
-		[Unit]
-		public void GivenOnExecuteNotInvokedWhenExecuteAsyncIsInvokedThenThrowsException()
-		{
-			var app = new FakeExecutable();
-			var ct = new CancellationToken();
+            app.OnExecute((ct) => { executed = 1; return Task.FromResult(false); });
+            app.OnExecute(() => { executed = 2; return true; });
 
-			Assert.IsType<InvalidOperationException>(Record.ExceptionAsync(async () => await app.ExecuteAsync(ct)).Result);
-		}
+            app.Execute();
 
-		[Unit]
-		public async void WhenExecuteAsyncIsInvokedThenActionIsInvoked()
-		{
-			var executed = false;
-			var app = new FakeExecutable();
-			var cts = new CancellationTokenSource();
-			app.OnExecute(() => { return true; });
+            executed.Should().Be(2);
+        }
 
-			executed = await app.ExecuteAsync(cts.Token);
+        [Unit]
+        public void GivenAnExecutableOfResultWhenExecuteAsyncIsInvokedAndOnExecuteIsNotInvokedThenThrowsException()
+        {
+            var app = new Fake.FakeExecutable();
+            var ct = new CancellationToken();
 
-			Assert.True(executed);
-		}
+            Action act = () => app.ExecuteAsync(ct).Wait();
 
-		[Unit]
-		public async void GivenFunctionIsRegisteredWhenExecuteAsyncIsInvokedThenFunctionIsInvoked()
-		{
-			var executed = false;
-			var app = new FakeExecutable();
-			var cts = new CancellationTokenSource();
-			app.OnExecute((ct) => { executed = true; return Task.FromResult(false); });
+            act.ShouldThrow<InvalidOperationException>();
+        }
 
-			await app.ExecuteAsync(cts.Token);
+        [Unit]
+        public async void GivenAnExecutableOfResultWhenExecuteAsyncIsInvokedThenActionIsInvoked()
+        {
+            var executed = false;
+            var app = new Fake.FakeExecutable();
+            var cts = new CancellationTokenSource();
+            app.OnExecute(() => { executed = true; return true; });
 
-			Assert.True(executed);
-		}
+            await app.ExecuteAsync(cts.Token);
 
-		[Unit]
-		public async void GivenBothActionAndFunctionAreRegisteredWhenExecuteAsyncIsInvokedThenFuncIsInvoked()
-		{
-			var executed = 0;
-			var app = new FakeExecutable();
-			var cts = new CancellationTokenSource();
-
-			app.OnExecute((ct) => { executed = 1; return Task.FromResult(false); });
-			app.OnExecute(() => { executed = 2; return false; });
+            executed.Should().BeTrue();
+        }
 
-			await app.ExecuteAsync(cts.Token);
+        [Unit]
+        public async void GivenAnExecutableOfResultWhenExecuteAsyncIsInvokedThenRegisteredFunctionIsInvoked()
+        {
+            var executed = false;
+            var app = new Fake.FakeExecutable();
+            var cts = new CancellationTokenSource();
+            app.OnExecute((ct) => { executed = true; return Task.FromResult(false); });
 
-			Assert.Equal(1, executed);
-		}
-	}
+            await app.ExecuteAsync(cts.Token);
 
-	public class ExecutableTContext
-	{
-		[Unit]
-		public void GivenOnExecuteNotInvokedWhenExecuteIsInvokedThenThrowsException()
-		{
-			var app = new FakeContextExecutable();
+            executed.Should().BeTrue();
+        }
 
-			Action act = () => app.Execute(false);
+        [Unit]
+        public async void GivenAnExecutableOfResultWhenExecuteAsyncIsInvokedAndBothActionAndFunctionAreRegisteredThenFunctionIsInvoked()
+        {
+            var executed = 0;
+            var app = new Fake.FakeExecutable();
+            var cts = new CancellationTokenSource();
 
-			Assert.IsType(typeof(InvalidOperationException), Record.Exception(act));
-		}
+            app.OnExecute((ct) => { executed = 1; return Task.FromResult(false); });
+            app.OnExecute(() => { executed = 2; return true; });
 
-		[Unit]
-		public void GivenApplicationServicesIsNullWhenActionTServiceIsRegisteredThenThrowsException()
-		{
-			var app = new FakeContextExecutable();
+            await app.ExecuteAsync(cts.Token);
 
-			Action act = () => app.OnExecute<string>((service, boo) => { return false; });
+            executed.Should().Be(1);
+        }
 
-			Assert.IsType(typeof(InvalidOperationException), Record.Exception(act));
-		}
+        [Unit]
+        public void GivenAnExecutableOfContextAndResultWhenExecuteIsInvokedAndOnExecuteIsNotInvokedThenThrowsException()
+        {
+            var app = new Fake.FakeContextExecutable();
 
-		[Unit]
-		public void WhenExecuteIsInvokedThenActionIsInvoked()
-		{
-			var executed = false;
-			var app = new FakeContextExecutable();
-			app.OnExecute((boo) => { return true; });
+            Action act = () => app.Execute(true);
 
-			executed = app.Execute(false);
+            act.ShouldThrow<InvalidOperationException>();
+        }
 
-			Assert.True(executed);
-		}
+        [Unit]
+        public void GivenAnExecutableOfContextAndResultWhenExecuteIsInvokedThenActionIsInvoked()
+        {
+            var executed = false;
+            var app = new Fake.FakeContextExecutable();
+            app.OnExecute((b) => { executed = true; return true; });
 
-		[Unit]
-		public void GivenFunctionIsRegisteredWhenExecuteIsInvokedThenFunctionIsInvoked()
-		{
-			var executed = false;
-			var app = new FakeContextExecutable();
-			var cts = new CancellationTokenSource();
-			app.OnExecute((boo, ct) => { executed = true; return Task.FromResult(false); });
+            app.Execute(true);
 
-			app.Execute(false);
+            executed.Should().BeTrue();
+        }
 
-			Assert.True(executed);
-		}
+        [Unit]
+        public void GivenAnExecutableOfContextAndResultWhenExecuteIsInvokedThenRegisteredFunctionIsInvoked()
+        {
+            var executed = false;
+            var app = new Fake.FakeContextExecutable();
+            var cts = new CancellationTokenSource();
+            app.OnExecute((ct, b) => { executed = true; return Task.FromResult(false); });
 
-		[Unit]
-		public void GivenBothActionAndFunctionAreRegisteredWhenExecuteIsInvokedThenActionIsInvoked()
-		{
-			var executed = 0;
-			var app = new FakeContextExecutable();
+            app.Execute(true);
 
-			app.OnExecute((boo, ct) => { executed = 1; return Task.FromResult(false); });
-			app.OnExecute((boo) => { executed = 2; return false; });
+            executed.Should().BeTrue();
+        }
 
-			app.Execute(false);
+        [Unit]
+        public void GivenAnExecutableOfContextAndResultWhenExecuteIsInvokedAndBothActionAndFunctionAreRegisteredThenActionIsInvoked()
+        {
+            var executed = 0;
+            var app = new Fake.FakeContextExecutable();
 
-			Assert.Equal(2, executed);
-		}
+            app.OnExecute((ct, b) => { executed = 1; return Task.FromResult(false); });
+            app.OnExecute((b) => { executed = 2; return true; });
 
-		[Unit]
-		public void GivenOnExecuteNotInvokedWhenExecuteAsyncIsInvokedThenThrowsException()
-		{
-			var app = new FakeContextExecutable();
-			var ct = new CancellationToken();
+            app.Execute(true);
 
-			Assert.IsType<InvalidOperationException>(Record.ExceptionAsync(async () => await app.ExecuteAsync(false, ct)).Result);
-		}
+            executed.Should().Be(2);
+        }
 
-		[Unit]
-		public async void WhenExecuteAsyncIsInvokedThenActionIsInvoked()
-		{
-			var executed = false;
-			var app = new FakeContextExecutable();
-			var cts = new CancellationTokenSource();
-			app.OnExecute((boo) => { return true; });
+        [Unit]
+        public void GivenAnExecutableOfContextAndResultWhenExecuteAsyncIsInvokedAndOnExecuteIsNotInvokedThenThrowsException()
+        {
+            var app = new Fake.FakeContextExecutable();
+            var ct = new CancellationToken();
 
-			executed = await app.ExecuteAsync(false, cts.Token);
+            Action act = () => app.ExecuteAsync(true, ct).Wait();
 
-			Assert.True(executed);
-		}
+            act.ShouldThrow<InvalidOperationException>();
+        }
 
-		[Unit]
-		public async void GivenFunctionIsRegisteredWhenExecuteAsyncIsInvokedThenFunctionIsInvoked()
-		{
-			var executed = false;
-			var app = new FakeContextExecutable();
-			var cts = new CancellationTokenSource();
-			app.OnExecute((boo, ct) => { executed = true; return Task.FromResult(false); });
+        [Unit]
+        public async void GivenAnExecutableOfContextAndResultWhenExecuteAsyncIsInvokedThenActionIsInvoked()
+        {
+            var executed = false;
+            var app = new Fake.FakeContextExecutable();
+            var cts = new CancellationTokenSource();
+            app.OnExecute(b => { executed = true; return true; });
 
-			await app.ExecuteAsync(false, cts.Token);
+            await app.ExecuteAsync(true, cts.Token);
 
-			Assert.True(executed);
-		}
+            executed.Should().BeTrue();
+        }
 
-		[Unit]
-		public async void GivenBothActionAndFunctionAreRegisteredWhenExecuteAsyncIsInvokedThenFuncIsInvoked()
-		{
-			var executed = 0;
-			var app = new FakeContextExecutable();
-			var cts = new CancellationTokenSource();
+        [Unit]
+        public async void GivenAnExecutableOfContextAndResultWhenExecuteAsyncIsInvokedThenRegisteredFunctionIsInvoked()
+        {
+            var executed = false;
+            var app = new Fake.FakeContextExecutable();
+            var cts = new CancellationTokenSource();
+            app.OnExecute((ct, b) => { executed = true; return Task.FromResult(false); });
 
-			app.OnExecute((boo, ct) => { executed = 1; return Task.FromResult(false); });
-			app.OnExecute((boo) => { executed = 2; return false; });
+            await app.ExecuteAsync(true, cts.Token);
 
-			await app.ExecuteAsync(false, cts.Token);
+            executed.Should().BeTrue();
+        }
 
-			Assert.Equal(1, executed);
-		}
-	}
+        [Unit]
+        public async void GivenAnExecutableOfContextAndResultWhenExecuteAsyncIsInvokedAndBothActionAndFunctionAreRegisteredThenFunctionIsInvoked()
+        {
+            var executed = 0;
+            var app = new Fake.FakeContextExecutable();
+            var cts = new CancellationTokenSource();
+
+            app.OnExecute((ct, b) => { executed = 1; return Task.FromResult(false); });
+            app.OnExecute((b) => { executed = 2; return true; });
+
+            await app.ExecuteAsync(true, cts.Token);
+
+            executed.Should().Be(1);
+        }
+    }
 }

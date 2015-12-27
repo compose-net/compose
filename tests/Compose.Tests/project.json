@@ -1,18 +1,30 @@
 ﻿{
-	"commands": {
-		"test": "xunit.runner.dnx -trait \"Category=Unit Tests\"",
-		"testall": "xunit.runner.dnx"
+	"version": "1.0.0-*",
+	"authors": [ "Tommy Long" ],
+	"owners": [ "Tommy Long" ],
+	"tags": [ "composition", "compose" ],
+	"projectUrl": "http://github.com/smudge202/compose",
+	"licenseUrl": "https://raw.githubusercontent.com/Smudge202/Compose/master/LICENSE",
+	"iconUrl": "https://raw.githubusercontent.com/Smudge202/Compose/master/Compose-Icon.png",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/smudge202/compose"
 	},
-	"compile": [
-		"../../src/**/*.cs"
-	],
+	"commands": {
+		"test": "xunit.runner.dnx"
+	},
 	"dependencies": {
-		"Microsoft.Framework.DependencyInjection": "1.0.0-beta6",
-		"System.Reflection.Emit": "4.0.0-beta-23019",
-		"Moq": "4.2.1507.118",
-		"TestAttributes": "1.2.3-beta"
+		"Compose": "",
+		"FluentAssertions": "4.1.0",
+		"Moq": "4.2.1510.2205",
+		"TestAttributes": "2.0.0-rc1",
+		"xunit.runner.dnx": "2.1.0-rc1-build204"
 	},
 	"frameworks": {
-		"dnx451": { }
+		"dnx46": {
+			"frameworkAssemblies": {
+				"System.ComponentModel": ""
+			}
+		}
 	}
 }
