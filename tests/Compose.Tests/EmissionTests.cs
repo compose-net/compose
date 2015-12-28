@@ -596,9 +596,9 @@ namespace Compose.Tests
         {
             var app = new Fake.FakeExecutable();
             app.UseServices(services => services.AddTransient(serviceType, implementationType));
-            var providerInfo = typeof(Fake.FakeExecutable).GetMethod("UseProvider").MakeGenericMethod(serviceType);
+            var providerInfo = typeof(TertiaryProviderExtensions).GetMethod("UseProvider", new[] { typeof(Application), typeof(Action<IServiceCollection>) }).MakeGenericMethod(serviceType);
             Action<IServiceCollection> serviceAction = services => services.AddTransient(serviceType, implementationType);
-            providerInfo.Invoke(app, new object[] { serviceAction });
+            providerInfo.Invoke(app, new object[] { app, serviceAction });
             return () => app.ApplicationServices.GetRequiredService(serviceType);
         }
 
