@@ -8,7 +8,8 @@ namespace Compose.Tests.Fake
 	internal sealed class Application : Compose.Application
 	{
 		public IServiceCollection PreConfiguredServices { get; } = new ServiceCollection();
-		public Action<IReadOnlyCollection<ServiceDescriptor>>  PostConfigurationCallback { private get; set; }
+		public IReadOnlyCollection<ServiceDescriptor> PostConfiguredServices { get; set; }
+		public Action<IReadOnlyCollection<ServiceDescriptor>> PostConfigurationCallback { private get; set; }
 		public bool PostConfigurationCalled { get; private set; }
 
 		protected override void PreServiceConfiguration(IServiceCollection services)
@@ -16,6 +17,7 @@ namespace Compose.Tests.Fake
 
 		protected override void PostServiceConfiguration(IReadOnlyCollection<ServiceDescriptor> services)
 		{
+			PostConfiguredServices = services;
 			PostConfigurationCallback?.Invoke(services);
 			PostConfigurationCalled = true;
 		}
