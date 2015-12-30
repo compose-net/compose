@@ -8,7 +8,7 @@ namespace Compose
 		private static readonly Type Exposer = typeof(DynamicManagerExposer<,>);
 
 		internal static object ForFactory(TypeInfo dynamicManagerTypeInfo, object dynamicContainer, object transitionManager, object abstractFactory)
-			=> Activator.CreateInstance(Exposer.MakeGenericType(dynamicManagerTypeInfo.GenericTypeArguments), 
+			=> Activate.Type(Exposer.MakeGenericType(dynamicManagerTypeInfo.GenericTypeArguments).GetTypeInfo(), 
 				dynamicContainer, transitionManager, abstractFactory
 			);
 

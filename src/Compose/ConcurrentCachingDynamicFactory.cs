@@ -7,8 +7,8 @@ namespace Compose
 	internal sealed class ConcurrentCachingDynamicFactory : DynamicFactory
 	{
 		private readonly DynamicEmitter _emitter;
-		private readonly ConcurrentDictionary<TypeInfo, Type> _dynamicProxyCache
-			= new ConcurrentDictionary<TypeInfo, Type>();
+		private readonly ConcurrentDictionary<TypeInfo, TypeInfo> _dynamicProxyCache
+			= new ConcurrentDictionary<TypeInfo, TypeInfo>();
 
 		public ConcurrentCachingDynamicFactory(DynamicEmitter emitter)
 		{
@@ -17,7 +17,7 @@ namespace Compose
 			_emitter = emitter;
 		}
 
-		public Type GetDynamicProxy(TypeInfo serviceTypeInfo)
+		public TypeInfo GetDynamicProxy(TypeInfo serviceTypeInfo)
 			=> _dynamicProxyCache.GetOrAdd(serviceTypeInfo, _emitter.GetManagedDynamicProxy);
 	}
 }
