@@ -1,4 +1,4 @@
-﻿using Microsoft.Framework.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using TestAttributes;
 using Xunit;
@@ -7,7 +7,7 @@ namespace Compose.Tests
 {
 	public class TransitionTests
 	{
-		[Unit]
+		[Fact]
 		public void CanResolveServicesWhenAddedAsTransitional()
 		{
 			var app = new Fake.Executable();
@@ -20,7 +20,7 @@ namespace Compose.Tests
 			app.Execute();
 		}
 
-		[Unit]
+		[Fact]
 		public void CanResolveServicesWhenWithTransitional()
 		{
 			var app = new Fake.Executable();
@@ -38,7 +38,7 @@ namespace Compose.Tests
 			app.Execute();
 		}
 
-		[Unit]
+		[Fact]
 		public void CanResolveServicesWhenAsTransitional()
 		{
 			var app = new Fake.Executable();
@@ -56,7 +56,7 @@ namespace Compose.Tests
 			app.Execute();
 		}
 
-		[Unit]
+		[Fact]
 		public void CanResolveServicesIndirectlyWhenAddedAsTransitional()
 		{
 			var app = new Fake.Executable();
@@ -73,7 +73,7 @@ namespace Compose.Tests
 			app.Execute();
 		}
 
-		[Unit]
+		[Fact]
 		public void CanResolveServicesIndirectlyWhenWithTransitional()
 		{
 			var app = new Fake.Executable();
@@ -92,7 +92,7 @@ namespace Compose.Tests
 			app.Execute();
 		}
 
-		[Unit]
+		[Fact]
 		public void CanResolveServicesIndirectlyWhenAsTransitional()
 		{
 			var app = new Fake.Executable();
@@ -111,7 +111,7 @@ namespace Compose.Tests
 			app.Execute();
 		}
 
-		[Unit]
+		[Fact]
 		public void CanTransitionService()
 		{
 			var app = new Fake.Executable();
@@ -130,7 +130,7 @@ namespace Compose.Tests
 			app.Execute();
 		}
 
-		[Unit]
+		[Fact]
 		public void CanTransitionSpecificallyBoundService()
 		{
 			var app = new Fake.Executable();
@@ -150,7 +150,7 @@ namespace Compose.Tests
 			app.Execute();
 		}
 
-		[Unit]
+		[Fact]
 		public void CanTransitionAllBoundServices()
 		{
 			var app = new Fake.Executable();
@@ -170,7 +170,7 @@ namespace Compose.Tests
 			app.Execute();
 		}
 
-		[Unit]
+		[Fact]
 		public void CanTransitionBackToOriginalService()
 		{
 			var app = new Fake.Executable();
@@ -189,7 +189,7 @@ namespace Compose.Tests
 			app.Execute();
 		}
 
-		[Unit]
+		[Fact]
 		public void CanPassThroughGenericArgumentsForGenericProxies()
 		{
 			var app = new Fake.Executable();
@@ -201,7 +201,7 @@ namespace Compose.Tests
 			app.Execute();
 		}
 
-		[Unit]
+		[Fact]
 		public void CanNotTransitionToUnresolvableService()
 		{
 			var app = new Fake.Executable();
@@ -214,7 +214,7 @@ namespace Compose.Tests
 			app.Execute();
 		}
 
-		[Unit]
+		[Fact]
 		public void CannotTransitionServicesAddedAfterMarker()
 		{
 			var app = new Fake.Executable();
@@ -232,7 +232,7 @@ namespace Compose.Tests
 			Assert.IsType(typeof(InvalidOperationException), Record.Exception(act));
 		}
 
-		[Unit]
+		[Fact]
 		public void CanTransitionServicesAddedBeforeLastMarker()
 		{
 			var app = new Fake.Executable();
@@ -249,7 +249,7 @@ namespace Compose.Tests
 			});
 		}
 
-		[Unit]
+		[Fact]
 		public void CanTransitionIndirectService()
 		{
 			var app = new Fake.Executable();

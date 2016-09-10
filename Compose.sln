@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.22823.1
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D83DB071-6554-4367-91AE-05ABFEB4E213}"
 EndProject
@@ -15,15 +15,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Compose", "src\Compose\Compose.xproj", "{59E87FC9-B97D-4F70-8F4D-C5534440B943}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Compose.Tests", "tests\Compose.Tests\Compose.Tests.xproj", "{36C3E928-822D-4F31-B26B-C67376CFAB20}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{76033DDB-F766-4F7C-8DC2-CA8DA01FE50C}"
 	ProjectSection(SolutionItems) = preProject
 		appveyor.yml = appveyor.yml
-		build.cmd = build.cmd
 	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Compose", "src\Compose\Compose.xproj", "{C04096DF-8919-40B6-BEE7-99E6407E7D0E}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Compose.Tests", "tests\Compose.Tests\Compose.Tests.xproj", "{312DF6A2-4CBD-4136-BDF0-D51AFB8241C0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,21 +30,21 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{59E87FC9-B97D-4F70-8F4D-C5534440B943}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{59E87FC9-B97D-4F70-8F4D-C5534440B943}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{59E87FC9-B97D-4F70-8F4D-C5534440B943}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{59E87FC9-B97D-4F70-8F4D-C5534440B943}.Release|Any CPU.Build.0 = Release|Any CPU
-		{36C3E928-822D-4F31-B26B-C67376CFAB20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{36C3E928-822D-4F31-B26B-C67376CFAB20}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{36C3E928-822D-4F31-B26B-C67376CFAB20}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{36C3E928-822D-4F31-B26B-C67376CFAB20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C04096DF-8919-40B6-BEE7-99E6407E7D0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C04096DF-8919-40B6-BEE7-99E6407E7D0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C04096DF-8919-40B6-BEE7-99E6407E7D0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C04096DF-8919-40B6-BEE7-99E6407E7D0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{312DF6A2-4CBD-4136-BDF0-D51AFB8241C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{312DF6A2-4CBD-4136-BDF0-D51AFB8241C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{312DF6A2-4CBD-4136-BDF0-D51AFB8241C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{312DF6A2-4CBD-4136-BDF0-D51AFB8241C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{59E87FC9-B97D-4F70-8F4D-C5534440B943} = {D83DB071-6554-4367-91AE-05ABFEB4E213}
-		{36C3E928-822D-4F31-B26B-C67376CFAB20} = {3CA78452-29CD-4197-A560-9346949EAE9F}
 		{76033DDB-F766-4F7C-8DC2-CA8DA01FE50C} = {0508FF26-B09D-4DB5-9F7B-D14FE9F808AB}
+		{C04096DF-8919-40B6-BEE7-99E6407E7D0E} = {D83DB071-6554-4367-91AE-05ABFEB4E213}
+		{312DF6A2-4CBD-4136-BDF0-D51AFB8241C0} = {3CA78452-29CD-4197-A560-9346949EAE9F}
 	EndGlobalSection
 EndGlobal

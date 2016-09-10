@@ -127,7 +127,7 @@ namespace Compose
 		{
 			var propertyInfoGetMethod = propertyInfo.GetMethod;
 			if (propertyInfoGetMethod == null) return;
-			var propertyGetMethod = typeBuilder.DefineMethod(propertyInfoGetMethod.Name, MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig | MethodAttributes.Virtual, propertyInfo.PropertyType, Type.EmptyTypes);
+			var propertyGetMethod = typeBuilder.DefineMethod(propertyInfoGetMethod.Name, MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig | MethodAttributes.Virtual, propertyInfo.PropertyType, new Type[] { });
 			var propertyGetEmitter = propertyGetMethod.GetILGenerator();
 			propertyGetEmitter.Emit(OpCodes.Ldarg_0);
 			propertyGetEmitter.Emit(OpCodes.Ldfld, managerField);

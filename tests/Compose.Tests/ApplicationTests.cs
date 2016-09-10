@@ -1,4 +1,4 @@
-﻿using Microsoft.Framework.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using TestAttributes;
@@ -8,7 +8,7 @@ namespace Compose.Tests
 {
 	public class ApplicationTests
 	{
-		[Unit]
+		[Fact]
 		public void WhenUsingInternalServiceProviderThenPreConfigureServicesReceivesEmptyServiceCollection()
 		{
 			var app = new Fake.Application();
@@ -18,24 +18,24 @@ namespace Compose.Tests
 			Assert.Equal(0, app.PreConfiguredServices.Count);
 		}
 
-		[Unit]
+		[Fact]
 		public void WhenUsingInternalServiceProviderThenPostConfigureServicesReceivesConfiguredServices()
 		{
 			var app = new Fake.Application();
-			app.UseServices(services => services.AddTransient<Fake.Service>());
+			app.UseServices(services => services.AddTransient<Fake.Service, Fake.ServiceImplementation>());
 
 			Assert.NotNull(app.PostConfiguredServices);
 			Assert.Contains(app.PostConfiguredServices, service => service.ServiceType == typeof(Fake.Service));
 		}
 
-		[Unit]
+		[Fact]
 		public void WhenUsingInternalServiceProviderThenPreConfiguredServicesArePresentInApplicationServices()
 		{
 			var app = new Fake.Application
 			{
 				ServicesToAppendPreConfiguration = new List<ServiceDescriptor>()
 				{
-					ServiceDescriptor.Transient<Fake.Service, Fake.Service>()
+					ServiceDescriptor.Transient<Fake.Service, Fake.ServiceImplementation>()
 				}
 			};
 
@@ -46,7 +46,7 @@ namespace Compose.Tests
 			Assert.Contains(app.PostConfiguredServices, service => service.ServiceType == typeof(Fake.Service));
 		}
 
-		[Unit]
+		[Fact]
 		public void WhenUsingCustomServiceProviderThenPreConfigureServicesReceivesEmptyServiceCollection()
 		{
 			var app = new Fake.Application();
@@ -56,7 +56,7 @@ namespace Compose.Tests
 			Assert.Equal(0, app.PreConfiguredServices.Count);
 		}
 
-		[Unit]
+		[Fact]
 		public void WhenUsingCustomServiceProviderThenPostConfigureServicesReceivesConfiguredServices()
 		{
 			var app = new Fake.Application();
@@ -70,7 +70,7 @@ namespace Compose.Tests
 			Assert.Contains(app.PostConfiguredServices, service => service.ServiceType == typeof(Fake.Service));
 		}
 
-		[Unit]
+		[Fact]
 		public void WhenUsingCustomServiceProviderThenPreConfiguredServicesArePresentInApplicationServices()
 		{
 			var app = new Fake.Application

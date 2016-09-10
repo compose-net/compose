@@ -1,30 +1,51 @@
-version: 0.1.{build}
+os: Visual Studio 2015
+
+## .NET Core SDK preview2 is already installed in the build worker image Visual Studio 2015
+##
+## To install a specific version:
+##
+## install:
+##   # .NET Core SDK binaries
+##   ## 1) from direct url  
+##   - ps: $url = "https://go.microsoft.com/fwlink/?LinkID=798402" # v1.0.0-preview1 x64
+##   ## 2) from url based on version, for example using an env var CLI_VERSION that can be a
+##   ##    a specific version `1.0.0-preview2-003121` or `Latest` (for latest dev version)
+##   - ps: $url = "https://dotnetcli.blob.core.windows.net/dotnet/preview/Binaries/$($env:CLI_VERSION)/dotnet-dev-win-x64.$($env:CLI_VERSION.ToLower()).zip"
+##   # Download .NET Core SDK and add to PATH
+##   - ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetsdk"
+##   - ps: mkdir $env:DOTNET_INSTALL_DIR -Force | Out-Null
+##   - ps: $tempFile = [System.IO.Path]::GetTempFileName()
+##   - ps: (New-Object System.Net.WebClient).DownloadFile($url, $tempFile)
+##   - ps: Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory($tempFile, $env:DOTNET_INSTALL_DIR)
+##   - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
+
+version: 0.2.{build}
 skip_tags: true
-os: Visual Studio 2015 RC
 assembly_info:
   patch: true
   file: '**\AssemblyInfo.*'
   assembly_version: '{version}'
   assembly_file_version: '{version}'
   assembly_informational_version: '{version}'
-install:
-- set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
+init:
+- ps: $Env:Label = "CI" + $Env:APPVEOY_BUILD_NUMBER.PadLeft(5, "0");
+before_build:
+- dotnet --info
+- appveyor-retry dotnet restore -v Minimal
 build_script:
-- build.cmd
+- dotnet build "**/project.json" -c Release --no-dependencies --version-suffix %LABEL%
+after_build:
+- dotnet pack "src/Compose/project.json" -c Release --no-build --version-suffix %LABEL% -o artifacts
+test_script:
+- dotnet test "test\Compose.Tests" -c Release
 test: off
 artifacts:
 - path: artifacts/packages/**.nupkg
 deploy:
 - provider: NuGet
   name: development
-  server: https://ci.appveyor.com/nuget/smudge202-46am3soaut15
+  server: https://ci.appveyor.com/nuget/danielcirket-hi8hon54vk5c
   api_key:
-    secure: fi5rlfPkAQ9yKX5ffuRSykvWTQbUqTp95PjfD00So1M=
+    secure: oik8xf1rao4f03yj64ttobfb
   on:
-    branch: dev
-- provider: NuGet
-  name: production
-  api_key:
-    secure: GauHc7DbZGcD8A4z+x6hToRqjurh0yQe/ky8TSjzBbRYug9ixYIsVnV/VDB8FT4H
-  on:
-    branch: master
+    branch: rtm

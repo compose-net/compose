@@ -1,18 +1,40 @@
-﻿{
-	"commands": {
-		"test": "xunit.runner.dnx -trait \"Category=Unit Tests\"",
-		"testall": "xunit.runner.dnx"
-	},
-	"compile": [
-		"../../src/**/*.cs"
-	],
-	"dependencies": {
-		"Microsoft.Framework.DependencyInjection": "1.0.0-beta6",
-		"System.Reflection.Emit": "4.0.0-beta-23019",
-		"Moq": "4.2.1507.118",
-		"TestAttributes": "1.2.3-beta"
-	},
-	"frameworks": {
-		"dnx451": { }
-	}
+{
+  "packOptions": {
+    "summary": "Assists with clean application composition allowing components to be isolated, reused, and interchanged.",
+    "tags": [ "composition", "compose" ],
+    "owners": [ "Tommy Long" ],
+    "projectUrl": "https://github.com/compose-net/compose",
+    "licenseUrl": "https://raw.githubusercontent.com/Smudge202/Compose/master/LICENSE",
+    "iconUrl": "https://raw.githubusercontent.com/Smudge202/Compose/master/Compose-Icon.png",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/compose-net/compose"
+    }
+  },
+  "version": "0.2.0-alpha",
+  "description": "The easy wasy to compose well formed application components in .NET",
+  "authors": [ "Tommy Long", "Stuart Blackler", "Daniel Cirket" ],
+
+  "testRunner": "xunit",
+
+  "dependencies": {
+    "Microsoft.Extensions.DependencyInjection": "1.0.0",
+    "TestAttributes": "2.0.0",
+    "xunit": "2.2.0-beta2-build3300",
+    "dotnet-test-xunit": "2.2.0-preview2-build1029",
+    "Compose": "0.2.0-alpha"
+  },
+
+  "buildOptions": {
+    "warningsAsErrors": true
+  },
+
+  "frameworks": {
+    "net451": {
+      "dependencies": {
+        "System.Runtime": "4.0.10",
+        "System.Reflection.Emit": "4.0.0"
+      }
+    }
+  }
 }

@@ -9,7 +9,7 @@ namespace Compose.Tests
 {
 	public class ExecutableTests
 	{
-		[Unit]
+		[Fact]
 		public void GivenOnExecuteNotInvokedWhenExecuteIsInvokedThenThrowsException()
 		{
 			var app = new Executable();
@@ -19,7 +19,7 @@ namespace Compose.Tests
 			Assert.IsType(typeof(InvalidOperationException), Record.Exception(act));
 		}
 
-		[Unit]
+		[Fact]
 		public void GivenApplicationServicesIsNullWhenActionTServiceIsRegisteredThenThrowsException()
 		{
 			var app = new Executable();
@@ -29,7 +29,7 @@ namespace Compose.Tests
 			Assert.IsType(typeof(InvalidOperationException), Record.Exception(act));
 		}
 
-		[Unit]
+		[Fact]
 		public void WhenExecuteIsInvokedThenActionIsInvoked()
 		{
 			var executed = false;
@@ -41,7 +41,7 @@ namespace Compose.Tests
 			Assert.True(executed);
 		}
 
-		[Unit]
+		[Fact]
 		public void GivenFunctionIsRegisteredWhenExecuteIsInvokedThenFunctionIsInvoked()
 		{
 			var executed = false;
@@ -54,7 +54,7 @@ namespace Compose.Tests
 			Assert.True(executed);
 		}
 
-		[Unit]
+		[Fact]
 		public void GivenBothActionAndFunctionAreRegisteredWhenExecuteIsInvokedThenActionIsInvoked()
 		{
 			var executed = 0;
@@ -68,7 +68,7 @@ namespace Compose.Tests
 			Assert.Equal(2, executed);
 		}
 
-		[Unit]
+		[Fact]
 		public void GivenOnExecuteNotInvokedWhenExecuteAsyncIsInvokedThenThrowsException()
 		{
 			var app = new Executable();
@@ -77,7 +77,7 @@ namespace Compose.Tests
 			Assert.IsType<InvalidOperationException>(Record.ExceptionAsync(async () => await app.ExecuteAsync(ct)).Result);
 		}
 
-		[Unit]
+		[Fact]
 		public async void WhenExecuteAsyncIsInvokedThenActionIsInvoked()
 		{
 			var executed = false;
@@ -90,7 +90,7 @@ namespace Compose.Tests
 			Assert.True(executed);
 		}
 
-		[Unit]
+		[Fact]
 		public async void GivenFunctionIsRegisteredWhenExecuteAsyncIsInvokedThenFunctionIsInvoked()
 		{
 			var executed = false;
@@ -103,7 +103,7 @@ namespace Compose.Tests
 			Assert.True(executed);
 		}
 
-		[Unit]
+		[Fact]
 		public async void GivenBothActionAndFunctionAreRegisteredWhenExecuteAsyncIsInvokedThenFuncIsInvoked()
 		{
 			var executed = 0;
@@ -121,7 +121,7 @@ namespace Compose.Tests
 
 	public class ExecutableTResult
 	{
-		[Unit]
+		[Fact]
 		public void GivenOnExecuteNotInvokedWhenExecuteIsInvokedThenThrowsException()
 		{
 			var app = new FakeExecutable();
@@ -131,7 +131,7 @@ namespace Compose.Tests
 			Assert.IsType(typeof(InvalidOperationException), Record.Exception(act));
 		}
 
-		[Unit]
+		[Fact]
 		public void GivenApplicationServicesIsNullWhenActionTServiceIsRegisteredThenThrowsException()
 		{
 			var app = new FakeExecutable();
@@ -141,7 +141,7 @@ namespace Compose.Tests
 			Assert.IsType(typeof(InvalidOperationException), Record.Exception(act));
 		}
 
-		[Unit]
+		[Fact]
 		public void WhenExecuteIsInvokedThenActionIsInvoked()
 		{
 			var executed = false;
@@ -153,7 +153,7 @@ namespace Compose.Tests
 			Assert.True(executed);
 		}
 
-		[Unit]
+		[Fact]
 		public void GivenFunctionIsRegisteredWhenExecuteIsInvokedThenFunctionIsInvoked()
 		{
 			var executed = false;
@@ -166,7 +166,7 @@ namespace Compose.Tests
 			Assert.True(executed);
 		}
 
-		[Unit]
+		[Fact]
 		public void GivenBothActionAndFunctionAreRegisteredWhenExecuteIsInvokedThenActionIsInvoked()
 		{
 			var executed = 0;
@@ -180,7 +180,7 @@ namespace Compose.Tests
 			Assert.Equal(2, executed);
 		}
 
-		[Unit]
+		[Fact]
 		public void GivenOnExecuteNotInvokedWhenExecuteAsyncIsInvokedThenThrowsException()
 		{
 			var app = new FakeExecutable();
@@ -189,7 +189,7 @@ namespace Compose.Tests
 			Assert.IsType<InvalidOperationException>(Record.ExceptionAsync(async () => await app.ExecuteAsync(ct)).Result);
 		}
 
-		[Unit]
+		[Fact]
 		public async void WhenExecuteAsyncIsInvokedThenActionIsInvoked()
 		{
 			var executed = false;
@@ -202,7 +202,7 @@ namespace Compose.Tests
 			Assert.True(executed);
 		}
 
-		[Unit]
+		[Fact]
 		public async void GivenFunctionIsRegisteredWhenExecuteAsyncIsInvokedThenFunctionIsInvoked()
 		{
 			var executed = false;
@@ -215,7 +215,7 @@ namespace Compose.Tests
 			Assert.True(executed);
 		}
 
-		[Unit]
+		[Fact]
 		public async void GivenBothActionAndFunctionAreRegisteredWhenExecuteAsyncIsInvokedThenFuncIsInvoked()
 		{
 			var executed = 0;
@@ -233,7 +233,7 @@ namespace Compose.Tests
 
 	public class ExecutableTContext
 	{
-		[Unit]
+		[Fact]
 		public void GivenOnExecuteNotInvokedWhenExecuteIsInvokedThenThrowsException()
 		{
 			var app = new FakeContextExecutable();
@@ -243,7 +243,7 @@ namespace Compose.Tests
 			Assert.IsType(typeof(InvalidOperationException), Record.Exception(act));
 		}
 
-		[Unit]
+		[Fact]
 		public void GivenApplicationServicesIsNullWhenActionTServiceIsRegisteredThenThrowsException()
 		{
 			var app = new FakeContextExecutable();
@@ -253,7 +253,7 @@ namespace Compose.Tests
 			Assert.IsType(typeof(InvalidOperationException), Record.Exception(act));
 		}
 
-		[Unit]
+		[Fact]
 		public void WhenExecuteIsInvokedThenActionIsInvoked()
 		{
 			var executed = false;
@@ -265,7 +265,7 @@ namespace Compose.Tests
 			Assert.True(executed);
 		}
 
-		[Unit]
+		[Fact]
 		public void GivenFunctionIsRegisteredWhenExecuteIsInvokedThenFunctionIsInvoked()
 		{
 			var executed = false;
@@ -278,7 +278,7 @@ namespace Compose.Tests
 			Assert.True(executed);
 		}
 
-		[Unit]
+		[Fact]
 		public void GivenBothActionAndFunctionAreRegisteredWhenExecuteIsInvokedThenActionIsInvoked()
 		{
 			var executed = 0;
@@ -292,7 +292,7 @@ namespace Compose.Tests
 			Assert.Equal(2, executed);
 		}
 
-		[Unit]
+		[Fact]
 		public void GivenOnExecuteNotInvokedWhenExecuteAsyncIsInvokedThenThrowsException()
 		{
 			var app = new FakeContextExecutable();
@@ -301,7 +301,7 @@ namespace Compose.Tests
 			Assert.IsType<InvalidOperationException>(Record.ExceptionAsync(async () => await app.ExecuteAsync(false, ct)).Result);
 		}
 
-		[Unit]
+		[Fact]
 		public async void WhenExecuteAsyncIsInvokedThenActionIsInvoked()
 		{
 			var executed = false;
@@ -314,7 +314,7 @@ namespace Compose.Tests
 			Assert.True(executed);
 		}
 
-		[Unit]
+		[Fact]
 		public async void GivenFunctionIsRegisteredWhenExecuteAsyncIsInvokedThenFunctionIsInvoked()
 		{
 			var executed = false;
@@ -327,7 +327,7 @@ namespace Compose.Tests
 			Assert.True(executed);
 		}
 
-		[Unit]
+		[Fact]
 		public async void GivenBothActionAndFunctionAreRegisteredWhenExecuteAsyncIsInvokedThenFuncIsInvoked()
 		{
 			var executed = 0;
