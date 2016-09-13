@@ -11,7 +11,7 @@
       "url": "https://github.com/compose-net/compose"
     }
   },
-  "version": "0.2.0-alpha",
+  "version": "0.2.0-alpha-*",
   "description": "The easy wasy to compose well formed application components in .NET",
   "authors": [ "Tommy Long", "Stuart Blackler", "Daniel Cirket" ],
 

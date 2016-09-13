@@ -19,33 +19,38 @@ os: Visual Studio 2015
 ##   - ps: Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory($tempFile, $env:DOTNET_INSTALL_DIR)
 ##   - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
 
-version: 0.2.{build}
-skip_tags: true
+version: '{build}'
+pull_requests:
+  do_not_increment_build_number: true
+branches:
+  only:
+  - rtm
+nuget:
+  disable_publish_on_pr: true
+  account_feed: true
+  project_feed: true
+build_script:
+  - ps: .\build.ps1
+test: off
+artifacts:  
+- path: .\artifacts\**\*.nupkg
+  name: NuGet
+environment:
+  # Don't report back to the mothership
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
 assembly_info:
   patch: true
   file: '**\AssemblyInfo.*'
   assembly_version: '{version}'
   assembly_file_version: '{version}'
   assembly_informational_version: '{version}'
-init:
-- ps: $Env:Label = "CI" + $Env:APPVEOY_BUILD_NUMBER.PadLeft(5, "0");
-before_build:
-- dotnet --info
-- appveyor-retry dotnet restore -v Minimal
-build_script:
-- dotnet build "**/project.json" -c Release --no-dependencies --version-suffix %LABEL%
-after_build:
-- dotnet pack "src/Compose/project.json" -c Release --no-build --version-suffix %LABEL% -o artifacts
-test_script:
-- dotnet test "test\Compose.Tests" -c Release
-test: off
-artifacts:
-- path: artifacts/packages/**.nupkg
+configuration: Release
+platform: Any CPU
 deploy:
-- provider: NuGet
-  name: development
-  server: https://ci.appveyor.com/nuget/danielcirket-hi8hon54vk5c
-  api_key:
-    secure: oik8xf1rao4f03yj64ttobfb
-  on:
-    branch: rtm
+  - provider: NuGet
+    symbol_server: https://ci.appveyor.com/nuget/danielcirket-hi8hon54vk5c/api/v2/package
+    server: https://ci.appveyor.com/nuget/danielcirket-hi8hon54vk5c/api/v2/package
+    api_key:
+      secure: uFSusnOGNJH7jZTIj0/gf6dWlRVX3OBjiOAfkCFQOJo=
+    artifact: NuGet
+    skip_symbols: true

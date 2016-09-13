@@ -18,6 +18,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{76033DDB-F766-4F7C-8DC2-CA8DA01FE50C}"
 	ProjectSection(SolutionItems) = preProject
 		appveyor.yml = appveyor.yml
+		build.ps1 = build.ps1
 	EndProjectSection
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Compose", "src\Compose\Compose.xproj", "{C04096DF-8919-40B6-BEE7-99E6407E7D0E}"
