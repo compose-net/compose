@@ -30,7 +30,7 @@
   },
 
   "frameworks": {
-    "net451": {
+    "net452": {
       "dependencies": {
         "System.Runtime": "4.0.10",
         "System.Reflection.Emit": "4.0.0"
