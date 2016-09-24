@@ -48,8 +48,8 @@ configuration: Release
 platform: Any CPU
 deploy:
   - provider: NuGet
-    symbol_server: https://ci.appveyor.com/nuget/danielcirket-hi8hon54vk5c/api/v2/package
-    server: https://ci.appveyor.com/nuget/danielcirket-hi8hon54vk5c/api/v2/package
+    symbol_server: https://ci.appveyor.com/nuget/danielcirket/api/v2/package
+    server: https://ci.appveyor.com/nuget/danielcirket/api/v2/package
     api_key:
       secure: uFSusnOGNJH7jZTIj0/gf6dWlRVX3OBjiOAfkCFQOJo=
     artifact: NuGet
