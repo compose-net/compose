@@ -1,23 +1,42 @@
 ﻿{
-	"version": "0.1.5-beta",
-	"description": "The easy wasy to compose well formed application components in .Net",
-	"authors": [ "Tommy Long" ],
-	"owners": [ "Tommy Long" ],
-	"tags": [ "composition", "compose" ],
-	"projectUrl": "http://github.com/smudge202/compose",
-	"licenseUrl": "https://raw.githubusercontent.com/Smudge202/Compose/master/LICENSE",
-	"iconUrl": "https://raw.githubusercontent.com/Smudge202/Compose/master/Compose-Icon.png",
-	"summary": "Assists with clean application composition allowing components to be isolated, reused, and interchanged.",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/smudge202/compose"
-	},
-	"frameworks": {
-		"dotnet": {
-			"dependencies": {
-				"Microsoft.Framework.DependencyInjection": "1.0.0-beta6",
-				"System.Reflection.Emit": "4.0.0-beta-23019"
-			}
-		}
-	}
+  "packOptions": {
+    "summary": "Assists with clean application composition allowing components to be isolated, reused, and interchanged.",
+    "tags": [ "composition", "compose" ],
+    "owners": [ "Tommy Long" ],
+    "projectUrl": "https://github.com/compose-net/compose",
+    "licenseUrl": "https://raw.githubusercontent.com/Smudge202/Compose/master/LICENSE",
+    "iconUrl": "https://raw.githubusercontent.com/Smudge202/Compose/master/Compose-Icon.png",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/compose-net/compose"
+    }
+  },
+  "version": "0.2.0-alpha-*",
+  "description": "The easy wasy to compose well formed application components in .NET",
+  "authors": [ "Tommy Long", "Stuart Blackler", "Daniel Cirket" ],
+
+  "dependencies": {
+    "Microsoft.Extensions.DependencyInjection": "1.0.0"
+  },
+
+  "buildOptions": {
+    "warningsAsErrors": true
+  },
+
+  "frameworks": {
+    "netstandard1.3": {
+      "dependencies": {
+        "System.Collections": "4.0.11",
+        "System.Runtime": "4.1.0",
+        "System.Runtime.InteropServices": "4.1.0",
+        "System.Reflection.Emit": "4.0.1"
+      }
+    },
+    "net452": {
+      "dependencies": {
+        "System.Runtime": "4.0.10",
+        "System.Reflection.Emit": "4.0.0"
+      }
+    }
+  }
 }

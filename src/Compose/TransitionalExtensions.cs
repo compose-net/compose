@@ -1,8 +1,9 @@
-﻿using Microsoft.Framework.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Compose
 {

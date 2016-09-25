@@ -1,4 +1,4 @@
-﻿using Microsoft.Framework.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using TestAttributes;
 using Xunit;
@@ -7,7 +7,7 @@ namespace Compose.Tests
 {
 	public class SnapshotTests
 	{
-		[Unit]
+		[Fact]
 		public void CanSnapshot()
 		{
 			var app = new Fake.Executable();
@@ -16,7 +16,7 @@ namespace Compose.Tests
 			Assert.Null(Record.Exception(act));
 		}
 
-		[Unit]
+		[Fact]
 		public void CanSnapshotWithoutServices()
 		{
 			var app = new Fake.Executable();
@@ -24,7 +24,7 @@ namespace Compose.Tests
 			Assert.Null(Record.Exception(act));
 		}
 
-		[Unit]
+		[Fact]
 		public void CanRestore()
 		{
 			var app = new Fake.Executable();
@@ -33,7 +33,7 @@ namespace Compose.Tests
 			Assert.Null(Record.Exception(act));
 		}
 
-		[Unit]
+		[Fact]
 		public void CanRestoreWithoutServices()
 		{
 			var app = new Fake.Executable();
@@ -41,7 +41,7 @@ namespace Compose.Tests
 			Assert.Null(Record.Exception(act));
 		}
 
-		[Unit]
+		[Fact]
 		public void CanRestoreExplicitlySnapshottedTransitionedServices()
 		{
 			var app = new Fake.Executable();
@@ -61,7 +61,7 @@ namespace Compose.Tests
 			app.Execute();
 		}
 
-		[Unit]
+		[Fact]
 		public void CanRestoreImplicitlySnapshottedTransitionedServices()
 		{
 			var app = new Fake.Executable();
@@ -80,7 +80,7 @@ namespace Compose.Tests
 			app.Execute();
 		}
 
-		[Unit]
+		[Fact]
 		public void CanRestoreLatestSnapshot()
 		{
 			var app = new Fake.Executable();

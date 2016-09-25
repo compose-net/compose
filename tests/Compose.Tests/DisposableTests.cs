@@ -1,4 +1,4 @@
-﻿using Microsoft.Framework.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using TestAttributes;
 using Xunit;
@@ -7,7 +7,7 @@ namespace Compose.Tests
 {
     public class DisposableTests
 	{
-		[Unit]
+		[Fact]
 		public void WhenTransitioningAwayFromDirectlyImplementedDisposableThenDisposesCurrentService()
 		{
 			var app = new Fake.Executable();
@@ -22,7 +22,7 @@ namespace Compose.Tests
 			});
 		}
 
-		[Unit]
+		[Fact]
 		public void WhenTransitioningAwayFromIndirectlyImplementedDisposableThenDisposesCurrentService()
 		{
 			var app = new Fake.Executable();
@@ -37,7 +37,7 @@ namespace Compose.Tests
 			});
 		}
 
-		[Unit]
+		[Fact]
 		public void WhenSnapshottingAwayFromDirectlyImplementedDisposableThenDisposesCurrentService()
 		{
 			var app = new Fake.Executable();
@@ -52,7 +52,7 @@ namespace Compose.Tests
 			});
 		}
 
-		[Unit]
+		[Fact]
 		public void WhenSnapshottingAwayFromIndirectlyImplementedDisposableThenDisposesCurrentService()
 		{
 			var app = new Fake.Executable();
@@ -67,7 +67,7 @@ namespace Compose.Tests
 			});
 		}
 
-		[Unit]
+		[Fact]
 		public void WhenRestoringAwayFromDirectlyImplementedDisposableThenDisposesCurrentService()
 		{
 			var app = new Fake.Executable();
@@ -82,7 +82,7 @@ namespace Compose.Tests
 			});
 		}
 
-		[Unit]
+		[Fact]
 		public void WhenRestoringAwayFromIndirectlyImplementedDisposableThenDisposesCurrentService()
 		{
 			var app = new Fake.Executable();

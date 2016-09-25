@@ -1,4 +1,4 @@
-﻿using Microsoft.Framework.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using TestAttributes;
 using Xunit;
@@ -13,7 +13,7 @@ namespace Compose.Tests
 
 		private class Dependency : IDependency { }
 
-		[Unit]
+		[Fact]
 		public void WhenResolvingUnboundServiceThenThrowsDescriptiveException()
 		{
 			var app = new Application();
@@ -28,7 +28,7 @@ namespace Compose.Tests
 
 		private class Service<T> : IService<T> { }
 
-		[Unit]
+		[Fact]
 		public void WhenMultipleTransientImplementationsRegisteredForGenericSerivceThenCanResolve()
 		{
 			var app = new Application();
@@ -47,7 +47,7 @@ namespace Compose.Tests
 			Assert.NotNull(Record.Exception(act));
 		}
 
-		[Unit]
+		[Fact]
 		public void WhenMultipleSingletonImplementationsRegisteredForGenericSerivceThenCanResolve()
 		{
 			var app = new Application();
@@ -66,7 +66,7 @@ namespace Compose.Tests
 			Assert.NotNull(Record.Exception(act));
 		}
 
-		[Unit]
+		[Fact]
 		public void WhenAddingClosedAndOpenGenericTransientImplementationsForGenericServiceThenCanResolve()
 		{
 			var app = new Application();
@@ -83,7 +83,7 @@ namespace Compose.Tests
 			Assert.Null(Record.Exception(act));
 		}
 
-		[Unit]
+		[Fact]
 		public void WhenAddingClosedAndOpenGenericSingletonImplementationsForGenericServiceThenCanResolve()
 		{
 			var app = new Application();
@@ -100,15 +100,15 @@ namespace Compose.Tests
 			Assert.Null(Record.Exception(act));
 		}
 
-		[Unit]
+		[Fact]
 		public void WhenAddingSameServiceTypeMultipleTimesThenCanResolve()
 		{
 			var app = new Application();
 
 			Action act = () => app.UseServices(services =>
 			{
-				services.Add(new ServiceDescriptor(typeof(IService<>), null));
-				services.Add(new ServiceDescriptor(typeof(IService<>), null));
+				services.Add(new ServiceDescriptor(typeof(IService<string>), new Service<string>()));
+				services.Add(new ServiceDescriptor(typeof(IService<string>), new Service<string>()));
 			});
 			Assert.Null(Record.Exception(act));
 		}

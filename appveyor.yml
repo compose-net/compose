@@ -1,30 +1,56 @@
-version: 0.1.{build}
-skip_tags: true
-os: Visual Studio 2015 RC
+os: Visual Studio 2015
+
+## .NET Core SDK preview2 is already installed in the build worker image Visual Studio 2015
+##
+## To install a specific version:
+##
+## install:
+##   # .NET Core SDK binaries
+##   ## 1) from direct url  
+##   - ps: $url = "https://go.microsoft.com/fwlink/?LinkID=798402" # v1.0.0-preview1 x64
+##   ## 2) from url based on version, for example using an env var CLI_VERSION that can be a
+##   ##    a specific version `1.0.0-preview2-003121` or `Latest` (for latest dev version)
+##   - ps: $url = "https://dotnetcli.blob.core.windows.net/dotnet/preview/Binaries/$($env:CLI_VERSION)/dotnet-dev-win-x64.$($env:CLI_VERSION.ToLower()).zip"
+##   # Download .NET Core SDK and add to PATH
+##   - ps: $env:DOTNET_INSTALL_DIR = "$pwd\.dotnetsdk"
+##   - ps: mkdir $env:DOTNET_INSTALL_DIR -Force | Out-Null
+##   - ps: $tempFile = [System.IO.Path]::GetTempFileName()
+##   - ps: (New-Object System.Net.WebClient).DownloadFile($url, $tempFile)
+##   - ps: Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory($tempFile, $env:DOTNET_INSTALL_DIR)
+##   - ps: $env:Path = "$env:DOTNET_INSTALL_DIR;$env:Path"
+
+version: '{build}'
+pull_requests:
+  do_not_increment_build_number: true
+branches:
+  only:
+  - rtm
+nuget:
+  disable_publish_on_pr: true
+  account_feed: true
+  project_feed: true
+build_script:
+  - ps: .\build.ps1
+test: off
+artifacts:  
+- path: .\artifacts\**\*.nupkg
+  name: NuGet
+environment:
+  # Don't report back to the mothership
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
 assembly_info:
   patch: true
   file: '**\AssemblyInfo.*'
   assembly_version: '{version}'
   assembly_file_version: '{version}'
   assembly_informational_version: '{version}'
-install:
-- set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
-build_script:
-- build.cmd
-test: off
-artifacts:
-- path: artifacts/packages/**.nupkg
+configuration: Release
+platform: Any CPU
 deploy:
-- provider: NuGet
-  name: development
-  server: https://ci.appveyor.com/nuget/smudge202-46am3soaut15
-  api_key:
-    secure: fi5rlfPkAQ9yKX5ffuRSykvWTQbUqTp95PjfD00So1M=
-  on:
-    branch: dev
-- provider: NuGet
-  name: production
-  api_key:
-    secure: GauHc7DbZGcD8A4z+x6hToRqjurh0yQe/ky8TSjzBbRYug9ixYIsVnV/VDB8FT4H
-  on:
-    branch: master
+  - provider: NuGet
+    symbol_server: https://ci.appveyor.com/nuget/danielcirket/api/v2/package
+    server: https://ci.appveyor.com/nuget/danielcirket/api/v2/package
+    api_key:
+      secure: uFSusnOGNJH7jZTIj0/gf6dWlRVX3OBjiOAfkCFQOJo=
+    artifact: NuGet
+    skip_symbols: true

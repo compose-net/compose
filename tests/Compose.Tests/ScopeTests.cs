@@ -1,4 +1,4 @@
-﻿using Microsoft.Framework.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using TestAttributes;
 using Xunit;
@@ -9,7 +9,7 @@ namespace Compose.Tests
     {
 		public class TypeBased
 		{
-			[Unit]
+			[Fact]
 			public void WhenResolvingTransientThenProviderReturnsMultipleInstances()
 			{
 				var app = new Fake.Executable();
@@ -17,7 +17,7 @@ namespace Compose.Tests
 				Assert.True(app.CanResolveMultipleInstances<IDependency>());
 			}
 
-			[Unit]
+			[Fact]
 			public void WhenResolvingTransientTransitionalThenProviderReturnsMultipleInstances()
 			{
 
@@ -26,7 +26,7 @@ namespace Compose.Tests
 				Assert.True(app.CanResolveMultipleInstances<IDependency>());
 			}
 
-			[Unit]
+			[Fact]
 			public void WhenResolvingSingletonThenProviderReturnsSingleInstance()
 			{
 				var app = new Fake.Executable();
@@ -34,7 +34,7 @@ namespace Compose.Tests
 				Assert.False(app.CanResolveMultipleInstances<IDependency>());
 			}
 
-			[Unit]
+			[Fact]
 			public void WhenResolvingSingletonTransitionalThenProviderReturnsSingleInstance()
 			{
 				var app = new Fake.Executable();
@@ -45,28 +45,28 @@ namespace Compose.Tests
 
 		public class InstanceBased
 		{
-			[Unit]
+			[Fact]
 			public void WhenResolvingInstanceThenProviderReturnsSingleInstance()
 			{
 				var app = new Fake.Executable();
 				var instance = new Dependency();
-				app.UseServices(services => services.AddInstance<IDependency>(instance));
+				app.UseServices(services => services.AddSingleton<IDependency>(instance));
 				Assert.False(app.CanResolveMultipleInstances<IDependency>());
 			}
 
-			[Unit]
+			[Fact]
 			public void WhenResolvingTransitionalInstanceThenProviderReturnsSingleInstance()
 			{
 				var app = new Fake.Executable();
 				var instance = new Dependency();
-				app.UseServices(services => services.AddInstance<IDependency>(instance).AsTransitional());
+				app.UseServices(services => services.AddSingleton<IDependency>(instance).AsTransitional());
 				Assert.False(app.CanResolveMultipleInstances<IDependency>());
 			}
 		}
 
 		public class FactoryBased
 		{
-			[Unit]
+			[Fact]
 			public void WhenTransientFactoryReturnsInstancesThenProviderReturnsInstances()
 			{
 				var app = new Fake.Executable();
@@ -75,7 +75,7 @@ namespace Compose.Tests
 				Assert.True(app.CanResolveMultipleInstances<IDependency>());
 			}
 
-			[Unit]
+			[Fact]
 			public void WhenTransientTransitionalFactoryReturnsInstancesThenProviderReturnsInstances()
 			{
 				var app = new Fake.Executable();
@@ -84,7 +84,7 @@ namespace Compose.Tests
 				Assert.True(app.CanResolveMultipleInstances<IDependency>());
 			}
 
-			[Unit]
+			[Fact]
 			public void WhenSingletonFactoryReturnsInstancesThenProviderReturnsSingleInstance()
 			{
 				var app = new Fake.Executable();
@@ -93,7 +93,7 @@ namespace Compose.Tests
 				Assert.False(app.CanResolveMultipleInstances<IDependency>());
 			}
 
-			[Unit]
+			[Fact]
 			public void WhenSingletonTransitionalFactoryReturnsInstancesThenProviderReturnsSingleInstance()
 			{
 				var app = new Fake.Executable();
