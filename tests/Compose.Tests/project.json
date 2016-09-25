@@ -35,6 +35,14 @@
         "System.Runtime": "4.0.10",
         "System.Reflection.Emit": "4.0.0"
       }
+    },
+    "netcoreapp1.0": {
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "type": "platform",
+          "version": "1.0.0"
+        }
+      }
     }
   }
 }
