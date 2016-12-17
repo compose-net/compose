@@ -9,4 +9,4 @@ that you install the Compose.ServiceExtension package.
 To see a list of features, and how to use them, please check out the
 documentation at:
 
-https://github.com/Smudge202/Compose
+https://github.com/compose-net/Compose

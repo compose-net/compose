@@ -1,4 +1,4 @@
-﻿using Microsoft.Framework.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using TestAttributes;
 using Xunit;
@@ -50,7 +50,7 @@ namespace Compose.Tests
 			{
 				var app = new Fake.Executable();
 				var instance = new Dependency();
-				app.UseServices(services => services.AddInstance<IDependency>(instance));
+				app.UseServices(services => services.AddSingleton<IDependency>(instance));
 				Assert.False(app.CanResolveMultipleInstances<IDependency>());
 			}
 
@@ -59,7 +59,7 @@ namespace Compose.Tests
 			{
 				var app = new Fake.Executable();
 				var instance = new Dependency();
-				app.UseServices(services => services.AddInstance<IDependency>(instance).AsTransitional());
+				app.UseServices(services => services.AddSingleton<IDependency>(instance).AsTransitional());
 				Assert.False(app.CanResolveMultipleInstances<IDependency>());
 			}
 		}

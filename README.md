@@ -39,7 +39,7 @@ There are a myriad of DI Containers available nowadays such as [Autofac], [Castl
 
 As part of [ASP.Net vNext] development, Microsoft are releasing an [Open Source Dependency Injection Framework] that supports all of the popular existing containers listed above.
 
-We utilise this new framework so that, unless you need additional features provided by _Compose_, your services only require a dependency on the [Microsoft.Framework.DependencyInjection package].
+We utilise this new framework so that, unless you need additional features provided by _Compose_, your services only require a dependency on the [Microsoft.Extensions.DependencyInjection package].
 
 ### <a name="transitioning"></a>Transitioning
 
@@ -94,5 +94,5 @@ app.Restore();
   [Castle Windsor]: http://docs.castleproject.org/Windsor.MainPage.ashx
   [ASP.Net vNext]: http://www.asp.net/vnext
   [Open Source Dependency Injection Framework]: https://github.com/aspnet/DependencyInjection
-  [Microsoft.Framework.DependencyInjection package]: http://www.nuget.org/packages/microsoft.framework.dependencyinjection
+  [Microsoft.Extensions.DependencyInjection package]: http://www.nuget.org/packages/Microsoft.Extensions.DependencyInjection
   [Package Manager Console]: http://docs.nuget.org/consume/package-manager-console

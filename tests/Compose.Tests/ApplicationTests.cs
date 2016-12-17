@@ -1,4 +1,4 @@
-﻿using Microsoft.Framework.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using TestAttributes;
@@ -8,6 +8,9 @@ namespace Compose.Tests
 {
 	public class ApplicationTests
 	{
+        class Service : Fake.Service
+        { }
+
 		[Unit]
 		public void WhenUsingInternalServiceProviderThenPreConfigureServicesReceivesEmptyServiceCollection()
 		{
@@ -22,10 +25,10 @@ namespace Compose.Tests
 		public void WhenUsingInternalServiceProviderThenPostConfigureServicesReceivesConfiguredServices()
 		{
 			var app = new Fake.Application();
-			app.UseServices(services => services.AddTransient<Fake.Service>());
+			app.UseServices(services => services.AddTransient<Service>());
 
 			Assert.NotNull(app.PostConfiguredServices);
-			Assert.Contains(app.PostConfiguredServices, service => service.ServiceType == typeof(Fake.Service));
+			Assert.Contains(app.PostConfiguredServices, service => service.ServiceType == typeof(Service));
 		}
 
 		[Unit]
@@ -35,7 +38,7 @@ namespace Compose.Tests
 			{
 				ServicesToAppendPreConfiguration = new List<ServiceDescriptor>()
 				{
-					ServiceDescriptor.Transient<Fake.Service, Fake.Service>()
+					ServiceDescriptor.Transient<Fake.Service, Service>()
 				}
 			};
 
@@ -77,7 +80,7 @@ namespace Compose.Tests
 			{
 				ServicesToAppendPreConfiguration = new List<ServiceDescriptor>()
 				{
-					ServiceDescriptor.Transient<Fake.Service, Fake.Service>()
+					ServiceDescriptor.Transient<Fake.Service, Service>()
 				}
 			};
 
