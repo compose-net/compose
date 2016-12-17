@@ -76,14 +76,16 @@ namespace Compose
 
 		private AssemblyBuilder CreateAssemblyBuilder()
 		{
-			var attributes = new List<CustomAttributeBuilder>(7);
-			attributes.Add(new CustomAttributeBuilder(typeof(AssemblyTitleAttribute).GetTypeInfo().DeclaredConstructors.Single(), new object[] { "Compose.DynamicProxies" }));
-			attributes.Add(new CustomAttributeBuilder(typeof(AssemblyCompanyAttribute).GetTypeInfo().DeclaredConstructors.Single(), new object[] { "Devbot.Net" }));
-			attributes.Add(new CustomAttributeBuilder(typeof(AssemblyProductAttribute).GetTypeInfo().DeclaredConstructors.Single(), new object[] { "Compose.DynamicProxies" }));
-			attributes.Add(new CustomAttributeBuilder(typeof(AssemblyCopyrightAttribute).GetTypeInfo().DeclaredConstructors.Single(), new object[] { $"Devbot.Net {DateTime.Now.Year}" }));
-			attributes.Add(new CustomAttributeBuilder(typeof(ComVisibleAttribute).GetTypeInfo().DeclaredConstructors.Single(), new object[] { false }));
-			attributes.Add(new CustomAttributeBuilder(typeof(TargetFrameworkAttribute).GetTypeInfo().DeclaredConstructors.Single(), new object[] { ".NETFramework,Version=v4.5" }));
-			return AssemblyBuilder.DefineDynamicAssembly(_assemblyName, AssemblyBuilderAccess.Run, attributes);
+            var attributes = new List<CustomAttributeBuilder>(7)
+            {
+                new CustomAttributeBuilder(typeof(AssemblyTitleAttribute).GetTypeInfo().DeclaredConstructors.Single(), new object[] { "Compose.DynamicProxies" }),
+                new CustomAttributeBuilder(typeof(AssemblyCompanyAttribute).GetTypeInfo().DeclaredConstructors.Single(), new object[] { "Devbot.Net" }),
+                new CustomAttributeBuilder(typeof(AssemblyProductAttribute).GetTypeInfo().DeclaredConstructors.Single(), new object[] { "Compose.DynamicProxies" }),
+                new CustomAttributeBuilder(typeof(AssemblyCopyrightAttribute).GetTypeInfo().DeclaredConstructors.Single(), new object[] { $"Devbot.Net {DateTime.Now.Year}" }),
+                new CustomAttributeBuilder(typeof(ComVisibleAttribute).GetTypeInfo().DeclaredConstructors.Single(), new object[] { false }),
+                new CustomAttributeBuilder(typeof(TargetFrameworkAttribute).GetTypeInfo().DeclaredConstructors.Single(), new object[] { ".NETFramework,Version=v4.5" })
+            };
+            return AssemblyBuilder.DefineDynamicAssembly(_assemblyName, AssemblyBuilderAccess.Run, attributes);
 		}
 
 		private ModuleBuilder CreateModuleBuilder()

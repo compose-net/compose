@@ -1,4 +1,4 @@
-﻿using Microsoft.Framework.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using TestAttributes;
 using Xunit;
@@ -107,8 +107,8 @@ namespace Compose.Tests
 
 			Action act = () => app.UseServices(services =>
 			{
-				services.Add(new ServiceDescriptor(typeof(IService<>), null));
-				services.Add(new ServiceDescriptor(typeof(IService<>), null));
+				services.Add(new ServiceDescriptor(typeof(IService<>), typeof(Service<>), ServiceLifetime.Transient));
+				services.Add(new ServiceDescriptor(typeof(IService<>), typeof(Service<>), ServiceLifetime.Transient));
 			});
 			Assert.Null(Record.Exception(act));
 		}

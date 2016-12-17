@@ -1,4 +1,4 @@
-﻿using Microsoft.Framework.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -429,8 +429,7 @@ namespace Compose.Tests
 		public void CanInvokeWithOutArguments()
 		{
 			var service = SetupProxy<IInvokeWithOutArguments, InvokeWithOutArguments>()();
-			var arg = 0;
-			service.Method(out arg);
+            service.Method(out var arg);
 		}
 		#endregion
 

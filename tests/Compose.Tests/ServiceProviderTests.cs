@@ -1,4 +1,4 @@
-﻿using Microsoft.Framework.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using TestAttributes;
 using Xunit;
@@ -11,7 +11,7 @@ namespace Compose.Tests
 		public void CanHandleImplementationInstances()
 		{
 			var app = new Fake.Executable();
-			app.UseServices(services => services.AddInstance(typeof(string), "foo"));
+			app.UseServices(services => services.AddSingleton(typeof(string), "foo"));
 			Action act = app.Execute;
 			Assert.Null(Record.Exception(act));
 		}
@@ -23,8 +23,8 @@ namespace Compose.Tests
 			app.UseServices(services =>
 			{
 				var service = new Service();
-				services.AddInstance<IService1>(service);
-				services.AddInstance<IService2>(service);
+				services.AddSingleton<IService1>(service);
+				services.AddSingleton<IService2>(service);
 			});
 			Action act = app.Execute;
 			Assert.Null(Record.Exception(act));
@@ -37,7 +37,7 @@ namespace Compose.Tests
 			var instance = new Service();
 			app.UseServices(services =>
 			{
-				services.AddInstance<IService1>(instance);
+				services.AddSingleton<IService1>(instance);
 			});
 			app.OnExecute<IService1>(parent =>
 			{

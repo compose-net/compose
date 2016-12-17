@@ -1,4 +1,5 @@
-﻿using Microsoft.Framework.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace Compose.Tests.Fake
     {
 		public ReadOnlyCollection<ServiceDescriptor> PreConfiguredServices { get; private set; }
 		public IEnumerable<ServiceDescriptor> ServicesToAppendPreConfiguration;
-		protected internal override void PreServiceConfiguration(IServiceCollection services)
+        protected internal override void PreServiceConfiguration(IServiceCollection services)
 		{
 			PreConfiguredServices = new List<ServiceDescriptor>(services).AsReadOnly();
 			if ((ServicesToAppendPreConfiguration?.Count() ?? 0) > 0)
